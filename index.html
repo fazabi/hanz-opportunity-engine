@@ -991,6 +991,8 @@ h1{
   transition:.15s ease;
 }
 .lang-btn:hover{background:#f5f7fb;color:var(--text)}
+.flag-svg{display:block;width:22px;height:15px;border-radius:2px;box-shadow:0 0 0 1px rgba(23,32,51,.10)}
+.lang-flag{display:inline-flex;align-items:center;justify-content:center}
 .lang-btn.active{
   background:var(--blue-soft);
   color:var(--blue);
@@ -1035,10 +1037,10 @@ h1{
     <div class="header-actions">
       <div class="lang-switch" aria-label="Language selector">
         <button class="lang-btn" id="langIdBtn" type="button" onclick="setLanguage('id')" aria-label="Bahasa Indonesia">
-          <span class="lang-flag">🇮🇩</span><span class="lang-label">ID</span>
+          <span class="lang-flag"><svg class="flag-svg" viewBox="0 0 28 20" aria-hidden="true"><rect width="28" height="10" y="0" fill="#e70011"/><rect width="28" height="10" y="10" fill="#fff"/></svg></span><span class="lang-label">ID</span>
         </button>
         <button class="lang-btn" id="langEnBtn" type="button" onclick="setLanguage('en')" aria-label="English">
-          <span class="lang-flag">🇬🇧</span><span class="lang-label">EN</span>
+          <span class="lang-flag"><svg class="flag-svg" viewBox="0 0 60 36" aria-hidden="true"><rect width="60" height="36" fill="#012169"/><path d="M0 0l60 36M60 0L0 36" stroke="#fff" stroke-width="8"/><path d="M0 0l60 36M60 0L0 36" stroke="#C8102E" stroke-width="4"/><path d="M30 0v36M0 18h60" stroke="#fff" stroke-width="12"/><path d="M30 0v36M0 18h60" stroke="#C8102E" stroke-width="7"/></svg></span><span class="lang-label">EN</span>
         </button>
       </div>
       <div class="safe-chip">
@@ -5253,7 +5255,7 @@ function resetProfile(){
 
 
 /* =====================================================
-   DUAL LANGUAGE — BAHASA INDONESIA / ENGLISH
+   DUAL LANGUAGE V1.1 — BAHASA INDONESIA / ENGLISH
    UI-only. Backend machine codes remain unchanged.
 ===================================================== */
 
@@ -5269,7 +5271,7 @@ let _hanzLanguageApplying = false;
 const I18N = [
   ["HANZ Opportunity Engine","HANZ Opportunity Engine"],
   ["Personal Opportunity Intelligence","Personal Opportunity Intelligence"],
-  ["✓ Verified Safe Sources","✓ Sumber Terverifikasi Aman"],
+  ["✓ Sumber Terverifikasi Aman","✓ Verified Safe Sources"],
   ["Personal Opportunity Engine","Mesin Peluang Personal"],
   ["Kesempatan terbaik, disesuaikan dengan profilmu.","The best opportunities, matched to your profile."],
   ["Upload CV atau isi profil secara manual. HANZ akan membaca background pendidikan, kompetensi, pengalaman dan skill untuk membantu menemukan lowongan maupun scholarship yang lebih relevan.","Upload your CV or complete your profile manually. HANZ analyzes your education, competencies, experience, and skills to find more relevant jobs and scholarships."],
@@ -5301,6 +5303,10 @@ const I18N = [
   ["Target Negara","Target Countries"],
   ["Kewarganegaraan","Nationality"],
   ["Tahun Lulus","Graduation Year"],
+  ["Contoh: Teknologi Rekayasa Internet","Example: Internet Engineering Technology"],
+  ["Contoh: Indonesia, Singapore, UAE, Japan","Example: Indonesia, Singapore, UAE, Japan"],
+  ["Contoh: Indonesia","Example: Indonesia"],
+  ["Contoh: 2026","Example: 2026"],
   ["Privacy:","Privacy:"],
   ["CV diproses oleh Candidate Profile Analyzer dan tidak disimpan ke database oleh engine V1. Hasil analisis profil disimpan lokal di browser untuk personalisasi.","Your CV is processed by the Candidate Profile Analyzer and is not stored in the database by engine V1. The analyzed profile is stored locally in your browser for personalization."],
   ["🔍 Analisa Profil & Cari Peluang","🔍 Analyze Profile & Find Opportunities"],
@@ -5382,8 +5388,8 @@ const I18N = [
   ["Persyaratan Pendidikan:","Education Requirement:"],
   ["Pengalaman Minimum:","Minimum Experience:"],
   ["Bidang Studi:","Field of Study:"],
-  ["Official vacancy source verified by HANZ","Sumber lowongan resmi diverifikasi oleh HANZ"],
-  ["View Official Vacancy ↗","Lihat Lowongan Resmi ↗"],
+  ["Sumber lowongan resmi diverifikasi oleh HANZ","Official vacancy source verified by HANZ"],
+  ["Lihat Lowongan Resmi ↗","View Official Vacancy ↗"],
   ["ELIGIBLE","ELIGIBLE"],
   ["LIKELY ELIGIBLE","LIKELY ELIGIBLE"],
   ["VERIFY REQUIRED","VERIFY REQUIRED"],
@@ -5409,22 +5415,23 @@ const I18N = [
   ["Fully Funded","Fully Funded"],
   ["Master / S2","Master / S2"],
   ["HANZ Eligibility:","HANZ Eligibility:"],
-  ["Official source + Fully Funded Gate + Anti-Scam + Personal Eligibility","Sumber resmi + Fully Funded Gate + Anti-Scam + Eligibility Personal"],
-  ["View Official Scholarship ↗","Lihat Scholarship Resmi ↗"],
-  ["Checking personal eligibility...","Memeriksa eligibility personal..."],
+  ["Sumber resmi + Fully Funded Gate + Anti-Scam + Eligibility Personal","Official source + Fully Funded Gate + Anti-Scam + Personal Eligibility"],
+  ["Lihat Scholarship Resmi ↗","View Official Scholarship ↗"],
+  ["Memeriksa eligibility personal...","Checking personal eligibility..."],
   ["HANZ sedang memeriksa eligibility","HANZ is checking eligibility"],
   ["Safety, funding, academic, experience, nationality, deadline dan persyaratan lain sedang dicocokkan.","Safety, funding, academic, experience, nationality, deadline, and other requirements are being checked."],
   ["Tidak Direkomendasikan — Syarat Wajib Tidak Terpenuhi","Not Recommended — Mandatory Requirement Not Met"],
   ["Rekomendasi Utama","Top Recommendations"],
   ["Perlu Verifikasi","Verification Required"],
   ["Deadline:","Deadline:"],
-  ["Match","Kecocokan"],
+  ["Kecocokan","Match"],
   ["tahun","years"]
 ];
 
 function i18nPairFor(source){
-  const s = String(source ?? "").trim();
-  return I18N.find(pair => pair[0] === s || pair[1] === s) || null;
+  const compact = value => String(value ?? "").replace(/\s+/g," ").trim();
+  const s = compact(source);
+  return I18N.find(pair => compact(pair[0]) === s || compact(pair[1]) === s) || null;
 }
 
 function translateDynamicString(source,lang){
