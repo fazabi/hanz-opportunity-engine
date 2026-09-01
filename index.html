@@ -1,729 +1,894 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>HANZ Opportunity Engine</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>HANZ Opportunity Engine</title>
+
+<style>
+*{box-sizing:border-box}
+
+:root{
+  --bg:#f5f7fb;
+  --card:#fff;
+  --text:#172033;
+  --muted:#6f7787;
+  --line:#e3e8f1;
+
+  --blue:#165dff;
+  --blue-soft:#edf3ff;
+
+  --green:#078b54;
+  --green-soft:#e9f8f1;
+
+  --purple:#7656d6;
+  --purple-soft:#f3efff;
+
+  --orange:#bb6800;
+  --orange-soft:#fff4e5;
+
+  --red:#c73737;
+  --red-soft:#fff0f0;
+
+  --shadow:0 10px 30px rgba(31,42,68,.07);
+}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Arial,
+    sans-serif;
+}
+
+input,
+select,
+button{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
+.container{
+  width:min(1450px,calc(100% - 32px));
+  margin:auto;
+  padding-bottom:50px;
+}
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.topbar{
+  position:sticky;
+  top:0;
+  z-index:30;
+
+  background:rgba(255,255,255,.95);
+  backdrop-filter:blur(12px);
+
+  border-bottom:1px solid var(--line);
+}
+
+.topbar-inner{
+  width:min(1450px,calc(100% - 32px));
+  min-height:72px;
+  margin:auto;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.brand-logo{
+  width:43px;
+  height:43px;
+
+  border-radius:13px;
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    :root {
-      --bg: #f5f7fb;
-      --card: #ffffff;
-      --text: #172033;
-      --muted: #6f7787;
-      --line: #e3e8f1;
+  display:grid;
+  place-items:center;
 
-      --blue: #165dff;
-      --blue-soft: #edf3ff;
-
-      --green: #078b54;
-      --green-soft: #e9f8f1;
-
-      --purple: #7656d6;
-      --purple-soft: #f3efff;
-
-      --orange: #bb6800;
-      --orange-soft: #fff4e5;
-
-      --red: #c73737;
-      --red-soft: #fff0f0;
-
-      --shadow: 0 10px 30px rgba(31,42,68,.07);
-    }
-
-    body {
-      margin: 0;
-
-      font-family:
-        Inter,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Arial,
-        sans-serif;
+  background:linear-gradient(135deg,#165dff,#5c88ff);
 
-      background: var(--bg);
-      color: var(--text);
-    }
+  color:#fff;
+  font-size:19px;
+  font-weight:900;
 
-    input,
-    select,
-    button {
-      font: inherit;
-    }
+  box-shadow:0 8px 20px rgba(22,93,255,.22);
+}
 
-    .container {
-      width: min(1450px, calc(100% - 32px));
-      margin: auto;
-      padding-bottom: 50px;
-    }
+.brand-name{
+  font-size:17px;
+  font-weight:850;
+}
 
-    /* ======================================================
-       HEADER
-       ====================================================== */
-
-    .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 30;
+.brand-sub{
+  margin-top:3px;
+  color:var(--muted);
+  font-size:11px;
+}
 
-      background: rgba(255,255,255,.95);
-      backdrop-filter: blur(12px);
+.safe-chip{
+  padding:8px 12px;
 
-      border-bottom: 1px solid var(--line);
-    }
+  border-radius:999px;
 
-    .topbar-inner {
-      width: min(1450px, calc(100% - 32px));
-      margin: auto;
+  background:var(--green-soft);
+  color:var(--green);
 
-      min-height: 72px;
+  font-size:12px;
+  font-weight:800;
+}
 
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-    }
+/* =====================================================
+   HERO
+===================================================== */
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+.hero{
+  padding-top:36px;
+}
 
-    .brand-logo {
-      width: 43px;
-      height: 43px;
+.hero-card{
+  padding:32px;
 
-      display: grid;
-      place-items: center;
+  border:1px solid var(--line);
+  border-radius:25px;
 
-      border-radius: 13px;
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(22,93,255,.14),
+      transparent 37%
+    ),
+    #fff;
 
-      background:
-        linear-gradient(
-          135deg,
-          #165dff,
-          #5c88ff
-        );
+  box-shadow:var(--shadow);
+}
 
-      color: white;
+.hero-label{
+  display:inline-flex;
 
-      font-weight: 900;
-      font-size: 19px;
+  padding:7px 11px;
+  border-radius:999px;
 
-      box-shadow:
-        0 8px 20px
-        rgba(22,93,255,.22);
-    }
+  background:var(--blue-soft);
+  color:var(--blue);
 
-    .brand-name {
-      font-weight: 850;
-      font-size: 17px;
-    }
+  font-size:11px;
+  font-weight:850;
+  text-transform:uppercase;
+}
 
-    .brand-sub {
-      margin-top: 3px;
+h1{
+  max-width:920px;
 
-      color: var(--muted);
-      font-size: 11px;
-    }
+  margin:17px 0 10px;
 
-    .safe-chip {
-      padding: 8px 12px;
+  font-size:clamp(30px,5vw,48px);
+  line-height:1.05;
+  letter-spacing:-.04em;
+}
 
-      border-radius: 999px;
+.hero-text{
+  max-width:860px;
+  margin:0;
 
-      background: var(--green-soft);
-      color: var(--green);
+  color:var(--muted);
 
-      font-size: 12px;
-      font-weight: 800;
-    }
+  font-size:15px;
+  line-height:1.7;
+}
 
-    /* ======================================================
-       HERO
-       ====================================================== */
+/* =====================================================
+   PROFILE
+===================================================== */
 
-    .hero {
-      padding-top: 38px;
-    }
+.profile-card{
+  margin-top:20px;
+  padding:20px;
 
-    .hero-card {
-      padding: 32px;
+  border:1px solid var(--line);
+  border-radius:20px;
 
-      border: 1px solid var(--line);
-      border-radius: 25px;
+  background:#fff;
+}
 
-      background:
-        radial-gradient(
-          circle at top right,
-          rgba(22,93,255,.14),
-          transparent 37%
-        ),
-        white;
+.profile-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:15px;
 
-      box-shadow: var(--shadow);
-    }
+  margin-bottom:17px;
+}
 
-    .hero-label {
-      display: inline-flex;
+.profile-title{
+  font-size:17px;
+  font-weight:850;
+}
 
-      padding: 7px 11px;
+.profile-sub{
+  margin-top:5px;
 
-      border-radius: 999px;
+  color:var(--muted);
 
-      background: var(--blue-soft);
-      color: var(--blue);
+  font-size:12px;
+  line-height:1.5;
+}
 
-      font-size: 11px;
-      font-weight: 850;
+.profile-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;
+}
 
-      text-transform: uppercase;
-    }
+.field label{
+  display:block;
 
-    h1 {
-      max-width: 900px;
+  margin-bottom:6px;
 
-      margin: 17px 0 10px;
+  color:var(--muted);
 
-      font-size: clamp(
-        30px,
-        5vw,
-        48px
-      );
+  font-size:11px;
+  font-weight:750;
+}
 
-      line-height: 1.05;
+.field input,
+.field select{
+  width:100%;
+  min-height:43px;
 
-      letter-spacing: -.04em;
-    }
+  padding:10px 12px;
 
-    .hero-text {
-      max-width: 850px;
+  border:1px solid var(--line);
+  border-radius:11px;
 
-      margin: 0;
+  background:#fff;
+  color:var(--text);
 
-      color: var(--muted);
+  outline:none;
+}
 
-      font-size: 15px;
-      line-height: 1.7;
-    }
+.field input:focus,
+.field select:focus{
+  border-color:var(--blue);
+  box-shadow:0 0 0 3px rgba(22,93,255,.08);
+}
 
-    /* ======================================================
-       PERSONAL PROFILE
-       ====================================================== */
+/* CV */
 
-    .profile-card {
-      margin-top: 20px;
+.cv-box{
+  grid-column:span 2;
 
-      border: 1px solid var(--line);
-      border-radius: 20px;
+  min-height:94px;
 
-      background: white;
+  padding:13px;
 
-      padding: 20px;
-    }
+  border:1px dashed #b9c4d7;
+  border-radius:13px;
 
-    .profile-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
+  background:#fafbfe;
+}
 
-      gap: 15px;
+.cv-title{
+  font-size:12px;
+  font-weight:800;
+}
 
-      margin-bottom: 17px;
-    }
+.cv-sub{
+  margin-top:4px;
+  margin-bottom:9px;
 
-    .profile-title {
-      font-size: 17px;
-      font-weight: 850;
-    }
+  color:var(--muted);
 
-    .profile-sub {
-      margin-top: 5px;
+  font-size:10px;
+  line-height:1.5;
+}
 
-      color: var(--muted);
+.cv-input{
+  width:100%;
+  font-size:11px;
+}
 
-      font-size: 12px;
-      line-height: 1.5;
-    }
+.cv-file{
+  margin-top:8px;
 
-    .profile-grid {
-      display: grid;
+  color:var(--blue);
 
-      grid-template-columns:
-        repeat(4,minmax(0,1fr));
+  font-size:11px;
+  font-weight:700;
+}
 
-      gap: 12px;
-    }
+.profile-note{
+  margin-top:13px;
 
-    .field label {
-      display: block;
+  padding:10px 12px;
 
-      margin-bottom: 6px;
+  border-radius:11px;
 
-      color: var(--muted);
+  background:#fafbfe;
 
-      font-size: 11px;
-      font-weight: 750;
-    }
+  color:var(--muted);
 
-    .field input,
-    .field select {
-      width: 100%;
+  font-size:11px;
+  line-height:1.55;
+}
 
-      min-height: 43px;
+/* EXECUTE */
 
-      padding: 10px 12px;
+.execute-row{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
 
-      border: 1px solid var(--line);
-      border-radius: 11px;
+  margin-top:16px;
+}
 
-      background: white;
-      color: var(--text);
+.execute-button{
+  min-height:48px;
 
-      outline: none;
-    }
+  padding:0 22px;
 
-    .profile-note {
-      margin-top: 13px;
+  border:0;
+  border-radius:12px;
 
-      padding: 10px 12px;
+  background:var(--blue);
+  color:white;
 
-      border-radius: 11px;
+  font-size:13px;
+  font-weight:850;
 
-      background: #fafbfe;
+  box-shadow:0 8px 18px rgba(22,93,255,.22);
+}
 
-      color: var(--muted);
+.execute-button:disabled{
+  opacity:.6;
+  cursor:not-allowed;
+}
 
-      font-size: 11px;
-      line-height: 1.5;
-    }
+.reset-button{
+  min-height:48px;
+  padding:0 17px;
 
-    /* ======================================================
-       MAIN TABS
-       ====================================================== */
+  border:1px solid var(--line);
+  border-radius:12px;
 
-    .main-tabs {
-      display: grid;
+  background:#fff;
+  color:var(--muted);
 
-      grid-template-columns:
-        repeat(3,minmax(0,1fr));
+  font-size:12px;
+  font-weight:750;
+}
 
-      gap: 12px;
+.execution-status{
+  color:var(--muted);
+  font-size:11px;
+}
 
-      margin-top: 22px;
-    }
+.execution-status.success{
+  color:var(--green);
+  font-weight:700;
+}
 
-    .main-tab {
-      padding: 18px;
+.execution-status.error{
+  color:var(--red);
+  font-weight:700;
+}
 
-      border: 1px solid var(--line);
-      border-radius: 17px;
+/* ANALYZED PROFILE */
 
-      background: white;
-      color: var(--text);
+.analyzed-profile{
+  margin-top:16px;
 
-      cursor: pointer;
+  padding:15px;
 
-      text-align: left;
+  border:1px solid #cfe1ff;
+  border-radius:14px;
 
-      transition: .15s ease;
-    }
+  background:#f8fbff;
+}
 
-    .main-tab:hover {
-      transform: translateY(-1px);
-      box-shadow: var(--shadow);
-    }
+.analyzed-title{
+  margin-bottom:8px;
 
-    .main-tab.active {
-      border-color: var(--blue);
+  font-size:12px;
+  font-weight:850;
+  color:var(--blue);
+}
 
-      box-shadow:
-        0 0 0 2px
-        rgba(22,93,255,.08);
-    }
+.analysis-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:8px;
+}
 
-    .tab-icon {
-      font-size: 22px;
-    }
+.analysis-item{
+  padding:9px 10px;
 
-    .tab-title {
-      margin-top: 10px;
+  border-radius:9px;
 
-      font-size: 16px;
-      font-weight: 850;
-    }
+  background:#fff;
+  border:1px solid var(--line);
 
-    .tab-description {
-      margin-top: 5px;
+  font-size:10px;
+  line-height:1.5;
+}
 
-      color: var(--muted);
+.analysis-item strong{
+  display:block;
+  margin-bottom:2px;
+  font-size:10px;
+}
 
-      font-size: 11px;
-      line-height: 1.5;
-    }
+/* =====================================================
+   MAIN SERVICES
+===================================================== */
 
-    /* ======================================================
-       FILTERS
-       ====================================================== */
+.main-tabs{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px;
 
-    .filters {
-      margin-top: 18px;
+  margin-top:22px;
+}
 
-      display: grid;
+.main-tab{
+  padding:18px;
 
-      grid-template-columns:
-        repeat(4,minmax(0,1fr));
+  border:1px solid var(--line);
+  border-radius:17px;
 
-      gap: 12px;
+  background:#fff;
+  color:var(--text);
 
-      padding: 17px;
+  text-align:left;
 
-      border: 1px solid var(--line);
-      border-radius: 18px;
+  transition:.15s;
+}
 
-      background: white;
-    }
+.main-tab:hover{
+  transform:translateY(-1px);
+  box-shadow:var(--shadow);
+}
 
-    .safe-box {
-      min-height: 43px;
+.main-tab.active{
+  border-color:var(--blue);
+  box-shadow:0 0 0 2px rgba(22,93,255,.08);
+}
 
-      display: flex;
-      align-items: center;
+.tab-icon{
+  font-size:22px;
+}
 
-      padding: 0 12px;
+.tab-title{
+  margin-top:10px;
 
-      border-radius: 11px;
+  font-size:16px;
+  font-weight:850;
+}
 
-      background: var(--green-soft);
-      color: var(--green);
+.tab-description{
+  margin-top:5px;
 
-      font-size: 12px;
-      font-weight: 800;
-    }
+  color:var(--muted);
 
-    /* ======================================================
-       STATS
-       ====================================================== */
+  font-size:11px;
+  line-height:1.5;
+}
 
-    .stats {
-      display: grid;
+/* =====================================================
+   STATS
+===================================================== */
 
-      grid-template-columns:
-        repeat(4,minmax(0,1fr));
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;
 
-      gap: 12px;
+  margin-top:18px;
+}
 
-      margin-top: 18px;
-    }
+.stat{
+  padding:19px;
 
-    .stat {
-      padding: 19px;
+  border:1px solid var(--line);
+  border-radius:17px;
 
-      border: 1px solid var(--line);
-      border-radius: 17px;
+  background:#fff;
+}
 
-      background: white;
-    }
+.stat-label{
+  color:var(--muted);
 
-    .stat-label {
-      color: var(--muted);
+  font-size:11px;
+  font-weight:750;
 
-      font-size: 11px;
-      font-weight: 750;
+  text-transform:uppercase;
+}
 
-      text-transform: uppercase;
-    }
+.stat-value{
+  margin-top:8px;
 
-    .stat-value {
-      margin-top: 8px;
+  font-size:29px;
+  font-weight:900;
+}
 
-      font-size: 29px;
-      font-weight: 900;
-    }
+/* =====================================================
+   FILTER
+===================================================== */
 
-    /* ======================================================
-       LIST
-       ====================================================== */
+.filters{
+  margin-top:18px;
 
-    .list-header {
-      display: flex;
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;
 
-      align-items: center;
-      justify-content: space-between;
+  padding:17px;
 
-      gap: 12px;
+  border:1px solid var(--line);
+  border-radius:18px;
 
-      margin:
-        25px 2px
-        11px;
-    }
+  background:#fff;
+}
 
-    .list-title {
-      font-size: 18px;
-      font-weight: 850;
-    }
+.safe-box{
+  min-height:43px;
 
-    .result-count {
-      color: var(--muted);
+  display:flex;
+  align-items:center;
 
-      font-size: 12px;
-    }
+  padding:0 12px;
 
-    .items {
-      display: grid;
-      gap: 12px;
-    }
+  border-radius:11px;
 
-    .job-card {
-      padding: 20px;
+  background:var(--green-soft);
+  color:var(--green);
 
-      border: 1px solid var(--line);
-      border-radius: 18px;
+  font-size:12px;
+  font-weight:800;
+}
 
-      background: white;
-    }
+/* =====================================================
+   JOB LIST
+===================================================== */
 
-    .job-head {
-      display: flex;
+.list-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
 
-      justify-content: space-between;
-      align-items: flex-start;
+  margin:25px 2px 11px;
+}
 
-      gap: 15px;
-    }
+.list-title{
+  font-size:18px;
+  font-weight:850;
+}
 
-    .job-title {
-      margin: 0;
+.result-count{
+  color:var(--muted);
+  font-size:12px;
+}
 
-      font-size: 18px;
-      font-weight: 850;
-    }
+.items{
+  display:grid;
+  gap:12px;
+}
 
-    .company {
-      margin-top: 6px;
+.job-card{
+  padding:20px;
 
-      color: #444d5e;
+  border:1px solid var(--line);
+  border-radius:18px;
 
-      font-size: 13px;
-      font-weight: 650;
-    }
+  background:#fff;
+}
 
-    .verified {
-      padding: 7px 10px;
+.job-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:15px;
+}
 
-      border-radius: 999px;
+.job-title{
+  margin:0;
 
-      background: var(--green-soft);
-      color: var(--green);
+  font-size:18px;
+  font-weight:850;
+}
 
-      font-size: 10px;
-      font-weight: 900;
+.company{
+  margin-top:6px;
 
-      white-space: nowrap;
-    }
+  color:#444d5e;
 
-    .badges {
-      display: flex;
-      flex-wrap: wrap;
+  font-size:13px;
+  font-weight:650;
+}
 
-      gap: 7px;
+.right-badges{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
 
-      margin-top: 15px;
-    }
+.verified{
+  padding:7px 10px;
 
-    .badge {
-      padding: 6px 9px;
+  border-radius:999px;
 
-      border-radius: 8px;
+  background:var(--green-soft);
+  color:var(--green);
 
-      background: #f2f4f8;
-      color: #566072;
+  font-size:10px;
+  font-weight:900;
 
-      font-size: 10px;
-      font-weight: 750;
-    }
+  white-space:nowrap;
+}
 
-    .badge.blue {
-      background: var(--blue-soft);
-      color: var(--blue);
-    }
+.match-score{
+  padding:7px 10px;
 
-    .badge.green {
-      background: var(--green-soft);
-      color: var(--green);
-    }
+  border-radius:999px;
 
-    .badge.orange {
-      background: var(--orange-soft);
-      color: var(--orange);
-    }
+  background:var(--blue-soft);
+  color:var(--blue);
 
-    .badge.purple {
-      background: var(--purple-soft);
-      color: var(--purple);
-    }
+  font-size:10px;
+  font-weight:900;
 
-    .candidate-box {
-      margin-top: 15px;
+  white-space:nowrap;
+}
 
-      padding: 13px;
+.match-score.good{
+  background:var(--purple-soft);
+  color:var(--purple);
+}
 
-      border: 1px solid var(--line);
-      border-radius: 12px;
+.match-score.possible{
+  background:var(--orange-soft);
+  color:var(--orange);
+}
 
-      background: #fafbfe;
+.badges{
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
 
-      font-size: 12px;
-      line-height: 1.7;
-    }
+  margin-top:15px;
+}
 
-    .candidate-label {
-      margin-bottom: 6px;
+.badge{
+  padding:6px 9px;
 
-      color: var(--muted);
+  border-radius:8px;
 
-      font-size: 10px;
-      font-weight: 850;
+  background:#f2f4f8;
+  color:#566072;
 
-      text-transform: uppercase;
-    }
+  font-size:10px;
+  font-weight:750;
+}
 
-    .footer-row {
-      display: flex;
+.badge.blue{
+  background:var(--blue-soft);
+  color:var(--blue);
+}
 
-      justify-content: space-between;
-      align-items: center;
+.badge.green{
+  background:var(--green-soft);
+  color:var(--green);
+}
 
-      gap: 12px;
+.badge.orange{
+  background:var(--orange-soft);
+  color:var(--orange);
+}
 
-      margin-top: 16px;
+.badge.purple{
+  background:var(--purple-soft);
+  color:var(--purple);
+}
 
-      padding-top: 14px;
+.candidate-box{
+  margin-top:15px;
 
-      border-top: 1px solid var(--line);
-    }
+  padding:13px;
 
-    .source-note {
-      color: var(--muted);
-      font-size: 11px;
-    }
+  border:1px solid var(--line);
+  border-radius:12px;
 
-    .open-button {
-      padding: 9px 13px;
+  background:#fafbfe;
 
-      border-radius: 9px;
+  font-size:12px;
+  line-height:1.7;
+}
 
-      background: var(--blue);
-      color: white;
+.candidate-label{
+  margin-bottom:6px;
 
-      text-decoration: none;
+  color:var(--muted);
 
-      font-size: 11px;
-      font-weight: 850;
-    }
+  font-size:10px;
+  font-weight:850;
 
-    /* ======================================================
-       STATES
-       ====================================================== */
+  text-transform:uppercase;
+}
 
-    .state {
-      padding: 42px 20px;
+.match-reason{
+  margin-top:12px;
 
-      border: 1px solid var(--line);
-      border-radius: 18px;
+  padding:11px 12px;
 
-      background: white;
+  border-radius:11px;
 
-      text-align: center;
+  background:var(--blue-soft);
 
-      color: var(--muted);
-    }
+  color:#34508c;
 
-    .state strong {
-      display: block;
+  font-size:11px;
+  line-height:1.55;
+}
 
-      margin-bottom: 7px;
+.footer-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
 
-      color: var(--text);
+  margin-top:16px;
+  padding-top:14px;
 
-      font-size: 16px;
-    }
+  border-top:1px solid var(--line);
+}
 
-    .hidden {
-      display: none !important;
-    }
+.source-note{
+  color:var(--muted);
+  font-size:11px;
+}
 
-    .error {
-      background: var(--red-soft);
-      color: var(--red);
-    }
+.open-button{
+  padding:9px 13px;
 
-    .page-footer {
-      padding-top: 30px;
+  border-radius:9px;
 
-      color: var(--muted);
+  background:var(--blue);
+  color:#fff;
 
-      text-align: center;
+  text-decoration:none;
 
-      font-size: 10px;
-    }
+  font-size:11px;
+  font-weight:850;
+}
 
-    /* ======================================================
-       MOBILE
-       ====================================================== */
+/* =====================================================
+   STATES
+===================================================== */
 
-    @media(max-width: 1000px) {
+.state{
+  padding:42px 20px;
 
-      .profile-grid,
-      .filters {
-        grid-template-columns:
-          repeat(2,minmax(0,1fr));
-      }
+  border:1px solid var(--line);
+  border-radius:18px;
 
-    }
+  background:#fff;
 
-    @media(max-width: 700px) {
+  text-align:center;
 
-      .container,
-      .topbar-inner {
-        width: calc(100% - 20px);
-      }
+  color:var(--muted);
+}
 
-      .main-tabs,
-      .profile-grid,
-      .filters,
-      .stats {
-        grid-template-columns: 1fr;
-      }
+.state strong{
+  display:block;
 
-      .job-head,
-      .footer-row {
-        flex-direction: column;
-      }
+  margin-bottom:7px;
 
-      .open-button {
-        width: 100%;
-        text-align: center;
-      }
+  color:var(--text);
 
-      .safe-chip {
-        display: none;
-      }
+  font-size:16px;
+}
 
-    }
-  </style>
+.hidden{
+  display:none!important;
+}
+
+.error-state{
+  background:var(--red-soft);
+  color:var(--red);
+}
+
+.page-footer{
+  padding-top:30px;
+
+  color:var(--muted);
+
+  text-align:center;
+
+  font-size:10px;
+}
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media(max-width:1000px){
+
+  .profile-grid,
+  .filters,
+  .analysis-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+
+}
+
+@media(max-width:700px){
+
+  .container,
+  .topbar-inner{
+    width:calc(100% - 20px);
+  }
+
+  .main-tabs,
+  .profile-grid,
+  .filters,
+  .stats,
+  .analysis-grid{
+    grid-template-columns:1fr;
+  }
+
+  .cv-box{
+    grid-column:span 1;
+  }
+
+  .job-head,
+  .footer-row{
+    flex-direction:column;
+  }
+
+  .right-badges{
+    justify-content:flex-start;
+  }
+
+  .open-button,
+  .execute-button,
+  .reset-button{
+    width:100%;
+    text-align:center;
+  }
+
+  .safe-chip{
+    display:none;
+  }
+
+}
+</style>
 </head>
 
 <body>
 
 <header class="topbar">
+
   <div class="topbar-inner">
 
     <div class="brand">
@@ -733,6 +898,7 @@
       </div>
 
       <div>
+
         <div class="brand-name">
           HANZ Opportunity Engine
         </div>
@@ -740,6 +906,7 @@
         <div class="brand-sub">
           Personal Opportunity Intelligence
         </div>
+
       </div>
 
     </div>
@@ -749,685 +916,834 @@
     </div>
 
   </div>
+
 </header>
+
 
 <main class="container">
 
-  <!-- =====================================================
-       HERO
-       ===================================================== -->
+<!-- =====================================================
+     HERO
+===================================================== -->
 
-  <section class="hero">
+<section class="hero">
 
-    <div class="hero-card">
+  <div class="hero-card">
 
-      <div class="hero-label">
-        Personal Opportunity Engine
+    <div class="hero-label">
+      Personal Opportunity Engine
+    </div>
+
+    <h1>
+      Kesempatan terbaik,
+      disesuaikan dengan profilmu.
+    </h1>
+
+    <p class="hero-text">
+      Upload CV atau isi profil secara manual.
+      HANZ akan membaca background pendidikan, kompetensi,
+      pengalaman dan skill untuk membantu menemukan
+      lowongan maupun scholarship yang lebih relevan.
+    </p>
+
+  </div>
+
+</section>
+
+
+<!-- =====================================================
+     PROFILE
+===================================================== -->
+
+<section class="profile-card">
+
+  <div class="profile-head">
+
+    <div>
+
+      <div class="profile-title">
+        👤 Profil Saya
       </div>
 
-      <h1>
-        Kesempatan terbaik,
-        disesuaikan dengan profilmu.
-      </h1>
-
-      <p class="hero-text">
-        HANZ memantau lowongan resmi di Indonesia dan luar negeri,
-        serta beasiswa Master fully funded dari berbagai negara.
-        Isi background-mu agar peluang yang ditampilkan semakin relevan.
-      </p>
+      <div class="profile-sub">
+        Isi manual atau upload CV.
+        Setelah selesai tekan tombol
+        <strong>Analisa Profil & Cari Peluang</strong>.
+      </div>
 
     </div>
 
-  </section>
+  </div>
 
 
-  <!-- =====================================================
-       PERSONAL PROFILE
-       ===================================================== -->
+  <div class="profile-grid">
 
-  <section class="profile-card">
+    <!-- CV -->
 
-    <div class="profile-header">
+    <div class="cv-box">
 
-      <div>
-        <div class="profile-title">
-          👤 Profil Saya
-        </div>
-
-        <div class="profile-sub">
-          Digunakan HANZ untuk membantu menyaring peluang
-          yang lebih sesuai dengan background kamu.
-        </div>
+      <div class="cv-title">
+        📄 Upload CV
       </div>
 
-    </div>
-
-    <div class="profile-grid">
-
-      <div class="field">
-
-        <label>
-          Pendidikan Terakhir
-        </label>
-
-        <select id="profileEducation">
-
-          <option value="">
-            Pilih pendidikan
-          </option>
-
-          <option value="SMA_SMK">
-            SMA / SMK
-          </option>
-
-          <option value="D3">
-            D3
-          </option>
-
-          <option value="D4_S1">
-            D4 / S1
-          </option>
-
-          <option value="S2">
-            S2
-          </option>
-
-        </select>
-
+      <div class="cv-sub">
+        HANZ akan membaca CV untuk mengenali pendidikan,
+        program studi, pengalaman, skill, bahasa dan job family.
+        Format: PDF, DOCX atau TXT. Maksimal 10 MB.
       </div>
 
+      <input
+        type="file"
+        id="cvFile"
+        class="cv-input"
+        accept=".pdf,.docx,.txt,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain"
+      >
 
-      <div class="field">
-
-        <label>
-          Program Studi
-        </label>
-
-        <input
-          id="profileStudy"
-          placeholder="Contoh: Teknologi Rekayasa Internet"
-        >
-
-      </div>
-
-
-      <div class="field">
-
-        <label>
-          Status Karier
-        </label>
-
-        <select id="profileCareer">
-
-          <option value="">
-            Semua
-          </option>
-
-          <option value="FRESH">
-            Fresh Graduate
-          </option>
-
-          <option value="EXPERIENCED">
-            Experienced
-          </option>
-
-          <option value="STUDENT">
-            Mahasiswa
-          </option>
-
-        </select>
-
-      </div>
-
-
-      <div class="field">
-
-        <label>
-          Skill Utama
-        </label>
-
-        <input
-          id="profileSkills"
-          placeholder="Network, Cloud, PLC, Finance..."
-        >
-
+      <div
+        id="cvFileName"
+        class="cv-file"
+      >
+        Belum ada CV dipilih
       </div>
 
     </div>
 
 
-    <div class="profile-note">
+    <div class="field">
 
-      Profil ini untuk personalisasi di browser.
-      Persyaratan pendidikan yang ditampilkan pada vacancy
-      adalah persyaratan dari perusahaan,
-      bukan pendidikan pengguna.
+      <label>
+        Pendidikan Terakhir
+      </label>
+
+      <select id="profileEducation">
+
+        <option value="">
+          Pilih pendidikan
+        </option>
+
+        <option value="SMA_SMK">
+          SMA / SMK
+        </option>
+
+        <option value="D3">
+          D3
+        </option>
+
+        <option value="D4_S1">
+          D4 / S1
+        </option>
+
+        <option value="S2">
+          S2
+        </option>
+
+      </select>
 
     </div>
 
-  </section>
+
+    <div class="field">
+
+      <label>
+        Program Studi
+      </label>
+
+      <input
+        id="profileStudy"
+        placeholder="Contoh: Teknologi Rekayasa Internet"
+      >
+
+    </div>
 
 
-  <!-- =====================================================
-       THREE MAIN SERVICES
-       ===================================================== -->
+    <div class="field">
 
-  <section class="main-tabs">
+      <label>
+        Status Karier
+      </label>
 
-    <button
-      class="main-tab active"
-      id="globalTab"
-      onclick="changeService('global')"
-    >
+      <select id="profileCareer">
 
-      <div class="tab-icon">
-        🌍
-      </div>
+        <option value="">
+          Belum dipilih
+        </option>
 
-      <div class="tab-title">
-        Global Job Vacancies
-      </div>
-
-      <div class="tab-description">
-        Vacancy resmi di luar Indonesia.
-        India, Vietnam dan Cambodia dikecualikan.
-      </div>
-
-    </button>
-
-
-    <button
-      class="main-tab"
-      id="indonesiaTab"
-      onclick="changeService('indonesia')"
-    >
-
-      <div class="tab-icon">
-        🇮🇩
-      </div>
-
-      <div class="tab-title">
-        Indonesia Job Vacancies
-      </div>
-
-      <div class="tab-description">
-        Lowongan terverifikasi dari perusahaan
-        di seluruh Indonesia.
-      </div>
-
-    </button>
-
-
-    <button
-      class="main-tab"
-      id="scholarshipTab"
-      onclick="changeService('scholarship')"
-    >
-
-      <div class="tab-icon">
-        🎓
-      </div>
-
-      <div class="tab-title">
-        Global Scholarship
-      </div>
-
-      <div class="tab-description">
-        Fully funded Master scholarship
-        dari berbagai negara.
-      </div>
-
-    </button>
-
-  </section>
-
-
-  <!-- =====================================================
-       JOB SECTION
-       ===================================================== -->
-
-  <section id="jobSection">
-
-    <div class="stats">
-
-      <div class="stat">
-
-        <div class="stat-label">
-          Verified Vacancies
-        </div>
-
-        <div
-          class="stat-value"
-          id="jobCount"
-        >
-          —
-        </div>
-
-      </div>
-
-
-      <div class="stat">
-
-        <div class="stat-label">
-          Companies
-        </div>
-
-        <div
-          class="stat-value"
-          id="companyCount"
-        >
-          —
-        </div>
-
-      </div>
-
-
-      <div class="stat">
-
-        <div class="stat-label">
+        <option value="FRESH_GRADUATE">
           Fresh Graduate
-        </div>
+        </option>
 
-        <div
-          class="stat-value"
-          id="freshCount"
-        >
-          —
-        </div>
+        <option value="EXPERIENCED">
+          Experienced
+        </option>
 
-      </div>
+        <option value="STUDENT_OR_INTERNSHIP">
+          Mahasiswa / Internship
+        </option>
+
+      </select>
+
+    </div>
 
 
-      <div class="stat">
+    <div class="field">
 
-        <div class="stat-label">
+      <label>
+        Pengalaman Kerja
+      </label>
+
+      <select id="profileExperience">
+
+        <option value="">
+          Belum dipilih
+        </option>
+
+        <option value="0">
+          Belum ada
+        </option>
+
+        <option value="1">
+          ± 1 tahun
+        </option>
+
+        <option value="2">
+          ± 2 tahun
+        </option>
+
+        <option value="3">
+          3–4 tahun
+        </option>
+
+        <option value="5">
+          5–7 tahun
+        </option>
+
+        <option value="8">
+          8+ tahun
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <div class="field">
+
+      <label>
+        Skill Utama
+      </label>
+
+      <input
+        id="profileSkills"
+        placeholder="Network, Cloud, PLC, Finance..."
+      >
+
+    </div>
+
+
+    <div class="field">
+
+      <label>
+        Preferensi Work Mode
+      </label>
+
+      <select id="profileWorkMode">
+
+        <option value="">
+          Semua
+        </option>
+
+        <option value="ONSITE">
+          On-site
+        </option>
+
+        <option value="HYBRID">
+          Hybrid
+        </option>
+
+        <option value="REMOTE">
           Remote / WFH
-        </div>
+        </option>
 
-        <div
-          class="stat-value"
-          id="remoteCount"
-        >
-          —
-        </div>
-
-      </div>
+      </select>
 
     </div>
 
 
-    <div class="filters">
+    <div class="field">
 
-      <div class="field">
+      <label>
+        Target Negara
+      </label>
 
-        <label>
-          Search Vacancy
-        </label>
-
-        <input
-          id="searchInput"
-          placeholder="Job title, company, location..."
-        >
-
-      </div>
-
-
-      <div
-        class="field"
-        id="countryField"
+      <input
+        id="profileCountries"
+        placeholder="Contoh: Indonesia, Singapore, UAE, Japan"
       >
-
-        <label>
-          Negara
-        </label>
-
-        <select id="countryFilter">
-
-          <option value="">
-            Semua Negara
-          </option>
-
-        </select>
-
-      </div>
-
-
-      <div
-        class="field hidden"
-        id="provinceField"
-      >
-
-        <label>
-          Provinsi
-        </label>
-
-        <select id="provinceFilter">
-
-          <option value="">
-            Semua Provinsi
-          </option>
-
-        </select>
-
-      </div>
-
-
-      <div class="field">
-
-        <label>
-          Work Mode
-        </label>
-
-        <select id="workModeFilter">
-
-          <option value="">
-            Semua
-          </option>
-
-          <option value="ONSITE">
-            On-site
-          </option>
-
-          <option value="HYBRID">
-            Hybrid
-          </option>
-
-          <option value="REMOTE">
-            Remote / WFH
-          </option>
-
-          <option value="UNKNOWN">
-            Belum Diketahui
-          </option>
-
-        </select>
-
-      </div>
-
-
-      <div class="field">
-
-        <label>
-          Persyaratan Pendidikan
-        </label>
-
-        <select id="educationFilter">
-
-          <option value="">
-            Semua
-          </option>
-
-          <option value="SMA_SMK">
-            Minimal SMA / SMK
-          </option>
-
-          <option value="D3">
-            Minimal D3
-          </option>
-
-          <option value="D4_S1">
-            Minimal D4 / S1
-          </option>
-
-          <option value="S2">
-            Minimal S2
-          </option>
-
-          <option value="NOT_REQUIRED">
-            Tidak Mensyaratkan Gelar
-          </option>
-
-          <option value="UNKNOWN">
-            Persyaratan Belum Disebutkan
-          </option>
-
-        </select>
-
-      </div>
-
-
-      <div class="field">
-
-        <label>
-          Career Level
-        </label>
-
-        <select id="careerFilter">
-
-          <option value="">
-            Semua
-          </option>
-
-          <option value="INTERNSHIP">
-            Internship
-          </option>
-
-          <option value="FRESH_GRADUATE">
-            Fresh Graduate
-          </option>
-
-          <option value="ENTRY">
-            Entry Level
-          </option>
-
-          <option value="MID">
-            Mid Level
-          </option>
-
-          <option value="SENIOR">
-            Senior
-          </option>
-
-          <option value="LEADERSHIP">
-            Leadership
-          </option>
-
-          <option value="UNKNOWN">
-            Belum Diketahui
-          </option>
-
-        </select>
-
-      </div>
-
-
-      <div class="field">
-
-        <label>
-          Fresh Graduate Eligibility
-        </label>
-
-        <select id="freshFilter">
-
-          <option value="">
-            Semua
-          </option>
-
-          <option value="YES">
-            Confirmed Eligible
-          </option>
-
-          <option value="NO">
-            Tidak Cocok
-          </option>
-
-          <option value="UNKNOWN">
-            Belum Jelas
-          </option>
-
-        </select>
-
-      </div>
-
-
-      <div class="field">
-
-        <label>
-          Safety
-        </label>
-
-        <div class="safe-box">
-          ✓ Verified Safe Only
-        </div>
-
-      </div>
 
     </div>
 
-
-    <div class="list-header">
-
-      <div
-        class="list-title"
-        id="jobListTitle"
-      >
-        Global Verified Vacancies
-      </div>
-
-      <div
-        class="result-count"
-        id="resultCount"
-      >
-        Loading...
-      </div>
-
-    </div>
+  </div>
 
 
-    <div
-      id="jobLoading"
-      class="state"
+  <div class="profile-note">
+    <strong>Privacy:</strong>
+    CV diproses oleh Candidate Profile Analyzer dan tidak disimpan
+    ke database oleh engine V1. Hasil analisis profil disimpan
+    lokal di browser untuk personalisasi.
+  </div>
+
+
+  <div class="execute-row">
+
+    <button
+      id="executeButton"
+      class="execute-button"
+      onclick="executeHANZ()"
     >
+      🔍 Analisa Profil & Cari Peluang
+    </button>
 
-      <strong>
-        Loading verified opportunities...
-      </strong>
-
-      Mengambil data terbaru dari HANZ.
-
-    </div>
-
-
-    <div
-      id="jobError"
-      class="state error hidden"
+    <button
+      class="reset-button"
+      onclick="resetProfile()"
     >
-
-      <strong>
-        Gagal mengambil vacancy
-      </strong>
-
-      <div id="jobErrorText"></div>
-
-    </div>
-
+      Reset Profil
+    </button>
 
     <div
-      id="jobEmpty"
-      class="state hidden"
+      id="executionStatus"
+      class="execution-status"
     >
-
-      <strong>
-        Belum ada vacancy yang cocok
-      </strong>
-
-      Coba ubah filter atau background profil.
-
+      Isi profil atau upload CV, lalu tekan tombol pencarian.
     </div>
 
-
-    <div
-      id="jobItems"
-      class="items"
-    ></div>
-
-  </section>
+  </div>
 
 
-  <!-- =====================================================
-       SCHOLARSHIP SECTION
-       ===================================================== -->
-
-  <section
-    id="scholarshipSection"
-    class="hidden"
+  <div
+    id="analyzedProfile"
+    class="analyzed-profile hidden"
   >
 
-    <div class="list-header">
+    <div class="analyzed-title">
+      ✓ HANZ Candidate Profile
+    </div>
 
-      <div class="list-title">
-        🎓 Global Fully Funded Master Scholarships
+    <div
+      id="analysisGrid"
+      class="analysis-grid"
+    ></div>
+
+  </div>
+
+</section>
+
+
+<!-- =====================================================
+     THREE SERVICES
+===================================================== -->
+
+<section class="main-tabs">
+
+  <button
+    class="main-tab active"
+    id="globalTab"
+    onclick="changeService('global')"
+  >
+
+    <div class="tab-icon">
+      🌍
+    </div>
+
+    <div class="tab-title">
+      Global Job Vacancies
+    </div>
+
+    <div class="tab-description">
+      Verified job vacancies di luar Indonesia.
+    </div>
+
+  </button>
+
+
+  <button
+    class="main-tab"
+    id="indonesiaTab"
+    onclick="changeService('indonesia')"
+  >
+
+    <div class="tab-icon">
+      🇮🇩
+    </div>
+
+    <div class="tab-title">
+      Indonesia Job Vacancies
+    </div>
+
+    <div class="tab-description">
+      Verified job vacancies dari seluruh Indonesia.
+    </div>
+
+  </button>
+
+
+  <button
+    class="main-tab"
+    id="scholarshipTab"
+    onclick="changeService('scholarship')"
+  >
+
+    <div class="tab-icon">
+      🎓
+    </div>
+
+    <div class="tab-title">
+      Global Scholarship
+    </div>
+
+    <div class="tab-description">
+      Fully funded Master scholarship worldwide.
+    </div>
+
+  </button>
+
+</section>
+
+
+<!-- =====================================================
+     JOB SECTION
+===================================================== -->
+
+<section id="jobSection">
+
+  <div class="stats">
+
+    <div class="stat">
+
+      <div class="stat-label">
+        Matching Vacancies
       </div>
 
       <div
-        class="result-count"
-        id="scholarshipCount"
+        class="stat-value"
+        id="jobCount"
       >
-        Loading...
+        —
       </div>
 
     </div>
 
 
-    <div
-      id="scholarshipLoading"
-      class="state"
-    >
+    <div class="stat">
 
-      <strong>
-        Loading global scholarships...
-      </strong>
+      <div class="stat-label">
+        Companies
+      </div>
 
-      Mengambil scholarship terverifikasi dari HANZ.
+      <div
+        class="stat-value"
+        id="companyCount"
+      >
+        —
+      </div>
+
+    </div>
+
+
+    <div class="stat">
+
+      <div class="stat-label">
+        Fresh Graduate
+      </div>
+
+      <div
+        class="stat-value"
+        id="freshCount"
+      >
+        —
+      </div>
+
+    </div>
+
+
+    <div class="stat">
+
+      <div class="stat-label">
+        Remote / WFH
+      </div>
+
+      <div
+        class="stat-value"
+        id="remoteCount"
+      >
+        —
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="filters">
+
+    <div class="field">
+
+      <label>
+        Search Vacancy
+      </label>
+
+      <input
+        id="searchInput"
+        placeholder="Job title, company, location..."
+      >
 
     </div>
 
 
     <div
-      id="scholarshipError"
-      class="state error hidden"
+      class="field"
+      id="countryField"
     >
 
-      <strong>
-        Scholarship engine belum tersedia
-      </strong>
+      <label>
+        Negara
+      </label>
 
-      <div id="scholarshipErrorText"></div>
+      <select id="countryFilter">
+
+        <option value="">
+          Semua Negara
+        </option>
+
+      </select>
 
     </div>
 
 
     <div
-      id="scholarshipEmpty"
-      class="state hidden"
+      class="field hidden"
+      id="provinceField"
     >
 
-      <strong>
-        Belum ada scholarship terverifikasi
-      </strong>
+      <label>
+        Provinsi
+      </label>
 
-      Scholarship hanya akan tampil setelah lolos
-      fully-funded verification.
+      <select id="provinceFilter">
+
+        <option value="">
+          Semua Provinsi
+        </option>
+
+      </select>
 
     </div>
 
 
+    <div class="field">
+
+      <label>
+        Work Mode
+      </label>
+
+      <select id="workModeFilter">
+
+        <option value="">
+          Semua
+        </option>
+
+        <option value="ONSITE">
+          On-site
+        </option>
+
+        <option value="HYBRID">
+          Hybrid
+        </option>
+
+        <option value="REMOTE">
+          Remote / WFH
+        </option>
+
+        <option value="UNKNOWN">
+          Belum Diketahui
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <div class="field">
+
+      <label>
+        Persyaratan Pendidikan
+      </label>
+
+      <select id="educationFilter">
+
+        <option value="">
+          Semua
+        </option>
+
+        <option value="SMA_SMK">
+          Minimal SMA / SMK
+        </option>
+
+        <option value="D3">
+          Minimal D3
+        </option>
+
+        <option value="D4_S1">
+          Minimal D4 / S1
+        </option>
+
+        <option value="S2">
+          Minimal S2
+        </option>
+
+        <option value="NOT_REQUIRED">
+          Tidak Mensyaratkan Gelar
+        </option>
+
+        <option value="UNKNOWN">
+          Persyaratan Belum Disebutkan
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <div class="field">
+
+      <label>
+        Career Level
+      </label>
+
+      <select id="careerFilter">
+
+        <option value="">
+          Semua
+        </option>
+
+        <option value="INTERNSHIP">
+          Internship
+        </option>
+
+        <option value="FRESH_GRADUATE">
+          Fresh Graduate
+        </option>
+
+        <option value="ENTRY">
+          Entry Level
+        </option>
+
+        <option value="MID">
+          Mid Level
+        </option>
+
+        <option value="SENIOR">
+          Senior
+        </option>
+
+        <option value="LEADERSHIP">
+          Leadership
+        </option>
+
+        <option value="UNKNOWN">
+          Belum Diketahui
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <div class="field">
+
+      <label>
+        Fresh Graduate Eligibility
+      </label>
+
+      <select id="freshFilter">
+
+        <option value="">
+          Semua
+        </option>
+
+        <option value="YES">
+          Confirmed Eligible
+        </option>
+
+        <option value="NO">
+          Tidak Cocok
+        </option>
+
+        <option value="UNKNOWN">
+          Belum Jelas
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <div class="field">
+
+      <label>
+        Safety
+      </label>
+
+      <div class="safe-box">
+        ✓ Verified Safe Only
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="list-header">
+
     <div
-      id="scholarshipItems"
-      class="items"
-    ></div>
+      class="list-title"
+      id="jobListTitle"
+    >
+      🌍 Global Job Matches
+    </div>
 
-  </section>
+    <div
+      class="result-count"
+      id="resultCount"
+    >
+      Isi profil lalu jalankan HANZ
+    </div>
+
+  </div>
 
 
-  <footer class="page-footer">
+  <div
+    id="jobWaiting"
+    class="state"
+  >
 
-    HANZ Opportunity Engine
-    • Verified Sources
-    • Anti-Scam
-    • Personal Opportunity Matching
+    <strong>
+      HANZ menunggu profilmu
+    </strong>
 
-  </footer>
+    Upload CV atau isi background,
+    kemudian tekan “Analisa Profil & Cari Peluang”.
+
+  </div>
+
+
+  <div
+    id="jobError"
+    class="state error-state hidden"
+  >
+
+    <strong>
+      Gagal mengambil vacancy
+    </strong>
+
+    <div id="jobErrorText"></div>
+
+  </div>
+
+
+  <div
+    id="jobEmpty"
+    class="state hidden"
+  >
+
+    <strong>
+      Belum ada vacancy yang cocok
+    </strong>
+
+    Tidak ada verified vacancy yang cukup relevan
+    dengan profil dan filter saat ini.
+
+  </div>
+
+
+  <div
+    id="jobItems"
+    class="items"
+  ></div>
+
+</section>
+
+
+<!-- =====================================================
+     SCHOLARSHIP
+===================================================== -->
+
+<section
+  id="scholarshipSection"
+  class="hidden"
+>
+
+  <div class="list-header">
+
+    <div class="list-title">
+      🎓 Global Scholarship Matches
+    </div>
+
+    <div
+      id="scholarshipCount"
+      class="result-count"
+    >
+      Isi profil lalu jalankan HANZ
+    </div>
+
+  </div>
+
+
+  <div
+    id="scholarshipWaiting"
+    class="state"
+  >
+
+    <strong>
+      HANZ menunggu profilmu
+    </strong>
+
+    Scholarship akan dicocokkan setelah profil dianalisa.
+
+  </div>
+
+
+  <div
+    id="scholarshipEmpty"
+    class="state hidden"
+  >
+
+    <strong>
+      Belum ada scholarship terverifikasi
+    </strong>
+
+    Global Scholarship hanya menampilkan
+    program Master yang lolos fully-funded verification.
+
+  </div>
+
+
+  <div
+    id="scholarshipItems"
+    class="items"
+  ></div>
+
+</section>
+
+
+<footer class="page-footer">
+
+  HANZ Opportunity Engine
+  • Personal Matching
+  • Verified Official Sources
+  • Anti-Scam
+
+</footer>
 
 </main>
 
@@ -1441,23 +1757,25 @@ const SUPABASE_KEY =
   "sb_publishable_g4V53o__-j1ThxsXgnJ-ig_P09KKu_Y";
 
 
-/* =========================================================
-   STATE
-   ========================================================= */
-
-let allGlobalJobs = [];
-let allIndonesiaJobs = [];
+let verifiedJobs = [];
+let globalJobs = [];
+let indonesiaJobs = [];
 let scholarships = [];
+
+let candidateProfile = null;
 
 let currentService =
   "global";
 
+let hasExecuted =
+  false;
 
-/* =========================================================
+
+/* =====================================================
    HELPERS
-   ========================================================= */
+===================================================== */
 
-function esc(v) {
+function esc(v){
 
   return String(v ?? "")
     .replaceAll("&","&amp;")
@@ -1468,9 +1786,29 @@ function esc(v) {
 }
 
 
-function pretty(v) {
+function normalize(v){
 
-  if (!v) {
+  return String(v ?? "")
+    .toLowerCase()
+    .replace(/[^a-z0-9+#./]+/g," ")
+    .replace(/\s+/g," ")
+    .trim();
+}
+
+
+function unique(list){
+
+  return [
+    ...new Set(
+      list.filter(Boolean)
+    )
+  ];
+}
+
+
+function pretty(v){
+
+  if (!v){
     return null;
   }
 
@@ -1479,13 +1817,12 @@ function pretty(v) {
     .toLowerCase()
     .replace(
       /\b\w/g,
-      x =>
-        x.toUpperCase()
+      x => x.toUpperCase()
     );
 }
 
 
-function educationLabel(v) {
+function educationLabel(v){
 
   const map = {
 
@@ -1514,106 +1851,47 @@ function educationLabel(v) {
 }
 
 
-function unique(list) {
+function splitComma(v){
 
-  return [
-    ...new Set(
-      list.filter(Boolean)
-    )
-  ];
+  return String(v || "")
+    .split(",")
+    .map(x => x.trim())
+    .filter(Boolean);
 }
 
 
-/* =========================================================
-   PROFILE LOCAL STORAGE
-   ========================================================= */
+/* =====================================================
+   CV
+===================================================== */
 
-function saveProfile() {
+document
+  .getElementById("cvFile")
+  .addEventListener(
+    "change",
+    function(){
 
-  const profile = {
+      const file =
+        this.files?.[0];
 
-    education:
       document
         .getElementById(
-          "profileEducation"
-        ).value,
+          "cvFileName"
+        )
+        .textContent =
+          file
+            ? "Dipilih: " +
+              file.name
 
-    study:
-      document
-        .getElementById(
-          "profileStudy"
-        ).value,
-
-    career:
-      document
-        .getElementById(
-          "profileCareer"
-        ).value,
-
-    skills:
-      document
-        .getElementById(
-          "profileSkills"
-        ).value
-
-  };
-
-  localStorage.setItem(
-    "hanz_candidate_profile",
-    JSON.stringify(profile)
+            : "Belum ada CV dipilih";
+    }
   );
 
-  applyJobFilters();
-}
 
+/* =====================================================
+   SUPABASE
+===================================================== */
 
-function loadProfile() {
-
-  try {
-
-    const raw =
-      localStorage.getItem(
-        "hanz_candidate_profile"
-      );
-
-    if (!raw) {
-      return;
-    }
-
-    const profile =
-      JSON.parse(raw);
-
-    document.getElementById(
-      "profileEducation"
-    ).value =
-      profile.education || "";
-
-    document.getElementById(
-      "profileStudy"
-    ).value =
-      profile.study || "";
-
-    document.getElementById(
-      "profileCareer"
-    ).value =
-      profile.career || "";
-
-    document.getElementById(
-      "profileSkills"
-    ).value =
-      profile.skills || "";
-
-  } catch {
-    // ignore invalid browser storage
-  }
-}
-
-
-/* =========================================================
-   FETCH
-   ========================================================= */
-
-async function supabaseFetch(path) {
+async function supabaseFetch(path){
 
   const response =
     await fetch(
@@ -1621,20 +1899,18 @@ async function supabaseFetch(path) {
       "/rest/v1/" +
       path,
       {
-        headers: {
-
+        headers:{
           apikey:
             SUPABASE_KEY,
 
           Authorization:
             "Bearer " +
             SUPABASE_KEY
-
         }
       }
     );
 
-  if (!response.ok) {
+  if (!response.ok){
 
     throw new Error(
       await response.text()
@@ -1645,662 +1921,469 @@ async function supabaseFetch(path) {
 }
 
 
-/* =========================================================
-   LOAD JOBS
-   ========================================================= */
+/* =====================================================
+   PROFILE FORM
+===================================================== */
 
-async function loadJobs() {
+function getManualProfile(){
 
-  try {
+  return {
 
-    const rows =
-      await supabaseFetch(
-        "verified_global_job_dashboard?select=*&order=posted_at.desc.nullslast"
-      );
-
-    /*
-      Global view = verified pool seluruh dunia.
-
-      Kita split di browser menjadi:
-
-      Indonesia
-      vs
-      Global outside Indonesia.
-    */
-
-    allIndonesiaJobs =
-      rows.filter(
-        job =>
-          job.country_code === "ID" ||
-          job.country_name === "Indonesia"
-      );
-
-
-    allGlobalJobs =
-      rows.filter(
-        job => {
-
-          const code =
-            String(
-              job.country_code || ""
-            ).toUpperCase();
-
-          const country =
-            String(
-              job.country_name || ""
-            ).toLowerCase();
-
-          if (
-            code === "ID" ||
-            country === "indonesia"
-          ) {
-            return false;
-          }
-
-          /*
-            Extra client-side protection.
-          */
-
-          if (
-            ["IN","VN","KH"]
-              .includes(code)
-          ) {
-            return false;
-          }
-
-          if (
-            [
-              "india",
-              "vietnam",
-              "viet nam",
-              "cambodia"
-            ].includes(country)
-          ) {
-            return false;
-          }
-
-          return true;
-        }
-      );
-
-
-    buildCountries();
-    buildProvinces();
-
-    hideJobLoading();
-
-    applyJobFilters();
-
-  } catch(error) {
-
-    hideJobLoading();
-
-    document
-      .getElementById(
-        "jobError"
-      )
-      .classList
-      .remove(
-        "hidden"
-      );
-
-    document
-      .getElementById(
-        "jobErrorText"
-      )
-      .textContent =
-        error?.message ||
-        "Unknown error";
-  }
-}
-
-
-/* =========================================================
-   SCHOLARSHIPS
-   ========================================================= */
-
-async function loadScholarships() {
-
-  try {
-
-    scholarships =
-      await supabaseFetch(
-        "master_scholarship_dashboard?select=*"
-      );
-
-    document
-      .getElementById(
-        "scholarshipLoading"
-      )
-      .classList
-      .add(
-        "hidden"
-      );
-
-    renderScholarships();
-
-  } catch(error) {
-
-    document
-      .getElementById(
-        "scholarshipLoading"
-      )
-      .classList
-      .add(
-        "hidden"
-      );
-
-    document
-      .getElementById(
-        "scholarshipError"
-      )
-      .classList
-      .remove(
-        "hidden"
-      );
-
-    document
-      .getElementById(
-        "scholarshipErrorText"
-      )
-      .textContent =
-        "Global Scholarship Engine belum memiliki data publik yang siap ditampilkan.";
-  }
-}
-
-
-/* =========================================================
-   COUNTRY / PROVINCE FILTER OPTIONS
-   ========================================================= */
-
-function buildCountries() {
-
-  const select =
-    document.getElementById(
-      "countryFilter"
-    );
-
-  select.innerHTML =
-    '<option value="">Semua Negara</option>';
-
-  const countries =
-    unique(
-      allGlobalJobs
-        .map(
-          j =>
-            j.country_name
-        )
-    )
-      .sort();
-
-  countries.forEach(
-    country => {
-
-      const option =
-        document.createElement(
-          "option"
-        );
-
-      option.value =
-        country;
-
-      option.textContent =
-        country;
-
-      select.appendChild(
-        option
-      );
-
-    }
-  );
-}
-
-
-function buildProvinces() {
-
-  const select =
-    document.getElementById(
-      "provinceFilter"
-    );
-
-  select.innerHTML =
-    '<option value="">Semua Provinsi</option>';
-
-  const provinces =
-    unique(
-      allIndonesiaJobs
-        .map(
-          j =>
-            j.province_name
-        )
-    )
-      .sort();
-
-  provinces.forEach(
-    province => {
-
-      const option =
-        document.createElement(
-          "option"
-        );
-
-      option.value =
-        province;
-
-      option.textContent =
-        province;
-
-      select.appendChild(
-        option
-      );
-
-    }
-  );
-}
-
-
-/* =========================================================
-   SERVICE SWITCH
-   ========================================================= */
-
-function changeService(service) {
-
-  currentService =
-    service;
-
-
-  [
-    "global",
-    "indonesia",
-    "scholarship"
-  ].forEach(
-    item => {
-
+    education_level:
       document
         .getElementById(
-          item + "Tab"
+          "profileEducation"
         )
-        .classList
-        .toggle(
-          "active",
-          item === service
-        );
+        .value,
 
-    }
+    study_program:
+      document
+        .getElementById(
+          "profileStudy"
+        )
+        .value
+        .trim(),
+
+    career_status:
+      document
+        .getElementById(
+          "profileCareer"
+        )
+        .value,
+
+    experience_years:
+      document
+        .getElementById(
+          "profileExperience"
+        )
+        .value !== ""
+
+          ? Number(
+              document
+                .getElementById(
+                  "profileExperience"
+                )
+                .value
+            )
+
+          : null,
+
+    skills:
+      splitComma(
+        document
+          .getElementById(
+            "profileSkills"
+          )
+          .value
+      ),
+
+    preferred_work_mode:
+      document
+        .getElementById(
+          "profileWorkMode"
+        )
+        .value,
+
+    target_countries:
+      splitComma(
+        document
+          .getElementById(
+            "profileCountries"
+          )
+          .value
+      )
+
+  };
+}
+
+
+/* =====================================================
+   ANALYZER CALL
+===================================================== */
+
+async function analyzeCv(file,manualProfile){
+
+  const form =
+    new FormData();
+
+  form.append(
+    "cv",
+    file
+  );
+
+  form.append(
+    "profile",
+    JSON.stringify(
+      manualProfile
+    )
   );
 
 
-  const jobSection =
-    document.getElementById(
-      "jobSection"
+  const response =
+    await fetch(
+      SUPABASE_URL +
+      "/functions/v1/candidate-profile-analyzer",
+      {
+        method:"POST",
+
+        headers:{
+          apikey:
+            SUPABASE_KEY,
+
+          Authorization:
+            "Bearer " +
+            SUPABASE_KEY
+        },
+
+        body:form
+      }
     );
 
-  const scholarshipSection =
-    document.getElementById(
-      "scholarshipSection"
-    );
 
+  const raw =
+    await response.text();
 
-  if (
-    service ===
-    "scholarship"
-  ) {
+  let result;
 
-    jobSection
-      .classList
-      .add(
-        "hidden"
-      );
-
-    scholarshipSection
-      .classList
-      .remove(
-        "hidden"
-      );
-
-    return;
+  try{
+    result =
+      JSON.parse(raw);
   }
-
-
-  scholarshipSection
-    .classList
-    .add(
-      "hidden"
+  catch{
+    throw new Error(
+      raw ||
+      "Candidate analyzer returned invalid response."
     );
-
-  jobSection
-    .classList
-    .remove(
-      "hidden"
-    );
-
-
-  const countryField =
-    document.getElementById(
-      "countryField"
-    );
-
-  const provinceField =
-    document.getElementById(
-      "provinceField"
-    );
-
-
-  if (
-    service ===
-    "global"
-  ) {
-
-    countryField
-      .classList
-      .remove(
-        "hidden"
-      );
-
-    provinceField
-      .classList
-      .add(
-        "hidden"
-      );
-
-    document.getElementById(
-      "jobListTitle"
-    ).textContent =
-      "🌍 Global Verified Vacancies";
-
   }
 
 
   if (
-    service ===
-    "indonesia"
-  ) {
-
-    countryField
-      .classList
-      .add(
-        "hidden"
-      );
-
-    provinceField
-      .classList
-      .remove(
-        "hidden"
-      );
-
-    document.getElementById(
-      "jobListTitle"
-    ).textContent =
-      "🇮🇩 Indonesia Verified Vacancies";
-
+    !response.ok ||
+    result?.ok !== true
+  ){
+    throw new Error(
+      result?.error ||
+      "CV analysis failed."
+    );
   }
 
 
-  applyJobFilters();
+  return result;
 }
 
 
-/* =========================================================
-   PROFILE MATCH
-   ========================================================= */
+/* =====================================================
+   MANUAL PROFILE
+===================================================== */
 
-function profileMatches(job) {
+function buildManualCandidateProfile(
+  manual
+){
 
-  const education =
-    document.getElementById(
-      "profileEducation"
-    ).value;
+  const studyPrograms =
+    manual.study_program
+      ? [manual.study_program]
+      : [];
 
-  const study =
-    document
-      .getElementById(
-        "profileStudy"
-      )
-      .value
-      .toLowerCase()
-      .trim();
-
-  const career =
-    document.getElementById(
-      "profileCareer"
-    ).value;
-
-  /*
-    Tidak memblokir vacancy jika requirement UNKNOWN.
-    UNKNOWN artinya perusahaan belum menyebutkan,
-    bukan kandidat tidak memenuhi.
-  */
-
-  if (
-    education &&
-    job.education_level &&
-    job.education_level !==
-      "UNKNOWN" &&
-    job.education_level !==
-      "NOT_REQUIRED"
-  ) {
-
-    const rank = {
-
-      SMA_SMK: 1,
-      D3: 2,
-      D4_S1: 3,
-      S2: 4
-
-    };
-
-    if (
-      rank[education] &&
-      rank[job.education_level] &&
-      rank[education] <
-      rank[job.education_level]
-    ) {
-      return false;
-    }
-  }
+  const jobFamilies =
+    inferJobFamilies(
+      studyPrograms,
+      manual.skills
+    );
 
 
-  if (
-    career ===
-      "FRESH" &&
-    job.fresh_graduate_eligible ===
-      false
-  ) {
-    return false;
-  }
+  return {
 
+    education_level:
+      manual.education_level ||
+      "UNKNOWN",
 
-  /*
-    Study program saat ini belum dipakai
-    sebagai hard-block.
+    study_programs:
+      studyPrograms,
 
-    Nanti akan masuk Personal Matching Engine,
-    supaya prodi yang unik tetap bisa
-    dipetakan berdasarkan kompetensi.
-  */
+    skills:
+      manual.skills || [],
 
-  return true;
+    career_status:
+      manual.career_status ||
+      "UNKNOWN",
+
+    experience_years:
+      manual.experience_years,
+
+    languages:[],
+
+    job_families:
+      jobFamilies,
+
+    preferred_work_mode:
+      manual.preferred_work_mode ||
+      "",
+
+    target_countries:
+      manual.target_countries ||
+      []
+
+  };
 }
 
 
-/* =========================================================
-   JOB FILTER
-   ========================================================= */
+/* =====================================================
+   JOB FAMILY INFERENCE
+===================================================== */
 
-function applyJobFilters() {
+function inferJobFamilies(
+  studyPrograms,
+  skills
+){
+
+  const h =
+    normalize(
+      [
+        ...(studyPrograms || []),
+        ...(skills || [])
+      ].join(" ")
+    );
+
+
+  const families = [];
+
 
   if (
-    currentService ===
-    "scholarship"
-  ) {
-    return;
+    [
+      "teknologi rekayasa internet",
+      "network",
+      "cisco",
+      "routing",
+      "switching",
+      "mikrotik",
+      "tcp/ip",
+      "bgp",
+      "ospf"
+    ].some(
+      term =>
+        h.includes(
+          normalize(term)
+        )
+    )
+  ){
+    families.push(
+      "Network / Infrastructure"
+    );
   }
 
 
-  let jobs =
-    currentService ===
-      "global"
-
-      ? allGlobalJobs
-
-      : allIndonesiaJobs;
-
-
-  const search =
-    document
-      .getElementById(
-        "searchInput"
-      )
-      .value
-      .toLowerCase()
-      .trim();
-
-
-  const country =
-    document.getElementById(
-      "countryFilter"
-    ).value;
+  if (
+    [
+      "cloud",
+      "aws",
+      "azure",
+      "google cloud"
+    ].some(
+      term =>
+        h.includes(
+          normalize(term)
+        )
+    )
+  ){
+    families.push(
+      "Cloud Engineering"
+    );
+  }
 
 
-  const province =
-    document.getElementById(
-      "provinceFilter"
-    ).value;
+  if (
+    [
+      "devops",
+      "docker",
+      "kubernetes",
+      "terraform",
+      "ansible"
+    ].some(
+      term =>
+        h.includes(
+          normalize(term)
+        )
+    )
+  ){
+    families.push(
+      "DevOps / Platform Engineering"
+    );
+  }
 
 
-  const workMode =
-    document.getElementById(
-      "workModeFilter"
-    ).value;
+  if (
+    [
+      "cybersecurity",
+      "cyber security",
+      "soc",
+      "siem",
+      "firewall"
+    ].some(
+      term =>
+        h.includes(
+          normalize(term)
+        )
+    )
+  ){
+    families.push(
+      "Cybersecurity"
+    );
+  }
 
 
-  const education =
-    document.getElementById(
-      "educationFilter"
-    ).value;
+  if (
+    [
+      "iot",
+      "embedded"
+    ].some(
+      term =>
+        h.includes(
+          normalize(term)
+        )
+    )
+  ){
+    families.push(
+      "IoT / Embedded Systems"
+    );
+  }
 
 
-  const career =
-    document.getElementById(
-      "careerFilter"
-    ).value;
+  if (
+    [
+      "data science",
+      "machine learning",
+      "artificial intelligence"
+    ].some(
+      term =>
+        h.includes(
+          normalize(term)
+        )
+    )
+  ){
+    families.push(
+      "Data / AI"
+    );
+  }
 
 
-  const fresh =
-    document.getElementById(
-      "freshFilter"
-    ).value;
+  if (
+    [
+      "informatika",
+      "computer science",
+      "software",
+      "javascript",
+      "java",
+      "react",
+      "node"
+    ].some(
+      term =>
+        h.includes(
+          normalize(term)
+        )
+    )
+  ){
+    families.push(
+      "Software Engineering"
+    );
+  }
 
 
-  jobs =
+  if (
+    [
+      "plc",
+      "siemens",
+      "tia portal",
+      "wincc",
+      "scada",
+      "mekatronika"
+    ].some(
+      term =>
+        h.includes(
+          normalize(term)
+        )
+    )
+  ){
+    families.push(
+      "Automation / Mechatronics"
+    );
+  }
+
+
+  return unique(
+    families
+  );
+}
+
+
+/* =====================================================
+   LOAD OPPORTUNITIES
+===================================================== */
+
+async function loadOpportunityData(){
+
+  const jobs =
+    await supabaseFetch(
+      "verified_global_job_dashboard?select=*&order=posted_at.desc.nullslast"
+    );
+
+
+  verifiedJobs =
+    jobs;
+
+
+  indonesiaJobs =
+    jobs.filter(
+      job =>
+        job.country_code === "ID" ||
+        normalize(
+          job.country_name
+        ) === "indonesia"
+    );
+
+
+  globalJobs =
     jobs.filter(
       job => {
 
-        const haystack =
+        const code =
+          String(
+            job.country_code || ""
+          ).toUpperCase();
+
+        const country =
+          normalize(
+            job.country_name
+          );
+
+
+        if (
+          code === "ID" ||
+          country === "indonesia"
+        ){
+          return false;
+        }
+
+
+        if (
           [
-            job.job_title,
-            job.company_name,
-            job.country_name,
-            job.city,
-            job.province_name,
-            job.location_text,
-            ...(job.study_fields || [])
-          ]
-            .filter(Boolean)
-            .join(" ")
-            .toLowerCase();
-
-
-        if (
-          search &&
-          !haystack.includes(search)
-        ) {
+            "IN",
+            "VN",
+            "KH"
+          ].includes(code)
+        ){
           return false;
         }
 
 
         if (
-          currentService ===
-            "global" &&
-          country &&
-          job.country_name !==
-            country
-        ) {
-          return false;
-        }
-
-
-        if (
-          currentService ===
-            "indonesia" &&
-          province &&
-          job.province_name !==
-            province
-        ) {
-          return false;
-        }
-
-
-        if (
-          workMode &&
-          job.work_mode !==
-            workMode
-        ) {
-          return false;
-        }
-
-
-        if (
-          education &&
-          job.education_level !==
-            education
-        ) {
-          return false;
-        }
-
-
-        if (
-          career &&
-          job.career_level !==
-            career
-        ) {
-          return false;
-        }
-
-
-        if (
-          fresh ===
-            "YES" &&
-          job.fresh_graduate_eligible !==
-            true
-        ) {
-          return false;
-        }
-
-
-        if (
-          fresh ===
-            "NO" &&
-          job.fresh_graduate_eligible !==
-            false
-        ) {
-          return false;
-        }
-
-
-        if (
-          fresh ===
-            "UNKNOWN" &&
-          job.fresh_graduate_eligible !==
-            null
-        ) {
-          return false;
-        }
-
-
-        if (
-          !profileMatches(job)
-        ) {
+          [
+            "india",
+            "vietnam",
+            "viet nam",
+            "cambodia"
+          ].includes(country)
+        ){
           return false;
         }
 
@@ -2310,6 +2393,1014 @@ function applyJobFilters() {
     );
 
 
+  try{
+
+    scholarships =
+      await supabaseFetch(
+        "master_scholarship_dashboard?select=*"
+      );
+
+  }
+  catch{
+
+    scholarships = [];
+
+  }
+
+
+  buildCountryFilter();
+  buildProvinceFilter();
+}
+
+
+/* =====================================================
+   EXECUTE HANZ
+===================================================== */
+
+async function executeHANZ(){
+
+  const button =
+    document.getElementById(
+      "executeButton"
+    );
+
+  const status =
+    document.getElementById(
+      "executionStatus"
+    );
+
+
+  button.disabled =
+    true;
+
+  button.textContent =
+    "⏳ HANZ sedang menganalisa...";
+
+
+  status.className =
+    "execution-status";
+
+  status.textContent =
+    "Membaca profil dan mengambil verified opportunities...";
+
+
+  try{
+
+    const manual =
+      getManualProfile();
+
+    const cvFile =
+      document
+        .getElementById(
+          "cvFile"
+        )
+        .files?.[0];
+
+
+    if (cvFile){
+
+      const result =
+        await analyzeCv(
+          cvFile,
+          manual
+        );
+
+
+      candidateProfile = {
+
+        ...result.candidate_profile,
+
+        preferred_work_mode:
+          manual.preferred_work_mode,
+
+        target_countries:
+          manual.target_countries
+
+      };
+
+
+      /*
+        CV analysis boleh mengisi form
+        kalau user belum mengisinya.
+      */
+
+      if (
+        !manual.education_level &&
+        candidateProfile.education_level &&
+        candidateProfile.education_level !==
+          "UNKNOWN"
+      ){
+        document
+          .getElementById(
+            "profileEducation"
+          )
+          .value =
+            candidateProfile.education_level;
+      }
+
+
+      if (
+        !manual.study_program &&
+        candidateProfile.study_programs?.length
+      ){
+        document
+          .getElementById(
+            "profileStudy"
+          )
+          .value =
+            candidateProfile
+              .study_programs[0];
+      }
+
+
+      if (
+        !manual.career_status &&
+        candidateProfile.career_status &&
+        candidateProfile.career_status !==
+          "UNKNOWN"
+      ){
+        document
+          .getElementById(
+            "profileCareer"
+          )
+          .value =
+            candidateProfile
+              .career_status;
+      }
+
+
+      if (
+        !manual.skills?.length &&
+        candidateProfile.skills?.length
+      ){
+        document
+          .getElementById(
+            "profileSkills"
+          )
+          .value =
+            candidateProfile
+              .skills
+              .join(", ");
+      }
+
+    }
+
+    else{
+
+      const hasManualInput =
+        manual.education_level ||
+        manual.study_program ||
+        manual.career_status ||
+        manual.skills.length;
+
+
+      if (!hasManualInput){
+
+        throw new Error(
+          "Isi minimal satu data profil atau upload CV terlebih dahulu."
+        );
+      }
+
+
+      candidateProfile =
+        buildManualCandidateProfile(
+          manual
+        );
+
+    }
+
+
+    localStorage.setItem(
+      "hanz_candidate_profile",
+      JSON.stringify(
+        candidateProfile
+      )
+    );
+
+
+    await loadOpportunityData();
+
+
+    hasExecuted =
+      true;
+
+
+    document
+      .getElementById(
+        "jobWaiting"
+      )
+      .classList
+      .add(
+        "hidden"
+      );
+
+
+    document
+      .getElementById(
+        "scholarshipWaiting"
+      )
+      .classList
+      .add(
+        "hidden"
+      );
+
+
+    renderAnalyzedProfile();
+
+
+    applyJobFilters();
+
+    renderScholarships();
+
+
+    status.className =
+      "execution-status success";
+
+    status.textContent =
+      "✓ Profil selesai dianalisa. HANZ sudah meranking peluang yang paling relevan.";
+
+  }
+
+  catch(error){
+
+    status.className =
+      "execution-status error";
+
+    status.textContent =
+      "✕ " +
+      (
+        error?.message ||
+        "HANZ gagal menjalankan analisis."
+      );
+
+  }
+
+  finally{
+
+    button.disabled =
+      false;
+
+    button.textContent =
+      "🔍 Analisa Profil & Cari Peluang";
+
+  }
+
+}
+
+
+/* =====================================================
+   ANALYSIS DISPLAY
+===================================================== */
+
+function renderAnalyzedProfile(){
+
+  if (!candidateProfile){
+    return;
+  }
+
+
+  const wrapper =
+    document.getElementById(
+      "analyzedProfile"
+    );
+
+
+  const grid =
+    document.getElementById(
+      "analysisGrid"
+    );
+
+
+  const studies =
+    candidateProfile
+      .study_programs?.length
+
+      ? candidateProfile
+          .study_programs
+          .join(", ")
+
+      : "Belum terdeteksi";
+
+
+  const skills =
+    candidateProfile
+      .skills?.length
+
+      ? candidateProfile
+          .skills
+          .join(", ")
+
+      : "Belum terdeteksi";
+
+
+  const families =
+    candidateProfile
+      .job_families?.length
+
+      ? candidateProfile
+          .job_families
+          .join(", ")
+
+      : "Belum terdeteksi";
+
+
+  const languages =
+    candidateProfile
+      .languages?.length
+
+      ? candidateProfile
+          .languages
+          .join(", ")
+
+      : "Belum terdeteksi";
+
+
+  grid.innerHTML = `
+
+    <div class="analysis-item">
+      <strong>Pendidikan</strong>
+      ${esc(
+        pretty(
+          candidateProfile.education_level
+        )
+      )}
+    </div>
+
+    <div class="analysis-item">
+      <strong>Program Studi</strong>
+      ${esc(studies)}
+    </div>
+
+    <div class="analysis-item">
+      <strong>Status Karier</strong>
+      ${esc(
+        pretty(
+          candidateProfile.career_status
+        )
+      )}
+    </div>
+
+    <div class="analysis-item">
+      <strong>Pengalaman</strong>
+      ${
+        candidateProfile.experience_years !==
+          null &&
+        candidateProfile.experience_years !==
+          undefined
+
+          ? esc(
+              candidateProfile.experience_years +
+              " tahun"
+            )
+
+          : "Belum terdeteksi"
+      }
+    </div>
+
+    <div class="analysis-item">
+      <strong>Job Family</strong>
+      ${esc(families)}
+    </div>
+
+    <div class="analysis-item">
+      <strong>Skills</strong>
+      ${esc(skills)}
+    </div>
+
+    <div class="analysis-item">
+      <strong>Bahasa</strong>
+      ${esc(languages)}
+    </div>
+
+    <div class="analysis-item">
+      <strong>Target Negara</strong>
+      ${
+        candidateProfile
+          .target_countries?.length
+
+          ? esc(
+              candidateProfile
+                .target_countries
+                .join(", ")
+            )
+
+          : "Semua target market HANZ"
+      }
+    </div>
+
+  `;
+
+
+  wrapper
+    .classList
+    .remove(
+      "hidden"
+    );
+
+}
+
+
+/* =====================================================
+   MATCHING ENGINE
+===================================================== */
+
+function scoreJob(job){
+
+  if (!candidateProfile){
+
+    return {
+      score:0,
+      reasons:[]
+    };
+
+  }
+
+
+  let score =
+    30;
+
+  const reasons = [];
+
+
+  /* EDUCATION */
+
+  const rank = {
+    SMA_SMK:1,
+    D3:2,
+    D4_S1:3,
+    S2:4
+  };
+
+
+  const candidateEducation =
+    candidateProfile
+      .education_level;
+
+  const requirement =
+    job.education_level;
+
+
+  if (
+    requirement ===
+      "UNKNOWN"
+  ){
+
+    reasons.push(
+      "Persyaratan pendidikan belum disebutkan oleh perusahaan"
+    );
+
+  }
+
+  else if (
+    requirement ===
+      "NOT_REQUIRED"
+  ){
+
+    score += 10;
+
+    reasons.push(
+      "Tidak mensyaratkan gelar tertentu"
+    );
+
+  }
+
+  else if (
+    rank[candidateEducation] &&
+    rank[requirement]
+  ){
+
+    if (
+      rank[candidateEducation] >=
+      rank[requirement]
+    ){
+
+      score += 18;
+
+      reasons.push(
+        "Pendidikan memenuhi requirement"
+      );
+
+    }
+
+    else{
+
+      score -= 30;
+
+      reasons.push(
+        "Pendidikan berada di bawah requirement yang terdeteksi"
+      );
+
+    }
+
+  }
+
+
+  /* FRESH GRAD */
+
+  if (
+    candidateProfile
+      .career_status ===
+      "FRESH_GRADUATE"
+  ){
+
+    if (
+      job.fresh_graduate_eligible ===
+      true
+    ){
+
+      score += 18;
+
+      reasons.push(
+        "Confirmed fresh graduate eligible"
+      );
+
+    }
+
+    else if (
+      job.fresh_graduate_eligible ===
+      false
+    ){
+
+      score -= 35;
+
+      reasons.push(
+        "Vacancy bukan untuk fresh graduate"
+      );
+
+    }
+
+  }
+
+
+  /* EXPERIENCE */
+
+  if (
+    candidateProfile
+      .experience_years !==
+      null &&
+    candidateProfile
+      .experience_years !==
+      undefined &&
+    job.experience_required_years !==
+      null &&
+    job.experience_required_years !==
+      undefined
+  ){
+
+    if (
+      candidateProfile
+        .experience_years >=
+      job.experience_required_years
+    ){
+
+      score += 12;
+
+      reasons.push(
+        "Pengalaman memenuhi minimum"
+      );
+
+    }
+
+    else{
+
+      score -= 20;
+
+      reasons.push(
+        "Pengalaman belum memenuhi minimum"
+      );
+
+    }
+
+  }
+
+
+  /* STUDY / JOB FAMILY */
+
+  const jobText =
+    normalize(
+      [
+        job.job_title,
+        ...(job.study_fields || [])
+      ].join(" ")
+    );
+
+
+  const familyTerms = {
+
+    "Network / Infrastructure":[
+      "network",
+      "infrastructure",
+      "cloud",
+      "security",
+      "telecommunication",
+      "system"
+    ],
+
+    "Cloud Engineering":[
+      "cloud",
+      "aws",
+      "azure",
+      "platform",
+      "infrastructure"
+    ],
+
+    "DevOps / Platform Engineering":[
+      "devops",
+      "platform",
+      "ci cd",
+      "cloud",
+      "infrastructure"
+    ],
+
+    "Cybersecurity":[
+      "cyber",
+      "security",
+      "soc",
+      "information security"
+    ],
+
+    "IoT / Embedded Systems":[
+      "iot",
+      "embedded",
+      "firmware"
+    ],
+
+    "Data / AI":[
+      "data",
+      "machine learning",
+      "artificial intelligence",
+      "ai"
+    ],
+
+    "Software Engineering":[
+      "software",
+      "developer",
+      "engineer",
+      "frontend",
+      "backend"
+    ],
+
+    "Automation / Mechatronics":[
+      "automation",
+      "plc",
+      "scada",
+      "mechatronic"
+    ]
+
+  };
+
+
+  let familyMatched =
+    false;
+
+
+  for (
+    const family of
+    candidateProfile
+      .job_families || []
+  ){
+
+    const terms =
+      familyTerms[family] || [];
+
+
+    if (
+      terms.some(
+        term =>
+          jobText.includes(
+            normalize(term)
+          )
+      )
+    ){
+
+      familyMatched =
+        true;
+
+      break;
+    }
+
+  }
+
+
+  if (familyMatched){
+
+    score += 22;
+
+    reasons.push(
+      "Job family sesuai dengan background"
+    );
+
+  }
+
+
+  /* SKILLS */
+
+  const candidateSkills =
+    candidateProfile
+      .skills || [];
+
+
+  const matchedSkills =
+    candidateSkills.filter(
+      skill =>
+        jobText.includes(
+          normalize(skill)
+        )
+    );
+
+
+  if (
+    matchedSkills.length
+  ){
+
+    score += Math.min(
+      15,
+      matchedSkills.length * 5
+    );
+
+    reasons.push(
+      "Skill relevan: " +
+      matchedSkills
+        .slice(0,3)
+        .join(", ")
+    );
+
+  }
+
+
+  /* WORK MODE */
+
+  if (
+    candidateProfile
+      .preferred_work_mode &&
+    job.work_mode ===
+      candidateProfile
+        .preferred_work_mode
+  ){
+
+    score += 7;
+
+    reasons.push(
+      "Work mode sesuai preferensi"
+    );
+
+  }
+
+
+  /* COUNTRY */
+
+  if (
+    candidateProfile
+      .target_countries?.length &&
+    job.country_name
+  ){
+
+    const countryMatch =
+      candidateProfile
+        .target_countries
+        .some(
+          country =>
+            normalize(country) ===
+            normalize(
+              job.country_name
+            )
+        );
+
+
+    if (countryMatch){
+
+      score += 8;
+
+      reasons.push(
+        "Negara sesuai preferensi"
+      );
+
+    }
+
+  }
+
+
+  score =
+    Math.max(
+      0,
+      Math.min(
+        100,
+        score
+      )
+    );
+
+
+  return {
+    score,
+    reasons
+  };
+}
+
+
+/* =====================================================
+   JOB FILTER
+===================================================== */
+
+function applyJobFilters(){
+
+  if (
+    !hasExecuted ||
+    currentService ===
+      "scholarship"
+  ){
+    return;
+  }
+
+
+  let jobs =
+    currentService ===
+      "global"
+
+      ? [...globalJobs]
+
+      : [...indonesiaJobs];
+
+
+  const search =
+    normalize(
+      document
+        .getElementById(
+          "searchInput"
+        )
+        .value
+    );
+
+
+  const country =
+    document
+      .getElementById(
+        "countryFilter"
+      )
+      .value;
+
+
+  const province =
+    document
+      .getElementById(
+        "provinceFilter"
+      )
+      .value;
+
+
+  const workMode =
+    document
+      .getElementById(
+        "workModeFilter"
+      )
+      .value;
+
+
+  const education =
+    document
+      .getElementById(
+        "educationFilter"
+      )
+      .value;
+
+
+  const career =
+    document
+      .getElementById(
+        "careerFilter"
+      )
+      .value;
+
+
+  const fresh =
+    document
+      .getElementById(
+        "freshFilter"
+      )
+      .value;
+
+
+  jobs =
+    jobs
+      .map(
+        job => ({
+          ...job,
+          _match:
+            scoreJob(job)
+        })
+      )
+      .filter(
+        job => {
+
+          const haystack =
+            normalize(
+              [
+                job.job_title,
+                job.company_name,
+                job.country_name,
+                job.city,
+                job.province_name,
+                job.location_text,
+                ...(job.study_fields || [])
+              ].join(" ")
+            );
+
+
+          if (
+            search &&
+            !haystack.includes(
+              search
+            )
+          ){
+            return false;
+          }
+
+
+          if (
+            currentService ===
+              "global" &&
+            country &&
+            job.country_name !==
+              country
+          ){
+            return false;
+          }
+
+
+          if (
+            currentService ===
+              "indonesia" &&
+            province &&
+            job.province_name !==
+              province
+          ){
+            return false;
+          }
+
+
+          if (
+            workMode &&
+            job.work_mode !==
+              workMode
+          ){
+            return false;
+          }
+
+
+          if (
+            education &&
+            job.education_level !==
+              education
+          ){
+            return false;
+          }
+
+
+          if (
+            career &&
+            job.career_level !==
+              career
+          ){
+            return false;
+          }
+
+
+          if (
+            fresh === "YES" &&
+            job.fresh_graduate_eligible !==
+              true
+          ){
+            return false;
+          }
+
+
+          if (
+            fresh === "NO" &&
+            job.fresh_graduate_eligible !==
+              false
+          ){
+            return false;
+          }
+
+
+          if (
+            fresh === "UNKNOWN" &&
+            job.fresh_graduate_eligible !==
+              null
+          ){
+            return false;
+          }
+
+
+          return true;
+        }
+      )
+      .sort(
+        (a,b) =>
+          b._match.score -
+          a._match.score
+      );
+
+
   updateStats(
     jobs
   );
@@ -2317,58 +3408,99 @@ function applyJobFilters() {
   renderJobs(
     jobs
   );
+
 }
 
 
-/* =========================================================
+/* =====================================================
    STATS
-   ========================================================= */
+===================================================== */
 
-function updateStats(jobs) {
+function updateStats(jobs){
 
-  document.getElementById(
-    "jobCount"
-  ).textContent =
-    jobs.length;
-
-
-  document.getElementById(
-    "companyCount"
-  ).textContent =
-    unique(
-      jobs.map(
-        j =>
-          j.company_name
-      )
-    ).length;
+  document
+    .getElementById(
+      "jobCount"
+    )
+    .textContent =
+      jobs.length;
 
 
-  document.getElementById(
-    "freshCount"
-  ).textContent =
-    jobs.filter(
-      j =>
-        j.fresh_graduate_eligible ===
-          true
-    ).length;
+  document
+    .getElementById(
+      "companyCount"
+    )
+    .textContent =
+      unique(
+        jobs.map(
+          x => x.company_name
+        )
+      ).length;
 
 
-  document.getElementById(
-    "remoteCount"
-  ).textContent =
-    jobs.filter(
-      j =>
-        j.work_mode ===
-          "REMOTE"
-    ).length;
+  document
+    .getElementById(
+      "freshCount"
+    )
+    .textContent =
+      jobs.filter(
+        x =>
+          x.fresh_graduate_eligible ===
+            true
+      ).length;
+
+
+  document
+    .getElementById(
+      "remoteCount"
+    )
+    .textContent =
+      jobs.filter(
+        x =>
+          x.work_mode ===
+            "REMOTE"
+      ).length;
+
 }
 
 
-/* =========================================================
-   RENDER JOBS
-   ========================================================= */
+/* =====================================================
+   MATCH LABEL
+===================================================== */
 
-function renderJobs(jobs) {
+function matchLabel(score){
+
+  if (score >= 80){
+    return {
+      text:
+        "Best Match",
+      cls:""
+    };
+  }
+
+
+  if (score >= 60){
+    return {
+      text:
+        "Good Match",
+      cls:"good"
+    };
+  }
+
+
+  return {
+    text:
+      "Possible Match",
+    cls:"possible"
+  };
+}
+
+
+/* =====================================================
+   JOB RENDER
+===================================================== */
+
+function renderJobs(jobs){
 
   const container =
     document.getElementById(
@@ -2381,14 +3513,16 @@ function renderJobs(jobs) {
     );
 
 
-  document.getElementById(
-    "resultCount"
-  ).textContent =
-    jobs.length +
-    " verified vacancies";
+  document
+    .getElementById(
+      "resultCount"
+    )
+    .textContent =
+      jobs.length +
+      " verified vacancies";
 
 
-  if (!jobs.length) {
+  if (!jobs.length){
 
     container.innerHTML =
       "";
@@ -2414,6 +3548,12 @@ function renderJobs(jobs) {
     jobs.map(
       job => {
 
+        const match =
+          matchLabel(
+            job._match.score
+          );
+
+
         const location =
           [
             job.city,
@@ -2432,11 +3572,8 @@ function renderJobs(jobs) {
           "Lokasi belum teridentifikasi";
 
 
-        const studyFields =
-          Array.isArray(
-            job.study_fields
-          ) &&
-          job.study_fields.length
+        const fields =
+          job.study_fields?.length
 
             ? job.study_fields.join(", ")
 
@@ -2455,18 +3592,14 @@ function renderJobs(jobs) {
             : "Belum disebutkan";
 
 
-        const freshText =
-          job.fresh_graduate_eligible ===
-            true
+        const reasons =
+          job._match.reasons.length
 
-            ? "Fresh Graduate Eligible"
+            ? job._match.reasons
+                .slice(0,4)
+                .join(" • ")
 
-            : job.fresh_graduate_eligible ===
-              false
-
-            ? "Experienced Candidate"
-
-            : "Fresh Graduate Eligibility Belum Jelas";
+            : "Belum cukup data untuk menentukan kecocokan secara detail.";
 
 
         return `
@@ -2487,8 +3620,19 @@ function renderJobs(jobs) {
 
               </div>
 
-              <div class="verified">
-                ✓ VERIFIED SAFE
+
+              <div class="right-badges">
+
+                <div class="match-score ${match.cls}">
+                  ${esc(match.text)}
+                  •
+                  ${esc(job._match.score)}%
+                </div>
+
+                <div class="verified">
+                  ✓ VERIFIED SAFE
+                </div>
+
               </div>
 
             </div>
@@ -2502,37 +3646,31 @@ function renderJobs(jobs) {
 
               ${
                 job.work_mode
-
-                ? `
-                  <span class="badge blue">
-                    ${esc(
-                      pretty(
-                        job.work_mode
-                      )
-                    )}
-                  </span>
-                `
-
-                : ""
+                  ? `
+                    <span class="badge blue">
+                      ${esc(
+                        pretty(
+                          job.work_mode
+                        )
+                      )}
+                    </span>
+                  `
+                  : ""
               }
-
 
               ${
                 job.employment_type
-
-                ? `
-                  <span class="badge">
-                    ${esc(
-                      pretty(
-                        job.employment_type
-                      )
-                    )}
-                  </span>
-                `
-
-                : ""
+                  ? `
+                    <span class="badge">
+                      ${esc(
+                        pretty(
+                          job.employment_type
+                        )
+                      )}
+                    </span>
+                  `
+                  : ""
               }
-
 
               <span class="badge orange">
                 ${esc(
@@ -2542,36 +3680,30 @@ function renderJobs(jobs) {
                 )}
               </span>
 
-
               ${
                 job.career_level
-
-                ? `
-                  <span class="badge purple">
-                    ${esc(
-                      pretty(
-                        job.career_level
-                      )
-                    )}
-                  </span>
-                `
-
-                : ""
+                  ? `
+                    <span class="badge purple">
+                      ${esc(
+                        pretty(
+                          job.career_level
+                        )
+                      )}
+                    </span>
+                  `
+                  : ""
               }
 
+            </div>
 
-              <span class="badge ${
-                job.fresh_graduate_eligible ===
-                  true
 
-                  ? "green"
+            <div class="match-reason">
 
-                  : ""
-              }">
+              <strong>
+                Why HANZ matched this:
+              </strong>
 
-                ${esc(freshText)}
-
-              </span>
+              ${esc(reasons)}
 
             </div>
 
@@ -2594,7 +3726,6 @@ function renderJobs(jobs) {
 
               <br>
 
-
               <strong>
                 Career Level:
               </strong>
@@ -2608,7 +3739,6 @@ function renderJobs(jobs) {
 
               <br>
 
-
               <strong>
                 Pengalaman Minimum:
               </strong>
@@ -2617,12 +3747,11 @@ function renderJobs(jobs) {
 
               <br>
 
-
               <strong>
                 Bidang Studi:
               </strong>
 
-              ${esc(studyFields)}
+              ${esc(fields)}
 
             </div>
 
@@ -2635,21 +3764,19 @@ function renderJobs(jobs) {
 
               ${
                 job.official_url
-
-                ? `
-                  <a
-                    class="open-button"
-                    href="${esc(
-                      job.official_url
-                    )}"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    View Official Vacancy ↗
-                  </a>
-                `
-
-                : ""
+                  ? `
+                    <a
+                      class="open-button"
+                      href="${esc(
+                        job.official_url
+                      )}"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      View Official Vacancy ↗
+                    </a>
+                  `
+                  : ""
               }
 
             </div>
@@ -2661,14 +3788,130 @@ function renderJobs(jobs) {
       }
     )
     .join("");
+
 }
 
 
-/* =========================================================
-   SCHOLARSHIP RENDER
-   ========================================================= */
+/* =====================================================
+   SCHOLARSHIP MATCHING
+===================================================== */
 
-function renderScholarships() {
+function scoreScholarship(item){
+
+  let score =
+    50;
+
+  const textData =
+    normalize(
+      JSON.stringify(
+        item
+      )
+    );
+
+  const reasons = [];
+
+
+  if (
+    textData.includes(
+      "fully funded"
+    ) ||
+    item.funding_class ===
+      "FULLY_FUNDED"
+  ){
+
+    score += 15;
+
+    reasons.push(
+      "Fully funded verified"
+    );
+
+  }
+
+
+  if (
+    candidateProfile
+      ?.study_programs?.length
+  ){
+
+    const studyWords =
+      candidateProfile
+        .study_programs
+        .flatMap(
+          program =>
+            normalize(program)
+              .split(" ")
+              .filter(
+                x =>
+                  x.length >= 4
+              )
+        );
+
+
+    if (
+      studyWords.some(
+        word =>
+          textData.includes(
+            word
+          )
+      )
+    ){
+
+      score += 15;
+
+      reasons.push(
+        "Bidang studi berpotensi relevan"
+      );
+
+    }
+
+  }
+
+
+  if (
+    candidateProfile
+      ?.target_countries?.length
+  ){
+
+    if (
+      candidateProfile
+        .target_countries
+        .some(
+          country =>
+            textData.includes(
+              normalize(country)
+            )
+        )
+    ){
+
+      score += 10;
+
+      reasons.push(
+        "Negara sesuai preferensi"
+      );
+
+    }
+
+  }
+
+
+  return {
+    score:
+      Math.min(
+        100,
+        score
+      ),
+
+    reasons
+  };
+}
+
+
+function renderScholarships(){
+
+  if (!hasExecuted){
+    return;
+  }
+
 
   const container =
     document.getElementById(
@@ -2681,16 +3924,34 @@ function renderScholarships() {
     );
 
 
-  document.getElementById(
-    "scholarshipCount"
-  ).textContent =
-    scholarships.length +
-    " verified scholarships";
+  const ranked =
+    scholarships
+      .map(
+        item => ({
+          ...item,
+          _match:
+            scoreScholarship(
+              item
+            )
+        })
+      )
+      .sort(
+        (a,b) =>
+          b._match.score -
+          a._match.score
+      );
 
 
-  if (
-    !scholarships.length
-  ) {
+  document
+    .getElementById(
+      "scholarshipCount"
+    )
+    .textContent =
+      ranked.length +
+      " verified scholarships";
+
+
+  if (!ranked.length){
 
     container.innerHTML =
       "";
@@ -2713,7 +3974,7 @@ function renderScholarships() {
 
 
   container.innerHTML =
-    scholarships.map(
+    ranked.map(
       item => {
 
         const title =
@@ -2744,6 +4005,12 @@ function renderScholarships() {
           "";
 
 
+        const label =
+          matchLabel(
+            item._match.score
+          );
+
+
         return `
 
           <article class="job-card">
@@ -2762,8 +4029,19 @@ function renderScholarships() {
 
               </div>
 
-              <div class="verified">
-                ✓ FULLY FUNDED VERIFIED
+
+              <div class="right-badges">
+
+                <div class="match-score ${label.cls}">
+                  ${esc(label.text)}
+                  •
+                  ${esc(item._match.score)}%
+                </div>
+
+                <div class="verified">
+                  ✓ FULLY FUNDED VERIFIED
+                </div>
+
               </div>
 
             </div>
@@ -2786,6 +4064,25 @@ function renderScholarships() {
             </div>
 
 
+            <div class="match-reason">
+
+              <strong>
+                HANZ Scholarship Match:
+              </strong>
+
+              ${
+                item._match.reasons.length
+                  ? esc(
+                      item._match.reasons.join(
+                        " • "
+                      )
+                    )
+                  : "Scholarship memenuhi verified fully-funded gate. Detail academic eligibility perlu diperiksa dari persyaratan resmi."
+              }
+
+            </div>
+
+
             <div class="footer-row">
 
               <div class="source-note">
@@ -2794,19 +4091,17 @@ function renderScholarships() {
 
               ${
                 url
-
-                ? `
-                  <a
-                    class="open-button"
-                    href="${esc(url)}"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    View Official Scholarship ↗
-                  </a>
-                `
-
-                : ""
+                  ? `
+                    <a
+                      class="open-button"
+                      href="${esc(url)}"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      View Official Scholarship ↗
+                    </a>
+                  `
+                  : ""
               }
 
             </div>
@@ -2818,29 +4113,256 @@ function renderScholarships() {
       }
     )
     .join("");
+
 }
 
 
-/* =========================================================
-   UI
-   ========================================================= */
+/* =====================================================
+   COUNTRY / PROVINCE
+===================================================== */
 
-function hideJobLoading() {
+function buildCountryFilter(){
 
-  document
-    .getElementById(
-      "jobLoading"
-    )
+  const select =
+    document.getElementById(
+      "countryFilter"
+    );
+
+
+  select.innerHTML =
+    '<option value="">Semua Negara</option>';
+
+
+  unique(
+    globalJobs
+      .map(
+        x => x.country_name
+      )
+  )
+    .sort()
+    .forEach(
+      country => {
+
+        const option =
+          document.createElement(
+            "option"
+          );
+
+        option.value =
+          country;
+
+        option.textContent =
+          country;
+
+        select.appendChild(
+          option
+        );
+
+      }
+    );
+
+}
+
+
+function buildProvinceFilter(){
+
+  const select =
+    document.getElementById(
+      "provinceFilter"
+    );
+
+
+  select.innerHTML =
+    '<option value="">Semua Provinsi</option>';
+
+
+  unique(
+    indonesiaJobs
+      .map(
+        x => x.province_name
+      )
+  )
+    .sort()
+    .forEach(
+      province => {
+
+        const option =
+          document.createElement(
+            "option"
+          );
+
+        option.value =
+          province;
+
+        option.textContent =
+          province;
+
+        select.appendChild(
+          option
+        );
+
+      }
+    );
+
+}
+
+
+/* =====================================================
+   SERVICE
+===================================================== */
+
+function changeService(service){
+
+  currentService =
+    service;
+
+
+  [
+    "global",
+    "indonesia",
+    "scholarship"
+  ]
+    .forEach(
+      item => {
+
+        document
+          .getElementById(
+            item + "Tab"
+          )
+          .classList
+          .toggle(
+            "active",
+            item === service
+          );
+
+      }
+    );
+
+
+  const jobs =
+    document.getElementById(
+      "jobSection"
+    );
+
+
+  const scholarship =
+    document.getElementById(
+      "scholarshipSection"
+    );
+
+
+  if (
+    service ===
+      "scholarship"
+  ){
+
+    jobs
+      .classList
+      .add(
+        "hidden"
+      );
+
+    scholarship
+      .classList
+      .remove(
+        "hidden"
+      );
+
+    if (hasExecuted){
+      renderScholarships();
+    }
+
+    return;
+  }
+
+
+  scholarship
     .classList
     .add(
       "hidden"
     );
+
+  jobs
+    .classList
+    .remove(
+      "hidden"
+    );
+
+
+  const countryField =
+    document.getElementById(
+      "countryField"
+    );
+
+
+  const provinceField =
+    document.getElementById(
+      "provinceField"
+    );
+
+
+  if (
+    service ===
+      "global"
+  ){
+
+    countryField
+      .classList
+      .remove(
+        "hidden"
+      );
+
+    provinceField
+      .classList
+      .add(
+        "hidden"
+      );
+
+
+    document
+      .getElementById(
+        "jobListTitle"
+      )
+      .textContent =
+        "🌍 Global Job Matches";
+
+  }
+
+  else{
+
+    countryField
+      .classList
+      .add(
+        "hidden"
+      );
+
+    provinceField
+      .classList
+      .remove(
+        "hidden"
+      );
+
+
+    document
+      .getElementById(
+        "jobListTitle"
+      )
+      .textContent =
+        "🇮🇩 Indonesia Job Matches";
+
+  }
+
+
+  if (hasExecuted){
+    applyJobFilters();
+  }
+
 }
 
 
-/* =========================================================
-   EVENTS
-   ========================================================= */
+/* =====================================================
+   FILTER EVENTS
+===================================================== */
 
 [
   "searchInput",
@@ -2854,10 +4376,11 @@ function hideJobLoading() {
 .forEach(
   id => {
 
-    const el =
+    const element =
       document.getElementById(id);
 
-    el.addEventListener(
+
+    element.addEventListener(
       id ===
         "searchInput"
 
@@ -2865,50 +4388,176 @@ function hideJobLoading() {
 
         : "change",
 
-      applyJobFilters
+      function(){
+
+        /*
+          Filter biasa boleh bekerja setelah
+          HANZ sudah dieksekusi.
+        */
+
+        if (hasExecuted){
+          applyJobFilters();
+        }
+
+      }
     );
 
   }
 );
 
 
-[
-  "profileEducation",
-  "profileStudy",
-  "profileCareer",
-  "profileSkills"
-]
-.forEach(
-  id => {
+/* =====================================================
+   RESET
+===================================================== */
 
-    document
-      .getElementById(id)
-      .addEventListener(
-        [
-          "profileStudy",
-          "profileSkills"
-        ].includes(id)
+function resetProfile(){
 
-          ? "input"
-
-          : "change",
-
-        saveProfile
-      );
-
-  }
-);
+  document
+    .getElementById(
+      "profileEducation"
+    )
+    .value = "";
 
 
-/* =========================================================
+  document
+    .getElementById(
+      "profileStudy"
+    )
+    .value = "";
+
+
+  document
+    .getElementById(
+      "profileCareer"
+    )
+    .value = "";
+
+
+  document
+    .getElementById(
+      "profileExperience"
+    )
+    .value = "";
+
+
+  document
+    .getElementById(
+      "profileSkills"
+    )
+    .value = "";
+
+
+  document
+    .getElementById(
+      "profileWorkMode"
+    )
+    .value = "";
+
+
+  document
+    .getElementById(
+      "profileCountries"
+    )
+    .value = "";
+
+
+  document
+    .getElementById(
+      "cvFile"
+    )
+    .value = "";
+
+
+  document
+    .getElementById(
+      "cvFileName"
+    )
+    .textContent =
+      "Belum ada CV dipilih";
+
+
+  document
+    .getElementById(
+      "analyzedProfile"
+    )
+    .classList
+    .add(
+      "hidden"
+    );
+
+
+  document
+    .getElementById(
+      "jobItems"
+    )
+    .innerHTML = "";
+
+
+  document
+    .getElementById(
+      "scholarshipItems"
+    )
+    .innerHTML = "";
+
+
+  document
+    .getElementById(
+      "jobWaiting"
+    )
+    .classList
+    .remove(
+      "hidden"
+    );
+
+
+  document
+    .getElementById(
+      "scholarshipWaiting"
+    )
+    .classList
+    .remove(
+      "hidden"
+    );
+
+
+  document
+    .getElementById(
+      "executionStatus"
+    )
+    .className =
+      "execution-status";
+
+
+  document
+    .getElementById(
+      "executionStatus"
+    )
+    .textContent =
+      "Isi profil atau upload CV, lalu tekan tombol pencarian.";
+
+
+  candidateProfile =
+    null;
+
+  hasExecuted =
+    false;
+
+
+  localStorage.removeItem(
+    "hanz_candidate_profile"
+  );
+
+}
+
+
+/* =====================================================
    START
-   ========================================================= */
+===================================================== */
 
-loadProfile();
-
-loadJobs();
-
-loadScholarships();
+/*
+  Tidak otomatis menjalankan pencarian.
+  User harus menekan tombol execute.
+*/
 
 </script>
 
