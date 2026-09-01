@@ -671,6 +671,79 @@ h1{
   color:var(--orange);
 }
 
+.eligibility-badge{
+  padding:7px 10px;
+  border-radius:999px;
+  font-size:10px;
+  font-weight:900;
+  white-space:nowrap;
+}
+
+.eligibility-badge.eligible{
+  background:var(--green-soft);
+  color:var(--green);
+}
+
+.eligibility-badge.likely{
+  background:var(--blue-soft);
+  color:var(--blue);
+}
+
+.eligibility-badge.verify{
+  background:var(--orange-soft);
+  color:var(--orange);
+}
+
+.eligibility-badge.not-eligible{
+  background:var(--red-soft);
+  color:var(--red);
+}
+
+.scholarship-card.not-eligible{
+  border-color:#f0caca;
+  background:#fffafa;
+}
+
+.scholarship-section-label{
+  margin:18px 2px 9px;
+  color:var(--muted);
+  font-size:11px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+}
+
+.eligibility-checks{
+  margin-top:10px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+}
+
+.eligibility-check{
+  padding:5px 8px;
+  border-radius:8px;
+  background:#f2f4f8;
+  color:#566072;
+  font-size:9px;
+  font-weight:750;
+}
+
+.eligibility-check.pass{
+  background:var(--green-soft);
+  color:var(--green);
+}
+
+.eligibility-check.fail{
+  background:var(--red-soft);
+  color:var(--red);
+}
+
+.eligibility-check.unknown{
+  background:var(--orange-soft);
+  color:var(--orange);
+}
+
 .badges{
   display:flex;
   flex-wrap:wrap;
@@ -882,6 +955,54 @@ h1{
   }
 
 }
+
+/* =====================================================
+   LANGUAGE SWITCHER
+===================================================== */
+.header-actions{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.lang-switch{
+  display:flex;
+  align-items:center;
+  gap:4px;
+  padding:4px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  background:#fff;
+  box-shadow:0 4px 14px rgba(31,42,68,.05);
+}
+.lang-btn{
+  min-width:72px;
+  min-height:34px;
+  padding:0 10px;
+  border:0;
+  border-radius:999px;
+  background:transparent;
+  color:var(--muted);
+  font-size:11px;
+  font-weight:850;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  transition:.15s ease;
+}
+.lang-btn:hover{background:#f5f7fb;color:var(--text)}
+.lang-btn.active{
+  background:var(--blue-soft);
+  color:var(--blue);
+  box-shadow:inset 0 0 0 1px rgba(22,93,255,.12);
+}
+.lang-flag{font-size:16px;line-height:1}
+@media(max-width:700px){
+  .header-actions{gap:6px}
+  .lang-btn{min-width:52px;padding:0 8px}
+  .lang-label{display:none}
+}
+
 </style>
 </head>
 
@@ -911,8 +1032,18 @@ h1{
 
     </div>
 
-    <div class="safe-chip">
-      ✓ Verified Safe Sources
+    <div class="header-actions">
+      <div class="lang-switch" aria-label="Language selector">
+        <button class="lang-btn" id="langIdBtn" type="button" onclick="setLanguage('id')" aria-label="Bahasa Indonesia">
+          <span class="lang-flag">🇮🇩</span><span class="lang-label">ID</span>
+        </button>
+        <button class="lang-btn" id="langEnBtn" type="button" onclick="setLanguage('en')" aria-label="English">
+          <span class="lang-flag">🇬🇧</span><span class="lang-label">EN</span>
+        </button>
+      </div>
+      <div class="safe-chip">
+        ✓ Verified Safe Sources
+      </div>
     </div>
 
   </div>
@@ -1178,6 +1309,37 @@ h1{
       <input
         id="profileCountries"
         placeholder="Contoh: Indonesia, Singapore, UAE, Japan"
+      >
+
+    </div>
+
+
+    <div class="field">
+
+      <label>
+        Kewarganegaraan
+      </label>
+
+      <input
+        id="profileNationality"
+        placeholder="Contoh: Indonesia"
+      >
+
+    </div>
+
+
+    <div class="field">
+
+      <label>
+        Tahun Lulus
+      </label>
+
+      <input
+        id="profileGraduationYear"
+        type="number"
+        min="1950"
+        max="2100"
+        placeholder="Contoh: 2026"
       >
 
     </div>
@@ -1991,7 +2153,30 @@ function getManualProfile(){
             "profileCountries"
           )
           .value
-      )
+      ),
+
+    nationality:
+      document
+        .getElementById(
+          "profileNationality"
+        )
+        .value
+        .trim(),
+
+    graduation_year:
+      document
+        .getElementById(
+          "profileGraduationYear"
+        )
+        .value !== ""
+          ? Number(
+              document
+                .getElementById(
+                  "profileGraduationYear"
+                )
+                .value
+            )
+          : null
 
   };
 }
@@ -2122,7 +2307,14 @@ function buildManualCandidateProfile(
 
     target_countries:
       manual.target_countries ||
-      []
+      [],
+
+    nationality:
+      manual.nationality ||
+      "",
+
+    graduation_year:
+      manual.graduation_year
 
   };
 }
@@ -2474,7 +2666,17 @@ async function executeHANZ(){
           manual.preferred_work_mode,
 
         target_countries:
-          manual.target_countries
+          manual.target_countries,
+
+        nationality:
+          manual.nationality ||
+          result.candidate_profile?.nationality ||
+          "",
+
+        graduation_year:
+          manual.graduation_year ??
+          result.candidate_profile?.graduation_year ??
+          null
 
       };
 
@@ -2541,6 +2743,32 @@ async function executeHANZ(){
             candidateProfile
               .skills
               .join(", ");
+      }
+
+
+      if (
+        !manual.nationality &&
+        candidateProfile.nationality
+      ){
+        document
+          .getElementById(
+            "profileNationality"
+          )
+          .value =
+            candidateProfile.nationality;
+      }
+
+
+      if (
+        manual.graduation_year === null &&
+        candidateProfile.graduation_year
+      ){
+        document
+          .getElementById(
+            "profileGraduationYear"
+          )
+          .value =
+            candidateProfile.graduation_year;
       }
 
     }
@@ -2610,7 +2838,7 @@ async function executeHANZ(){
 
     applyJobFilters();
 
-    renderScholarships();
+    await renderScholarships();
 
 
     status.className =
@@ -2770,6 +2998,22 @@ function renderAnalyzedProfile(){
     <div class="analysis-item">
       <strong>Bahasa</strong>
       ${esc(languages)}
+    </div>
+
+    <div class="analysis-item">
+      <strong>Kewarganegaraan</strong>
+      ${esc(
+        candidateProfile.nationality ||
+        "Belum terdeteksi"
+      )}
+    </div>
+
+    <div class="analysis-item">
+      <strong>Tahun Lulus</strong>
+      ${esc(
+        candidateProfile.graduation_year ??
+        "Belum terdeteksi"
+      )}
     </div>
 
     <div class="analysis-item">
@@ -3793,120 +4037,527 @@ function renderJobs(jobs){
 
 
 /* =====================================================
-   SCHOLARSHIP MATCHING
+   SCHOLARSHIP ELIGIBILITY + PERSONAL MATCHING
 ===================================================== */
 
-function scoreScholarship(item){
-
-  let score =
-    50;
-
-  const textData =
-    normalize(
-      JSON.stringify(
-        item
-      )
-    );
-
-  const reasons = [];
+const SCHOLARSHIP_ELIGIBILITY_PRIORITY = {
+  ELIGIBLE:4,
+  LIKELY_ELIGIBLE:3,
+  VERIFY_REQUIRED:2,
+  NOT_ELIGIBLE:1
+};
 
 
-  if (
-    textData.includes(
-      "fully funded"
-    ) ||
-    item.funding_class ===
-      "FULLY_FUNDED"
-  ){
+function eligibilityMeta(status){
 
-    score += 15;
+  const map = {
+    ELIGIBLE:{
+      text:"ELIGIBLE",
+      cls:"eligible"
+    },
 
-    reasons.push(
-      "Fully funded verified"
-    );
+    LIKELY_ELIGIBLE:{
+      text:"LIKELY ELIGIBLE",
+      cls:"likely"
+    },
 
-  }
+    VERIFY_REQUIRED:{
+      text:"VERIFY REQUIRED",
+      cls:"verify"
+    },
 
-
-  if (
-    candidateProfile
-      ?.study_programs?.length
-  ){
-
-    const studyWords =
-      candidateProfile
-        .study_programs
-        .flatMap(
-          program =>
-            normalize(program)
-              .split(" ")
-              .filter(
-                x =>
-                  x.length >= 4
-              )
-        );
-
-
-    if (
-      studyWords.some(
-        word =>
-          textData.includes(
-            word
-          )
-      )
-    ){
-
-      score += 15;
-
-      reasons.push(
-        "Bidang studi berpotensi relevan"
-      );
-
+    NOT_ELIGIBLE:{
+      text:"NOT ELIGIBLE",
+      cls:"not-eligible"
     }
+  };
 
-  }
-
-
-  if (
-    candidateProfile
-      ?.target_countries?.length
-  ){
-
-    if (
-      candidateProfile
-        .target_countries
-        .some(
-          country =>
-            textData.includes(
-              normalize(country)
-            )
-        )
-    ){
-
-      score += 10;
-
-      reasons.push(
-        "Negara sesuai preferensi"
-      );
-
-    }
-
-  }
-
-
-  return {
-    score:
-      Math.min(
-        100,
-        score
-      ),
-
-    reasons
+  return map[status] || {
+    text:"VERIFY REQUIRED",
+    cls:"verify"
   };
 }
 
 
-function renderScholarships(){
+function scholarshipCountry(item){
+
+  return (
+    item.destination_country ||
+    item.country_name ||
+    item.country ||
+    "Global"
+  );
+}
+
+
+async function callScholarshipEligibility(item){
+
+  const response =
+    await fetch(
+      SUPABASE_URL +
+      "/functions/v1/scholarship-eligibility-resolver",
+      {
+        method:"POST",
+
+        headers:{
+          apikey:
+            SUPABASE_KEY,
+
+          Authorization:
+            "Bearer " +
+            SUPABASE_KEY,
+
+          "Content-Type":
+            "application/json"
+        },
+
+        body:
+          JSON.stringify({
+            candidate:
+              candidateProfile,
+
+            scholarship:
+              item
+          })
+      }
+    );
+
+
+  const raw =
+    await response.text();
+
+  let result;
+
+  try{
+    result =
+      JSON.parse(raw);
+  }
+  catch{
+    throw new Error(
+      raw ||
+      "Scholarship eligibility resolver returned invalid response."
+    );
+  }
+
+
+  if (
+    !response.ok ||
+    result?.ok !== true
+  ){
+    throw new Error(
+      result?.error ||
+      "Scholarship eligibility screening failed."
+    );
+  }
+
+
+  return result;
+}
+
+
+function fallbackScholarshipEligibility(
+  item,
+  error
+){
+
+  return {
+    ok:false,
+
+    eligibility:
+      "VERIFY_REQUIRED",
+
+    personal_match_score:
+      0,
+
+    hard_failures:[],
+
+    verification_required:[
+      "eligibility_engine"
+    ],
+
+    checks:{
+      engine:{
+        status:
+          "UNKNOWN",
+
+        reason:
+          error?.message ||
+          "Eligibility engine could not be completed."
+      }
+    },
+
+    recommendation:
+      "DO_NOT_RANK_AS_CONFIRMED_MATCH"
+  };
+}
+
+
+function scholarshipCheckHtml(
+  checks
+){
+
+  const labels = {
+    safety:
+      "Safety",
+
+    official_source:
+      "Official",
+
+    funding:
+      "Funding",
+
+    deadline:
+      "Deadline",
+
+    nationality:
+      "Nationality",
+
+    academic:
+      "Academic",
+
+    graduation_window:
+      "Graduation",
+
+    work_experience:
+      "Experience",
+
+    language:
+      "Language",
+
+    age:
+      "Age",
+
+    study_field:
+      "Field"
+  };
+
+
+  return Object
+    .entries(
+      checks || {}
+    )
+    .filter(
+      ([key]) =>
+        labels[key]
+    )
+    .map(
+      ([key,value]) => {
+
+        const status =
+          String(
+            value?.status ||
+            "UNKNOWN"
+          )
+          .toUpperCase();
+
+        const cls =
+          status === "PASS"
+            ? "pass"
+
+            : status === "FAIL"
+            ? "fail"
+
+            : "unknown";
+
+        const icon =
+          status === "PASS"
+            ? "✓"
+
+            : status === "FAIL"
+            ? "✕"
+
+            : "?";
+
+        return `
+          <span
+            class="eligibility-check ${cls}"
+            title="${esc(
+              value?.reason ||
+              ""
+            )}"
+          >
+            ${icon}
+            ${esc(labels[key])}
+          </span>
+        `;
+      }
+    )
+    .join("");
+}
+
+
+function scholarshipReason(
+  result
+){
+
+  if (
+    result.eligibility ===
+      "NOT_ELIGIBLE"
+  ){
+
+    const failed =
+      result.hard_failures ||
+      [];
+
+    if (
+      failed.length
+    ){
+      return (
+        "Tidak direkomendasikan karena syarat wajib belum terpenuhi: " +
+        failed
+          .map(pretty)
+          .join(", ") +
+        "."
+      );
+    }
+
+    return (
+      "Ada syarat wajib scholarship yang tidak terpenuhi."
+    );
+  }
+
+
+  if (
+    result.eligibility ===
+      "VERIFY_REQUIRED"
+  ){
+
+    const verify =
+      result.verification_required ||
+      [];
+
+    return (
+      "Belum boleh dianggap confirmed match. Perlu verifikasi: " +
+      (
+        verify.length
+          ? verify
+              .map(pretty)
+              .join(", ")
+          : "persyaratan resmi"
+      ) +
+      "."
+    );
+  }
+
+
+  if (
+    result.eligibility ===
+      "LIKELY_ELIGIBLE"
+  ){
+
+    const verify =
+      result.verification_required ||
+      [];
+
+    return (
+      "Profil terlihat cocok dan tidak ada hard failure." +
+      (
+        verify.length
+          ? " Masih perlu verifikasi: " +
+            verify
+              .map(pretty)
+              .join(", ") +
+            "."
+          : ""
+      )
+    );
+  }
+
+
+  return (
+    "Syarat utama yang dapat diverifikasi sudah terpenuhi."
+  );
+}
+
+
+function scholarshipCard(
+  item
+){
+
+  const result =
+    item._eligibility;
+
+  const meta =
+    eligibilityMeta(
+      result.eligibility
+    );
+
+  const title =
+    item.scholarship_name ||
+    item.title ||
+    item.program_name ||
+    "Fully Funded Master Scholarship";
+
+
+  const provider =
+    item.provider_name ||
+    item.provider ||
+    item.university_name ||
+    item.institution_name ||
+    "Official Scholarship Provider";
+
+
+  const country =
+    scholarshipCountry(
+      item
+    );
+
+
+  const url =
+    item.official_url ||
+    item.application_url ||
+    item.source_url ||
+    "";
+
+
+  const score =
+    Number(
+      result.personal_match_score ??
+      0
+    );
+
+
+  const isNotEligible =
+    result.eligibility ===
+      "NOT_ELIGIBLE";
+
+
+  return `
+
+    <article
+      class="job-card scholarship-card ${
+        isNotEligible
+          ? "not-eligible"
+          : ""
+      }"
+    >
+
+      <div class="job-head">
+
+        <div>
+
+          <h3 class="job-title">
+            ${esc(title)}
+          </h3>
+
+          <div class="company">
+            ${esc(provider)}
+          </div>
+
+        </div>
+
+
+        <div class="right-badges">
+
+          <div
+            class="eligibility-badge ${meta.cls}"
+          >
+            ${esc(meta.text)}
+          </div>
+
+          <div class="match-score">
+            Match ${esc(score)}%
+          </div>
+
+          <div class="verified">
+            ✓ VERIFIED SAFE
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="badges">
+
+        <span class="badge">
+          🌍 ${esc(country)}
+        </span>
+
+        <span class="badge green">
+          Fully Funded
+        </span>
+
+        <span class="badge purple">
+          Master / S2
+        </span>
+
+        ${
+          item.application_deadline
+            ? `
+              <span class="badge orange">
+                Deadline:
+                ${esc(
+                  new Date(
+                    item.application_deadline
+                  )
+                  .toLocaleDateString(
+                    "id-ID",
+                    {
+                      day:"2-digit",
+                      month:"short",
+                      year:"numeric"
+                    }
+                  )
+                )}
+              </span>
+            `
+            : ""
+        }
+
+      </div>
+
+
+      <div class="match-reason">
+
+        <strong>
+          HANZ Eligibility:
+        </strong>
+
+        ${esc(
+          scholarshipReason(
+            result
+          )
+        )}
+
+        <div class="eligibility-checks">
+          ${scholarshipCheckHtml(
+            result.checks
+          )}
+        </div>
+
+      </div>
+
+
+      <div class="footer-row">
+
+        <div class="source-note">
+          Official source + Fully Funded Gate + Anti-Scam + Personal Eligibility
+        </div>
+
+        ${
+          url
+            ? `
+              <a
+                class="open-button"
+                href="${esc(url)}"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View Official Scholarship ↗
+              </a>
+            `
+            : ""
+        }
+
+      </div>
+
+    </article>
+  `;
+}
+
+
+async function renderScholarships(){
 
   if (!hasExecuted){
     return;
@@ -3923,38 +4574,19 @@ function renderScholarships(){
       "scholarshipEmpty"
     );
 
-
-  const ranked =
-    scholarships
-      .map(
-        item => ({
-          ...item,
-          _match:
-            scoreScholarship(
-              item
-            )
-        })
-      )
-      .sort(
-        (a,b) =>
-          b._match.score -
-          a._match.score
-      );
-
-
-  document
-    .getElementById(
+  const count =
+    document.getElementById(
       "scholarshipCount"
-    )
-    .textContent =
-      ranked.length +
-      " verified scholarships";
+    );
 
 
-  if (!ranked.length){
+  if (!scholarships.length){
 
     container.innerHTML =
       "";
+
+    count.textContent =
+      "0 verified scholarships";
 
     empty
       .classList
@@ -3973,146 +4605,190 @@ function renderScholarships(){
     );
 
 
-  container.innerHTML =
-    ranked.map(
-      item => {
-
-        const title =
-          item.scholarship_name ||
-          item.title ||
-          item.program_name ||
-          "Fully Funded Master Scholarship";
+  count.textContent =
+    "Checking personal eligibility...";
 
 
-        const provider =
-          item.provider_name ||
-          item.provider ||
-          item.university_name ||
-          item.institution_name ||
-          "Official Scholarship Provider";
+  container.innerHTML = `
+    <div class="state">
+      <strong>
+        HANZ sedang memeriksa eligibility
+      </strong>
+      Safety, funding, academic, experience,
+      nationality, deadline dan persyaratan lain sedang dicocokkan.
+    </div>
+  `;
 
 
-        const country =
-          item.country_name ||
-          item.country ||
-          "Global";
+  const screened =
+    await Promise.all(
+      scholarships.map(
+        async item => {
+
+          try{
+
+            const result =
+              await callScholarshipEligibility(
+                item
+              );
+
+            return {
+              ...item,
+              _eligibility:
+                result
+            };
+
+          }
+          catch(error){
+
+            return {
+              ...item,
+
+              _eligibility:
+                fallbackScholarshipEligibility(
+                  item,
+                  error
+                )
+            };
+
+          }
+
+        }
+      )
+    );
 
 
-        const url =
-          item.official_url ||
-          item.application_url ||
-          item.source_url ||
-          "";
+  const ranked =
+    screened
+      .sort(
+        (a,b) => {
+
+          const aPriority =
+            SCHOLARSHIP_ELIGIBILITY_PRIORITY[
+              a._eligibility
+                .eligibility
+            ] || 0;
+
+          const bPriority =
+            SCHOLARSHIP_ELIGIBILITY_PRIORITY[
+              b._eligibility
+                .eligibility
+            ] || 0;
 
 
-        const label =
-          matchLabel(
-            item._match.score
+          if (
+            bPriority !==
+            aPriority
+          ){
+            return (
+              bPriority -
+              aPriority
+            );
+          }
+
+
+          return (
+            Number(
+              b._eligibility
+                .personal_match_score ||
+              0
+            ) -
+            Number(
+              a._eligibility
+                .personal_match_score ||
+              0
+            )
           );
 
-
-        return `
-
-          <article class="job-card">
-
-            <div class="job-head">
-
-              <div>
-
-                <h3 class="job-title">
-                  ${esc(title)}
-                </h3>
-
-                <div class="company">
-                  ${esc(provider)}
-                </div>
-
-              </div>
+        }
+      );
 
 
-              <div class="right-badges">
-
-                <div class="match-score ${label.cls}">
-                  ${esc(label.text)}
-                  •
-                  ${esc(item._match.score)}%
-                </div>
-
-                <div class="verified">
-                  ✓ FULLY FUNDED VERIFIED
-                </div>
-
-              </div>
-
-            </div>
+  const primary =
+    ranked.filter(
+      item =>
+        item._eligibility
+          .eligibility !==
+        "NOT_ELIGIBLE"
+    );
 
 
-            <div class="badges">
-
-              <span class="badge">
-                🌍 ${esc(country)}
-              </span>
-
-              <span class="badge green">
-                Fully Funded
-              </span>
-
-              <span class="badge purple">
-                Master / S2
-              </span>
-
-            </div>
+  const rejected =
+    ranked.filter(
+      item =>
+        item._eligibility
+          .eligibility ===
+        "NOT_ELIGIBLE"
+    );
 
 
-            <div class="match-reason">
-
-              <strong>
-                HANZ Scholarship Match:
-              </strong>
-
-              ${
-                item._match.reasons.length
-                  ? esc(
-                      item._match.reasons.join(
-                        " • "
-                      )
-                    )
-                  : "Scholarship memenuhi verified fully-funded gate. Detail academic eligibility perlu diperiksa dari persyaratan resmi."
-              }
-
-            </div>
+  count.textContent =
+    primary.length +
+    " recommended / verify • " +
+    rejected.length +
+    " not eligible";
 
 
-            <div class="footer-row">
+  let html = "";
 
-              <div class="source-note">
-                Official scholarship source verified by HANZ
-              </div>
 
-              ${
-                url
-                  ? `
-                    <a
-                      class="open-button"
-                      href="${esc(url)}"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      View Official Scholarship ↗
-                    </a>
-                  `
-                  : ""
-              }
+  if (
+    primary.length
+  ){
 
-            </div>
+    html += `
+      <div class="scholarship-section-label">
+        Recommended & Verification Queue
+      </div>
+    `;
 
-          </article>
+    html +=
+      primary
+        .map(
+          scholarshipCard
+        )
+        .join("");
 
-        `;
+  }
 
-      }
-    )
-    .join("");
+
+  if (
+    rejected.length
+  ){
+
+    html += `
+      <div class="scholarship-section-label">
+        Tidak Direkomendasikan — Syarat Wajib Tidak Terpenuhi
+      </div>
+    `;
+
+    html +=
+      rejected
+        .map(
+          scholarshipCard
+        )
+        .join("");
+
+  }
+
+
+  if (!html){
+
+    empty
+      .classList
+      .remove(
+        "hidden"
+      );
+
+    container.innerHTML =
+      "";
+
+    return;
+  }
+
+
+  container.innerHTML =
+    html;
 
 }
 
@@ -4269,7 +4945,9 @@ function changeService(service){
       );
 
     if (hasExecuted){
-      renderScholarships();
+      renderScholarships().catch(
+        console.error
+      );
     }
 
     return;
@@ -4463,6 +5141,20 @@ function resetProfile(){
 
   document
     .getElementById(
+      "profileNationality"
+    )
+    .value = "";
+
+
+  document
+    .getElementById(
+      "profileGraduationYear"
+    )
+    .value = "";
+
+
+  document
+    .getElementById(
       "cvFile"
     )
     .value = "";
@@ -4558,6 +5250,303 @@ function resetProfile(){
   Tidak otomatis menjalankan pencarian.
   User harus menekan tombol execute.
 */
+
+
+/* =====================================================
+   DUAL LANGUAGE — BAHASA INDONESIA / ENGLISH
+   UI-only. Backend machine codes remain unchanged.
+===================================================== */
+
+let currentLanguage =
+  localStorage.getItem("hanz_language") === "en"
+    ? "en"
+    : "id";
+
+const _hanzOriginalText = new WeakMap();
+const _hanzOriginalAttrs = new WeakMap();
+let _hanzLanguageApplying = false;
+
+const I18N = [
+  ["HANZ Opportunity Engine","HANZ Opportunity Engine"],
+  ["Personal Opportunity Intelligence","Personal Opportunity Intelligence"],
+  ["✓ Verified Safe Sources","✓ Sumber Terverifikasi Aman"],
+  ["Personal Opportunity Engine","Mesin Peluang Personal"],
+  ["Kesempatan terbaik, disesuaikan dengan profilmu.","The best opportunities, matched to your profile."],
+  ["Upload CV atau isi profil secara manual. HANZ akan membaca background pendidikan, kompetensi, pengalaman dan skill untuk membantu menemukan lowongan maupun scholarship yang lebih relevan.","Upload your CV or complete your profile manually. HANZ analyzes your education, competencies, experience, and skills to find more relevant jobs and scholarships."],
+  ["👤 Profil Saya","👤 My Profile"],
+  ["Isi manual atau upload CV. Setelah selesai tekan tombol Analisa Profil & Cari Peluang.","Complete the form or upload a CV. When ready, click Analyze Profile & Find Opportunities."],
+  ["📄 Upload CV","📄 Upload CV"],
+  ["HANZ akan membaca CV untuk mengenali pendidikan, program studi, pengalaman, skill, bahasa dan job family. Format: PDF, DOCX atau TXT. Maksimal 10 MB.","HANZ reads your CV to identify education, field of study, experience, skills, languages, and job families. Formats: PDF, DOCX, or TXT. Maximum 10 MB."],
+  ["Belum ada CV dipilih","No CV selected"],
+  ["Pendidikan Terakhir","Highest Education"],
+  ["Pilih pendidikan","Select education"],
+  ["SMA / SMK","Senior High / Vocational School"],
+  ["D4 / S1","D4 / Bachelor's"],
+  ["Program Studi","Field of Study"],
+  ["Status Karier","Career Status"],
+  ["Belum dipilih","Not selected"],
+  ["Mahasiswa / Internship","Student / Internship"],
+  ["Pengalaman Kerja","Work Experience"],
+  ["Belum ada","None yet"],
+  ["± 1 tahun","± 1 year"],
+  ["± 2 tahun","± 2 years"],
+  ["3–4 tahun","3–4 years"],
+  ["5–7 tahun","5–7 years"],
+  ["8+ tahun","8+ years"],
+  ["Skill Utama","Key Skills"],
+  ["Preferensi Work Mode","Preferred Work Mode"],
+  ["Semua","All"],
+  ["On-site","On-site"],
+  ["Remote / WFH","Remote / WFH"],
+  ["Target Negara","Target Countries"],
+  ["Kewarganegaraan","Nationality"],
+  ["Tahun Lulus","Graduation Year"],
+  ["Privacy:","Privacy:"],
+  ["CV diproses oleh Candidate Profile Analyzer dan tidak disimpan ke database oleh engine V1. Hasil analisis profil disimpan lokal di browser untuk personalisasi.","Your CV is processed by the Candidate Profile Analyzer and is not stored in the database by engine V1. The analyzed profile is stored locally in your browser for personalization."],
+  ["🔍 Analisa Profil & Cari Peluang","🔍 Analyze Profile & Find Opportunities"],
+  ["Reset Profil","Reset Profile"],
+  ["Isi profil atau upload CV, lalu tekan tombol pencarian.","Complete your profile or upload a CV, then click the search button."],
+  ["✓ HANZ Candidate Profile","✓ HANZ Candidate Profile"],
+  ["Global Job Vacancies","Global Job Vacancies"],
+  ["Verified job vacancies di luar Indonesia.","Verified job vacancies outside Indonesia."],
+  ["Indonesia Job Vacancies","Indonesia Job Vacancies"],
+  ["Verified job vacancies dari seluruh Indonesia.","Verified job vacancies across Indonesia."],
+  ["Global Scholarship","Global Scholarship"],
+  ["Fully funded Master scholarship worldwide.","Fully funded Master's scholarships worldwide."],
+  ["Matching Vacancies","Matching Vacancies"],
+  ["Companies","Companies"],
+  ["Fresh Graduate","Fresh Graduate"],
+  ["Search Vacancy","Search Vacancies"],
+  ["Negara","Country"],
+  ["Semua Negara","All Countries"],
+  ["Provinsi","Province"],
+  ["Semua Provinsi","All Provinces"],
+  ["Work Mode","Work Mode"],
+  ["Belum Diketahui","Unknown"],
+  ["Persyaratan Pendidikan","Education Requirement"],
+  ["Minimal SMA / SMK","Minimum Senior High / Vocational"],
+  ["Minimal D3","Minimum D3"],
+  ["Minimal D4 / S1","Minimum D4 / Bachelor's"],
+  ["Minimal S2","Minimum Master's"],
+  ["Tidak Mensyaratkan Gelar","No Degree Required"],
+  ["Persyaratan Belum Disebutkan","Requirement Not Stated"],
+  ["Career Level","Career Level"],
+  ["Entry Level","Entry Level"],
+  ["Mid Level","Mid Level"],
+  ["Senior","Senior"],
+  ["Leadership","Leadership"],
+  ["Fresh Graduate Eligibility","Fresh Graduate Eligibility"],
+  ["Confirmed Eligible","Confirmed Eligible"],
+  ["Tidak Cocok","Not Suitable"],
+  ["Belum Jelas","Unclear"],
+  ["Safety","Safety"],
+  ["✓ Verified Safe Only","✓ Verified Safe Only"],
+  ["🌍 Global Job Matches","🌍 Global Job Matches"],
+  ["🇮🇩 Indonesia Job Matches","🇮🇩 Indonesia Job Matches"],
+  ["Isi profil lalu jalankan HANZ","Complete your profile, then run HANZ"],
+  ["HANZ menunggu profilmu","HANZ is waiting for your profile"],
+  ["Upload CV atau isi background, kemudian tekan “Analisa Profil & Cari Peluang”.","Upload a CV or complete your background, then click “Analyze Profile & Find Opportunities”."],
+  ["Gagal mengambil vacancy","Failed to load vacancies"],
+  ["Belum ada vacancy yang cocok","No matching vacancies yet"],
+  ["Tidak ada verified vacancy yang cukup relevan dengan profil dan filter saat ini.","No verified vacancies are sufficiently relevant to your current profile and filters."],
+  ["🎓 Global Scholarship Matches","🎓 Global Scholarship Matches"],
+  ["Scholarship akan dicocokkan setelah profil dianalisa.","Scholarships will be matched after your profile is analyzed."],
+  ["Belum ada scholarship terverifikasi","No verified scholarships yet"],
+  ["Global Scholarship hanya menampilkan program Master yang lolos fully-funded verification.","Global Scholarship only shows Master's programs that pass fully funded verification."],
+  ["Pendidikan","Education"],
+  ["Pengalaman","Experience"],
+  ["Job Family","Job Family"],
+  ["Skills","Skills"],
+  ["Bahasa","Languages"],
+  ["Semua target market HANZ","All HANZ target markets"],
+  ["Belum terdeteksi","Not detected"],
+  ["Persyaratan pendidikan belum disebutkan oleh perusahaan","Education requirement has not been stated by the company"],
+  ["Tidak mensyaratkan gelar tertentu","No specific degree required"],
+  ["Pendidikan memenuhi requirement","Education meets the requirement"],
+  ["Pendidikan berada di bawah requirement yang terdeteksi","Education is below the detected requirement"],
+  ["Confirmed fresh graduate eligible","Confirmed fresh graduate eligible"],
+  ["Vacancy bukan untuk fresh graduate","Vacancy is not intended for fresh graduates"],
+  ["Pengalaman memenuhi minimum","Experience meets the minimum requirement"],
+  ["Pengalaman belum memenuhi minimum","Experience does not yet meet the minimum requirement"],
+  ["Job family sesuai dengan background","Job family matches the candidate background"],
+  ["Work mode sesuai preferensi","Work mode matches preference"],
+  ["Negara sesuai preferensi","Country matches preference"],
+  ["Best Match","Best Match"],
+  ["Good Match","Good Match"],
+  ["Possible Match","Possible Match"],
+  ["Lokasi belum teridentifikasi","Location not identified"],
+  ["Belum disebutkan","Not stated"],
+  ["Belum cukup data untuk menentukan kecocokan secara detail.","Not enough data to determine the match in detail."],
+  ["Why HANZ matched this:","Why HANZ matched this:"],
+  ["Vacancy Requirements","Vacancy Requirements"],
+  ["Persyaratan Pendidikan:","Education Requirement:"],
+  ["Pengalaman Minimum:","Minimum Experience:"],
+  ["Bidang Studi:","Field of Study:"],
+  ["Official vacancy source verified by HANZ","Sumber lowongan resmi diverifikasi oleh HANZ"],
+  ["View Official Vacancy ↗","Lihat Lowongan Resmi ↗"],
+  ["ELIGIBLE","ELIGIBLE"],
+  ["LIKELY ELIGIBLE","LIKELY ELIGIBLE"],
+  ["VERIFY REQUIRED","VERIFY REQUIRED"],
+  ["NOT ELIGIBLE","NOT ELIGIBLE"],
+  ["Safety","Safety"],
+  ["Official","Official"],
+  ["Funding","Funding"],
+  ["Deadline","Deadline"],
+  ["Nationality","Nationality"],
+  ["Academic","Academic"],
+  ["Graduation","Graduation"],
+  ["Experience","Experience"],
+  ["Language","Language"],
+  ["Age","Age"],
+  ["Field","Field"],
+  ["Tidak direkomendasikan karena syarat wajib belum terpenuhi:","Not recommended because mandatory requirements are not met:"],
+  ["Ada syarat wajib scholarship yang tidak terpenuhi.","One or more mandatory scholarship requirements are not met."],
+  ["Belum boleh dianggap confirmed match. Perlu verifikasi:","This should not yet be treated as a confirmed match. Verification is required:"],
+  ["persyaratan resmi","official requirements"],
+  ["Profil terlihat cocok dan tidak ada hard failure.","The profile appears suitable and there are no hard failures."],
+  ["Masih perlu verifikasi:","Still requires verification:"],
+  ["Syarat utama yang dapat diverifikasi sudah terpenuhi.","The main verifiable requirements are satisfied."],
+  ["Fully Funded","Fully Funded"],
+  ["Master / S2","Master / S2"],
+  ["HANZ Eligibility:","HANZ Eligibility:"],
+  ["Official source + Fully Funded Gate + Anti-Scam + Personal Eligibility","Sumber resmi + Fully Funded Gate + Anti-Scam + Eligibility Personal"],
+  ["View Official Scholarship ↗","Lihat Scholarship Resmi ↗"],
+  ["Checking personal eligibility...","Memeriksa eligibility personal..."],
+  ["HANZ sedang memeriksa eligibility","HANZ is checking eligibility"],
+  ["Safety, funding, academic, experience, nationality, deadline dan persyaratan lain sedang dicocokkan.","Safety, funding, academic, experience, nationality, deadline, and other requirements are being checked."],
+  ["Tidak Direkomendasikan — Syarat Wajib Tidak Terpenuhi","Not Recommended — Mandatory Requirement Not Met"],
+  ["Rekomendasi Utama","Top Recommendations"],
+  ["Perlu Verifikasi","Verification Required"],
+  ["Deadline:","Deadline:"],
+  ["Match","Kecocokan"],
+  ["tahun","years"]
+];
+
+function i18nPairFor(source){
+  const s = String(source ?? "").trim();
+  return I18N.find(pair => pair[0] === s || pair[1] === s) || null;
+}
+
+function translateDynamicString(source,lang){
+  const s = String(source ?? "").trim();
+  const pair = i18nPairFor(s);
+  if (pair) return lang === "en" ? pair[1] : pair[0];
+
+  let m;
+  if ((m=s.match(/^(\d+) verified vacancies$/i)))
+    return lang === "en" ? `${m[1]} verified vacancies` : `${m[1]} lowongan terverifikasi`;
+  if ((m=s.match(/^(\d+) lowongan terverifikasi$/i)))
+    return lang === "en" ? `${m[1]} verified vacancies` : `${m[1]} lowongan terverifikasi`;
+  if ((m=s.match(/^(\d+) verified scholarships$/i)))
+    return lang === "en" ? `${m[1]} verified scholarships` : `${m[1]} scholarship terverifikasi`;
+  if ((m=s.match(/^(\d+) scholarship terverifikasi$/i)))
+    return lang === "en" ? `${m[1]} verified scholarships` : `${m[1]} scholarship terverifikasi`;
+  if ((m=s.match(/^Match\s+(\d+)%$/i)))
+    return lang === "en" ? `Match ${m[1]}%` : `Kecocokan ${m[1]}%`;
+  if ((m=s.match(/^Kecocokan\s+(\d+)%$/i)))
+    return lang === "en" ? `Match ${m[1]}%` : `Kecocokan ${m[1]}%`;
+  if ((m=s.match(/^Skill relevan:\s*(.+)$/i)))
+    return lang === "en" ? `Relevant skills: ${m[1]}` : `Skill relevan: ${m[1]}`;
+  if ((m=s.match(/^Relevant skills:\s*(.+)$/i)))
+    return lang === "en" ? `Relevant skills: ${m[1]}` : `Skill relevan: ${m[1]}`;
+  if ((m=s.match(/^(\d+(?:\.\d+)?)\s*tahun$/i)))
+    return lang === "en" ? `${m[1]} years` : `${m[1]} tahun`;
+  if ((m=s.match(/^(\d+(?:\.\d+)?)\+\s*tahun$/i)))
+    return lang === "en" ? `${m[1]}+ years` : `${m[1]}+ tahun`;
+  if ((m=s.match(/^Tidak direkomendasikan karena syarat wajib belum terpenuhi:\s*(.+)$/i)))
+    return lang === "en" ? `Not recommended because mandatory requirements are not met: ${m[1]}` : s;
+  if ((m=s.match(/^Belum boleh dianggap confirmed match\. Perlu verifikasi:\s*(.+)$/i)))
+    return lang === "en" ? `This should not yet be treated as a confirmed match. Verification is required: ${m[1]}` : s;
+  if ((m=s.match(/^Profil terlihat cocok dan tidak ada hard failure\.\s*Masih perlu verifikasi:\s*(.+)$/i)))
+    return lang === "en" ? `The profile appears suitable and there are no hard failures. Still requires verification: ${m[1]}` : s;
+  if ((m=s.match(/^Dipilih:\s*(.+)$/i)))
+    return lang === "en" ? `Selected: ${m[1]}` : `Dipilih: ${m[1]}`;
+
+  return s;
+}
+
+function translateTextNode(node,lang){
+  if (!_hanzOriginalText.has(node)){
+    _hanzOriginalText.set(node,node.nodeValue);
+  }
+  const original = _hanzOriginalText.get(node);
+  const leading = (original.match(/^\s*/) || [""])[0];
+  const trailing = (original.match(/\s*$/) || [""])[0];
+  const core = original.trim();
+  if (!core) return;
+  node.nodeValue = leading + translateDynamicString(core,lang) + trailing;
+}
+
+function translateElementAttrs(el,lang){
+  if (!_hanzOriginalAttrs.has(el)){
+    _hanzOriginalAttrs.set(el,{
+      placeholder:el.getAttribute("placeholder"),
+      title:el.getAttribute("title"),
+      aria:el.getAttribute("aria-label")
+    });
+  }
+  const original = _hanzOriginalAttrs.get(el);
+  for (const [attr,val] of [["placeholder",original.placeholder],["title",original.title],["aria-label",original.aria]]){
+    if (val !== null){
+      el.setAttribute(attr,translateDynamicString(val,lang));
+    }
+  }
+}
+
+function translateTree(root=document.body){
+  if (!root) return;
+  _hanzLanguageApplying = true;
+  try{
+    const walker = document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
+    let node;
+    while ((node=walker.nextNode())){
+      const p=node.parentElement;
+      if (p && !["SCRIPT","STYLE"].includes(p.tagName)){
+        translateTextNode(node,currentLanguage);
+      }
+    }
+    root.querySelectorAll?.("input,select,option,button,a,[title],[aria-label]").forEach(el=>translateElementAttrs(el,currentLanguage));
+    document.documentElement.lang = currentLanguage === "en" ? "en" : "id";
+    document.title = currentLanguage === "en" ? "HANZ Opportunity Engine" : "HANZ Opportunity Engine";
+    document.getElementById("langIdBtn")?.classList.toggle("active",currentLanguage === "id");
+    document.getElementById("langEnBtn")?.classList.toggle("active",currentLanguage === "en");
+  } finally {
+    _hanzLanguageApplying = false;
+  }
+}
+
+function setLanguage(lang){
+  currentLanguage = lang === "en" ? "en" : "id";
+  localStorage.setItem("hanz_language",currentLanguage);
+  translateTree(document.body);
+}
+
+const _hanzLanguageObserver = new MutationObserver(mutations=>{
+  if (_hanzLanguageApplying) return;
+  let needsApply=false;
+  for (const mutation of mutations){
+    if (mutation.type === "childList" && mutation.addedNodes.length){
+      needsApply=true;
+      break;
+    }
+    if (mutation.type === "attributes"){
+      needsApply=true;
+      break;
+    }
+  }
+  if (needsApply){
+    requestAnimationFrame(()=>translateTree(document.body));
+  }
+});
+
+_hanzLanguageObserver.observe(document.body,{
+  subtree:true,
+  childList:true,
+  attributes:true,
+  attributeFilter:["placeholder","title","aria-label"]
+});
+
+translateTree(document.body);
 
 </script>
 
