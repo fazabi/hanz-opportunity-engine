@@ -103,9 +103,7 @@
       font-weight: 800;
     }
 
-    .hero {
-      padding: 44px 0 26px;
-    }
+    .hero { padding: 44px 0 26px; }
 
     .hero-card {
       padding: 34px;
@@ -167,12 +165,11 @@
       border-color: var(--text);
     }
 
-    .section { margin-top: 22px; }
-
     .stats {
       display: grid;
       grid-template-columns: repeat(4,minmax(0,1fr));
       gap: 14px;
+      margin-top: 22px;
     }
 
     .stat-card {
@@ -230,13 +227,19 @@
       min-height: 43px;
       display: flex;
       align-items: center;
-      gap: 9px;
       padding: 0 12px;
       border-radius: 11px;
       background: var(--green-soft);
       color: var(--green);
       font-size: 13px;
       font-weight: 800;
+    }
+
+    .major-hint {
+      grid-column: 1 / -1;
+      font-size: 12px;
+      color: var(--muted);
+      padding: 2px 3px 0;
     }
 
     .list-header {
@@ -453,164 +456,171 @@
 
 <main class="container">
 
-  <section class="hero">
-    <div class="hero-card">
-      <div class="hero-label">Opportunity Intelligence</div>
+<section class="hero">
+  <div class="hero-card">
+    <div class="hero-label">Opportunity Intelligence</div>
 
-      <h1>Peluang nyata. Sumber resmi. Lebih aman.</h1>
+    <h1>Peluang nyata. Sumber resmi. Lebih aman.</h1>
 
-      <p class="hero-description">
-        Lowongan Indonesia dan Remote/WFH yang sudah melewati
-        verifikasi sumber resmi, anti-scam, lokasi, eligibility,
-        serta klasifikasi pendidikan dan level karier.
-      </p>
+    <p class="hero-description">
+      Cari lowongan berdasarkan lokasi, pendidikan, level karier,
+      atau cukup ketik nama program studi. HANZ akan mencocokkan
+      program studi dengan kompetensi dan job family yang relevan.
+    </p>
 
-      <div class="tabs">
-        <button class="tab active" id="jobsTab" onclick="showTab('jobs')">
-          Jobs Indonesia & Remote
-        </button>
+    <div class="tabs">
+      <button class="tab active" id="jobsTab" onclick="showTab('jobs')">
+        Jobs Indonesia & Remote
+      </button>
 
-        <button class="tab" id="scholarshipsTab" onclick="showTab('scholarships')">
-          Fully Funded Master
-        </button>
-      </div>
+      <button class="tab" id="scholarshipsTab" onclick="showTab('scholarships')">
+        Fully Funded Master
+      </button>
     </div>
-  </section>
+  </div>
+</section>
 
-  <section id="jobsSection">
+<section id="jobsSection">
 
-    <div class="stats">
-      <div class="stat-card">
-        <div class="stat-label">Verified Jobs</div>
-        <div class="stat-value" id="verifiedCount">—</div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-label">Indonesia</div>
-        <div class="stat-value" id="indonesiaCount">—</div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-label">Fresh Graduate Confirmed</div>
-        <div class="stat-value" id="freshCount">—</div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-label">Companies</div>
-        <div class="stat-value" id="companyCount">—</div>
-      </div>
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-label">Verified Jobs</div>
+      <div class="stat-value" id="verifiedCount">—</div>
     </div>
 
-    <div class="filters">
-
-      <div class="field">
-        <label>Search</label>
-        <input id="searchInput" placeholder="Job title, company, city..." />
-      </div>
-
-      <div class="field">
-        <label>Province</label>
-        <select id="provinceFilter">
-          <option value="">All 38 Provinces</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <label>Work Mode</label>
-        <select id="workModeFilter">
-          <option value="">All Work Modes</option>
-          <option value="REMOTE">Remote / WFH</option>
-          <option value="HYBRID">Hybrid</option>
-          <option value="ONSITE">On-site</option>
-          <option value="UNKNOWN">Unknown</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <label>Lulusan</label>
-        <select id="educationFilter">
-          <option value="">Semua Pendidikan</option>
-          <option value="SMA_SMK">SMA / SMK</option>
-          <option value="D3">D3</option>
-          <option value="D4_S1">D4 / S1</option>
-          <option value="S2">S2</option>
-          <option value="NOT_REQUIRED">Tidak Mensyaratkan Gelar</option>
-          <option value="UNKNOWN">Belum Disebutkan</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <label>Career Level</label>
-        <select id="careerFilter">
-          <option value="">Semua Level</option>
-          <option value="INTERNSHIP">Internship</option>
-          <option value="FRESH_GRADUATE">Fresh Graduate</option>
-          <option value="ENTRY">Entry Level</option>
-          <option value="MID">Mid Level</option>
-          <option value="SENIOR">Senior</option>
-          <option value="LEADERSHIP">Leadership</option>
-          <option value="UNKNOWN">Belum Diketahui</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <label>Fresh Graduate</label>
-        <select id="freshFilter">
-          <option value="">Semua</option>
-          <option value="YES">Confirmed Eligible</option>
-          <option value="NO">Tidak Cocok Fresh Graduate</option>
-          <option value="UNKNOWN">Belum Jelas</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <label>Jurusan / Bidang</label>
-        <select id="fieldFilter">
-          <option value="">Semua Jurusan</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <label>Safety</label>
-        <div class="verified-filter">✓ Verified Safe Only</div>
-      </div>
-
+    <div class="stat-card">
+      <div class="stat-label">Indonesia</div>
+      <div class="stat-value" id="indonesiaCount">—</div>
     </div>
 
-    <div class="list-header">
-      <div class="list-title">Verified Opportunities</div>
-      <div class="result-count" id="resultCount">Loading...</div>
+    <div class="stat-card">
+      <div class="stat-label">Fresh Graduate Confirmed</div>
+      <div class="stat-value" id="freshCount">—</div>
     </div>
 
-    <div id="loadingState" class="state-card">
-      <div class="state-title">Loading verified jobs...</div>
-      Mengambil data terbaru dari HANZ Opportunity Engine.
+    <div class="stat-card">
+      <div class="stat-label">Companies</div>
+      <div class="stat-value" id="companyCount">—</div>
+    </div>
+  </div>
+
+  <div class="filters">
+
+    <div class="field">
+      <label>Search</label>
+      <input id="searchInput" placeholder="Job title, company, city..." />
     </div>
 
-    <div id="errorState" class="state-card error hidden">
-      <div class="state-title">Gagal mengambil data</div>
-      <div id="errorMessage"></div>
+    <div class="field">
+      <label>Program Studi</label>
+      <input
+        id="studyProgramInput"
+        placeholder="Contoh: Teknologi Rekayasa Internet"
+      />
     </div>
 
-    <div id="emptyState" class="state-card hidden">
-      <div class="state-title">Tidak ada lowongan yang cocok</div>
-      Coba ubah filter pendidikan, level karier, jurusan, atau lokasi.
+    <div class="field">
+      <label>Province</label>
+      <select id="provinceFilter">
+        <option value="">All 38 Provinces</option>
+      </select>
     </div>
 
-    <div id="jobsList" class="jobs"></div>
-
-  </section>
-
-  <section id="scholarshipsSection" class="hidden">
-    <div class="state-card">
-      <div class="state-title">Fully Funded Master Scholarship Engine</div>
-      Modul beasiswa akan dihubungkan setelah vacancy engine selesai.
+    <div class="field">
+      <label>Work Mode</label>
+      <select id="workModeFilter">
+        <option value="">All Work Modes</option>
+        <option value="REMOTE">Remote / WFH</option>
+        <option value="HYBRID">Hybrid</option>
+        <option value="ONSITE">On-site</option>
+        <option value="UNKNOWN">Unknown</option>
+      </select>
     </div>
-  </section>
 
-  <footer class="footer">
-    HANZ Opportunity Engine • Fail-closed verification architecture
-  </footer>
+    <div class="field">
+      <label>Lulusan</label>
+      <select id="educationFilter">
+        <option value="">Semua Pendidikan</option>
+        <option value="SMA_SMK">SMA / SMK</option>
+        <option value="D3">D3</option>
+        <option value="D4_S1">D4 / S1</option>
+        <option value="S2">S2</option>
+        <option value="NOT_REQUIRED">Tidak Mensyaratkan Gelar</option>
+        <option value="UNKNOWN">Belum Disebutkan</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Career Level</label>
+      <select id="careerFilter">
+        <option value="">Semua Level</option>
+        <option value="INTERNSHIP">Internship</option>
+        <option value="FRESH_GRADUATE">Fresh Graduate</option>
+        <option value="ENTRY">Entry Level</option>
+        <option value="MID">Mid Level</option>
+        <option value="SENIOR">Senior</option>
+        <option value="LEADERSHIP">Leadership</option>
+        <option value="UNKNOWN">Belum Diketahui</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Fresh Graduate</label>
+      <select id="freshFilter">
+        <option value="">Semua</option>
+        <option value="YES">Confirmed Eligible</option>
+        <option value="NO">Tidak Cocok Fresh Graduate</option>
+        <option value="UNKNOWN">Belum Jelas</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Safety</label>
+      <div class="verified-filter">✓ Verified Safe Only</div>
+    </div>
+
+    <div class="major-hint">
+      Program Studi boleh diketik bebas. Contoh:
+      Teknologi Rekayasa Internet, Teknik Kimia, Psikologi,
+      Akuntansi, Sistem Informasi, dan lain-lain.
+    </div>
+
+  </div>
+
+  <div class="list-header">
+    <div class="list-title">Verified Opportunities</div>
+    <div class="result-count" id="resultCount">Loading...</div>
+  </div>
+
+  <div id="loadingState" class="state-card">
+    <div class="state-title">Loading verified jobs...</div>
+    Mengambil data terbaru dari HANZ Opportunity Engine.
+  </div>
+
+  <div id="errorState" class="state-card error hidden">
+    <div class="state-title">Gagal mengambil data</div>
+    <div id="errorMessage"></div>
+  </div>
+
+  <div id="emptyState" class="state-card hidden">
+    <div class="state-title">Belum ada lowongan yang cocok</div>
+    Coba ubah program studi atau filter lainnya.
+  </div>
+
+  <div id="jobsList" class="jobs"></div>
+
+</section>
+
+<section id="scholarshipsSection" class="hidden">
+  <div class="state-card">
+    <div class="state-title">Fully Funded Master Scholarship Engine</div>
+    Modul beasiswa akan dihubungkan setelah vacancy engine selesai.
+  </div>
+</section>
+
+<footer class="footer">
+  HANZ Opportunity Engine • Fail-closed verification architecture
+</footer>
 
 </main>
 
@@ -634,6 +644,14 @@ const PROVINCES = [
 ];
 
 let allJobs = [];
+
+function normalize(v) {
+  return String(v ?? "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g," ")
+    .replace(/\s+/g," ")
+    .trim();
+}
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -675,32 +693,419 @@ function freshLabel(value) {
 function buildProvinceOptions() {
   const el = document.getElementById("provinceFilter");
 
-  PROVINCES.forEach(p => {
-    const o = document.createElement("option");
-    o.value = p;
-    o.textContent = p;
-    el.appendChild(o);
+  PROVINCES.forEach(province => {
+    const option = document.createElement("option");
+    option.value = province;
+    option.textContent = province;
+    el.appendChild(option);
   });
 }
 
-function buildStudyFieldOptions() {
-  const fields = new Set();
+/* =========================================================
+   FREE-TEXT PROGRAM STUDY → COMPETENCY MATCHING
+   ========================================================= */
 
-  allJobs.forEach(job => {
-    (job.study_fields || []).forEach(field => fields.add(field));
+function inferCompetencies(programStudy) {
+  const p = normalize(programStudy);
+
+  if (!p) return [];
+
+  const rules = [
+    {
+      terms: [
+        "teknologi rekayasa internet",
+        "internet engineering"
+      ],
+      fields: [
+        "Computer / Network Engineering",
+        "Computer Science / Informatics",
+        "Information Systems"
+      ]
+    },
+
+    {
+      terms: [
+        "informatika",
+        "ilmu komputer",
+        "computer science",
+        "teknik informatika"
+      ],
+      fields: [
+        "Computer Science / Informatics"
+      ]
+    },
+
+    {
+      terms: [
+        "teknologi informasi",
+        "information technology"
+      ],
+      fields: [
+        "Computer Science / Informatics",
+        "Information Systems",
+        "Computer / Network Engineering"
+      ]
+    },
+
+    {
+      terms: [
+        "sistem informasi",
+        "information systems"
+      ],
+      fields: [
+        "Information Systems"
+      ]
+    },
+
+    {
+      terms: [
+        "rekayasa perangkat lunak",
+        "software engineering"
+      ],
+      fields: [
+        "Computer Science / Informatics"
+      ]
+    },
+
+    {
+      terms: [
+        "teknik komputer",
+        "computer engineering"
+      ],
+      fields: [
+        "Computer / Network Engineering",
+        "Electrical / Electronics Engineering"
+      ]
+    },
+
+    {
+      terms: [
+        "jaringan",
+        "network engineering",
+        "networking"
+      ],
+      fields: [
+        "Computer / Network Engineering"
+      ]
+    },
+
+    {
+      terms: [
+        "telekomunikasi",
+        "telecommunication",
+        "telecommunications"
+      ],
+      fields: [
+        "Computer / Network Engineering",
+        "Electrical / Electronics Engineering"
+      ]
+    },
+
+    {
+      terms: [
+        "cybersecurity",
+        "cyber security",
+        "keamanan siber"
+      ],
+      fields: [
+        "Computer Science / Informatics",
+        "Computer / Network Engineering"
+      ]
+    },
+
+    {
+      terms: [
+        "data science",
+        "sains data"
+      ],
+      fields: [
+        "Data Science / Statistics",
+        "Computer Science / Informatics",
+        "Mathematics"
+      ]
+    },
+
+    {
+      terms: [
+        "statistika",
+        "statistics"
+      ],
+      fields: [
+        "Data Science / Statistics",
+        "Mathematics"
+      ]
+    },
+
+    {
+      terms: [
+        "artificial intelligence",
+        "kecerdasan buatan",
+        "machine learning"
+      ],
+      fields: [
+        "Data Science / Statistics",
+        "Computer Science / Informatics",
+        "Mathematics"
+      ]
+    },
+
+    {
+      terms: [
+        "cloud",
+        "devops"
+      ],
+      fields: [
+        "Computer Science / Informatics",
+        "Computer / Network Engineering"
+      ]
+    },
+
+    {
+      terms: [
+        "iot",
+        "internet of things",
+        "embedded"
+      ],
+      fields: [
+        "Computer / Network Engineering",
+        "Electrical / Electronics Engineering",
+        "Mechanical / Mechatronics Engineering"
+      ]
+    },
+
+    {
+      terms: [
+        "teknik elektro",
+        "electrical engineering"
+      ],
+      fields: [
+        "Electrical / Electronics Engineering"
+      ]
+    },
+
+    {
+      terms: [
+        "elektronika",
+        "electronics engineering"
+      ],
+      fields: [
+        "Electrical / Electronics Engineering"
+      ]
+    },
+
+    {
+      terms: [
+        "mekatronika",
+        "mechatronics"
+      ],
+      fields: [
+        "Mechanical / Mechatronics Engineering",
+        "Electrical / Electronics Engineering"
+      ]
+    },
+
+    {
+      terms: [
+        "teknik mesin",
+        "mechanical engineering"
+      ],
+      fields: [
+        "Mechanical / Mechatronics Engineering"
+      ]
+    },
+
+    {
+      terms: [
+        "teknik kimia",
+        "chemical engineering"
+      ],
+      fields: [
+        "Chemical Engineering"
+      ]
+    },
+
+    {
+      terms: [
+        "teknik industri",
+        "industrial engineering"
+      ],
+      fields: [
+        "Industrial Engineering"
+      ]
+    },
+
+    {
+      terms: [
+        "teknik sipil",
+        "civil engineering"
+      ],
+      fields: [
+        "Civil Engineering"
+      ]
+    },
+
+    {
+      terms: [
+        "akuntansi",
+        "accounting"
+      ],
+      fields: [
+        "Accounting"
+      ]
+    },
+
+    {
+      terms: [
+        "keuangan",
+        "finance"
+      ],
+      fields: [
+        "Finance",
+        "Accounting"
+      ]
+    },
+
+    {
+      terms: [
+        "manajemen",
+        "management"
+      ],
+      fields: [
+        "Business / Management"
+      ]
+    },
+
+    {
+      terms: [
+        "ekonomi",
+        "economics"
+      ],
+      fields: [
+        "Economics",
+        "Finance"
+      ]
+    },
+
+    {
+      terms: [
+        "marketing",
+        "pemasaran"
+      ],
+      fields: [
+        "Marketing / Communication",
+        "Business / Management"
+      ]
+    },
+
+    {
+      terms: [
+        "matematika",
+        "mathematics"
+      ],
+      fields: [
+        "Mathematics",
+        "Data Science / Statistics"
+      ]
+    },
+
+    {
+      terms: [
+        "psikologi",
+        "psychology"
+      ],
+      fields: [
+        "Psychology"
+      ]
+    },
+
+    {
+      terms: [
+        "hukum",
+        "law"
+      ],
+      fields: [
+        "Law"
+      ]
+    },
+
+    {
+      terms: [
+        "ilmu komunikasi",
+        "communication science"
+      ],
+      fields: [
+        "Marketing / Communication"
+      ]
+    }
+  ];
+
+  const matchedFields = [];
+
+  rules.forEach(rule => {
+    const matched = rule.terms.some(term =>
+      p.includes(normalize(term))
+    );
+
+    if (matched) {
+      matchedFields.push(...rule.fields);
+    }
   });
 
-  const select = document.getElementById("fieldFilter");
-
-  [...fields]
-    .sort()
-    .forEach(field => {
-      const o = document.createElement("option");
-      o.value = field;
-      o.textContent = field;
-      select.appendChild(o);
-    });
+  return [...new Set(matchedFields)];
 }
+
+function programStudyMatches(job, programStudy) {
+  const p = normalize(programStudy);
+
+  if (!p) {
+    return true;
+  }
+
+  const jobFields = Array.isArray(job.study_fields)
+    ? job.study_fields
+    : [];
+
+  if (jobFields.includes("Any Major")) {
+    return true;
+  }
+
+  const inferred = inferCompetencies(programStudy);
+
+  if (inferred.length) {
+    return inferred.some(field =>
+      jobFields.includes(field)
+    );
+  }
+
+  /*
+    Fallback untuk prodi yang belum ada di dictionary:
+    cari kecocokan nama secara langsung terhadap job fields,
+    title, dan location text.
+  */
+
+  const fallbackText = normalize([
+    job.job_title,
+    ...(job.study_fields || [])
+  ].join(" "));
+
+  const programTokens = p
+    .split(" ")
+    .filter(token => token.length >= 4);
+
+  if (!programTokens.length) {
+    return false;
+  }
+
+  const matchedTokenCount = programTokens.filter(
+    token => fallbackText.includes(token)
+  ).length;
+
+  return matchedTokenCount / programTokens.length >= 0.5;
+}
+
+/* =========================================================
+   LOAD JOBS
+   ========================================================= */
 
 async function loadJobs() {
   const fields = [
@@ -732,7 +1137,8 @@ async function loadJobs() {
   const endpoint =
     SUPABASE_URL +
     "/rest/v1/verified_job_dashboard_v2" +
-    "?select=" + encodeURIComponent(fields) +
+    "?select=" +
+    encodeURIComponent(fields) +
     "&order=posted_at.desc.nullslast";
 
   try {
@@ -749,7 +1155,6 @@ async function loadJobs() {
 
     allJobs = await response.json();
 
-    buildStudyFieldOptions();
     updateStats();
     applyFilters();
 
@@ -764,25 +1169,29 @@ async function loadJobs() {
 }
 
 function updateStats() {
-  const fresh = allJobs.filter(j => j.fresh_graduate_eligible === true);
-
   const companies = new Set(
     allJobs.map(j => j.company_name).filter(Boolean)
   );
 
-  document.getElementById("verifiedCount").textContent = allJobs.length;
+  document.getElementById("verifiedCount").textContent =
+    allJobs.length;
 
   document.getElementById("indonesiaCount").textContent =
     allJobs.filter(j => j.country_name === "Indonesia").length;
 
-  document.getElementById("freshCount").textContent = fresh.length;
+  document.getElementById("freshCount").textContent =
+    allJobs.filter(j => j.fresh_graduate_eligible === true).length;
 
-  document.getElementById("companyCount").textContent = companies.size;
+  document.getElementById("companyCount").textContent =
+    companies.size;
 }
 
 function applyFilters() {
   const q =
     document.getElementById("searchInput").value.trim().toLowerCase();
+
+  const programStudy =
+    document.getElementById("studyProgramInput").value.trim();
 
   const province =
     document.getElementById("provinceFilter").value;
@@ -799,9 +1208,6 @@ function applyFilters() {
   const fresh =
     document.getElementById("freshFilter").value;
 
-  const field =
-    document.getElementById("fieldFilter").value;
-
   const filtered = allJobs.filter(job => {
     const haystack = [
       job.job_title,
@@ -816,6 +1222,8 @@ function applyFilters() {
       .toLowerCase();
 
     if (q && !haystack.includes(q)) return false;
+
+    if (!programStudyMatches(job, programStudy)) return false;
 
     if (province && job.province_name !== province) return false;
 
@@ -832,11 +1240,6 @@ function applyFilters() {
     if (
       fresh === "UNKNOWN" &&
       job.fresh_graduate_eligible !== null
-    ) return false;
-
-    if (
-      field &&
-      !(job.study_fields || []).includes(field)
     ) return false;
 
     return true;
@@ -899,23 +1302,31 @@ function renderJobs(jobs) {
         </div>
 
         <div class="meta">
-          <span class="badge">📍 ${escapeHtml(location)}</span>
-
-          <span class="badge blue">
-            ${escapeHtml(pretty(job.work_mode))}
-          </span>
-
           <span class="badge">
-            ${escapeHtml(pretty(job.employment_type))}
+            📍 ${escapeHtml(location)}
           </span>
+
+          ${
+            job.work_mode
+              ? `<span class="badge blue">${escapeHtml(pretty(job.work_mode))}</span>`
+              : ""
+          }
+
+          ${
+            job.employment_type
+              ? `<span class="badge">${escapeHtml(pretty(job.employment_type))}</span>`
+              : ""
+          }
 
           <span class="badge orange">
             ${escapeHtml(educationLabel(job.education_level))}
           </span>
 
-          <span class="badge">
-            ${escapeHtml(pretty(job.career_level))}
-          </span>
+          ${
+            job.career_level
+              ? `<span class="badge">${escapeHtml(pretty(job.career_level))}</span>`
+              : ""
+          }
 
           <span class="badge ${
             job.fresh_graduate_eligible === true ? "green" : ""
@@ -996,15 +1407,17 @@ function showTab(tab) {
 
 [
   "searchInput",
+  "studyProgramInput",
   "provinceFilter",
   "workModeFilter",
   "educationFilter",
   "careerFilter",
-  "freshFilter",
-  "fieldFilter"
+  "freshFilter"
 ].forEach(id => {
   document.getElementById(id).addEventListener(
-    id === "searchInput" ? "input" : "change",
+    ["searchInput","studyProgramInput"].includes(id)
+      ? "input"
+      : "change",
     applyFilters
   );
 });
