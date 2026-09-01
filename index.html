@@ -2,17 +2,11 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  />
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>HANZ Opportunity Engine</title>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     :root {
       --bg: #f5f7fb;
@@ -28,32 +22,18 @@
       --orange-soft: #fff4e5;
       --red: #c73737;
       --red-soft: #fff0f0;
-      --shadow:
-        0 10px 30px rgba(31, 42, 68, 0.08);
+      --shadow: 0 10px 30px rgba(31,42,68,.08);
     }
 
     body {
       margin: 0;
-      font-family:
-        Inter,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Arial,
-        sans-serif;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
       background: var(--bg);
       color: var(--text);
     }
 
-    button,
-    select,
-    input {
-      font: inherit;
-    }
-
-    a {
-      color: inherit;
-    }
+    button, select, input { font: inherit; }
+    a { color: inherit; }
 
     .container {
       width: min(1440px, calc(100% - 32px));
@@ -62,7 +42,7 @@
     }
 
     .topbar {
-      background: rgba(255, 255, 255, 0.94);
+      background: rgba(255,255,255,.94);
       border-bottom: 1px solid var(--line);
       position: sticky;
       top: 0;
@@ -90,18 +70,13 @@
       width: 42px;
       height: 42px;
       border-radius: 13px;
-      background: linear-gradient(
-        135deg,
-        #165dff,
-        #4d84ff
-      );
+      background: linear-gradient(135deg,#165dff,#4d84ff);
       color: white;
       display: grid;
       place-items: center;
       font-weight: 900;
       font-size: 18px;
-      box-shadow:
-        0 7px 18px rgba(22, 93, 255, 0.25);
+      box-shadow: 0 7px 18px rgba(22,93,255,.25);
     }
 
     .brand-title {
@@ -126,7 +101,6 @@
       color: var(--green);
       font-size: 12px;
       font-weight: 800;
-      white-space: nowrap;
     }
 
     .hero {
@@ -137,11 +111,7 @@
       padding: 34px;
       border-radius: 26px;
       background:
-        radial-gradient(
-          circle at top right,
-          rgba(22, 93, 255, 0.14),
-          transparent 36%
-        ),
+        radial-gradient(circle at top right, rgba(22,93,255,.14), transparent 36%),
         #fff;
       border: 1px solid var(--line);
       box-shadow: var(--shadow);
@@ -156,20 +126,19 @@
       font-size: 12px;
       font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.04em;
     }
 
     h1 {
       margin: 18px 0 10px;
-      font-size: clamp(30px, 5vw, 49px);
+      font-size: clamp(30px,5vw,49px);
       line-height: 1.04;
-      letter-spacing: -0.04em;
+      letter-spacing: -.04em;
       max-width: 850px;
     }
 
     .hero-description {
       color: var(--muted);
-      max-width: 780px;
+      max-width: 820px;
       line-height: 1.7;
       font-size: 15px;
       margin: 0;
@@ -198,14 +167,11 @@
       border-color: var(--text);
     }
 
-    .section {
-      margin-top: 22px;
-    }
+    .section { margin-top: 22px; }
 
     .stats {
       display: grid;
-      grid-template-columns:
-        repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(4,minmax(0,1fr));
       gap: 14px;
     }
 
@@ -227,7 +193,6 @@
       font-size: 30px;
       font-weight: 850;
       margin-top: 9px;
-      letter-spacing: -0.03em;
     }
 
     .filters {
@@ -237,10 +202,8 @@
       border-radius: 20px;
       padding: 18px;
       display: grid;
-      grid-template-columns:
-        1.7fr 1fr 1fr 1fr;
+      grid-template-columns: repeat(4,minmax(0,1fr));
       gap: 12px;
-      align-items: end;
     }
 
     .field label {
@@ -263,13 +226,6 @@
       min-height: 43px;
     }
 
-    .field input:focus,
-    .field select:focus {
-      border-color: var(--primary);
-      box-shadow:
-        0 0 0 3px rgba(22, 93, 255, 0.08);
-    }
-
     .verified-filter {
       min-height: 43px;
       display: flex;
@@ -281,11 +237,6 @@
       color: var(--green);
       font-size: 13px;
       font-weight: 800;
-    }
-
-    .verified-filter input {
-      width: auto;
-      accent-color: var(--green);
     }
 
     .list-header {
@@ -316,14 +267,6 @@
       border: 1px solid var(--line);
       border-radius: 19px;
       padding: 21px;
-      transition:
-        transform 0.15s ease,
-        box-shadow 0.15s ease;
-    }
-
-    .job-card:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow);
     }
 
     .job-top {
@@ -371,14 +314,40 @@
       font-weight: 700;
     }
 
-    .badge.remote {
+    .badge.green {
+      background: var(--green-soft);
+      color: var(--green);
+    }
+
+    .badge.blue {
       background: var(--primary-soft);
       color: var(--primary);
     }
 
-    .badge.score {
+    .badge.orange {
       background: var(--orange-soft);
       color: var(--orange);
+    }
+
+    .candidate-box {
+      margin-top: 16px;
+      border: 1px solid var(--line);
+      background: #fafbfe;
+      border-radius: 13px;
+      padding: 13px 14px;
+    }
+
+    .candidate-title {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 800;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .candidate-text {
+      font-size: 13px;
+      line-height: 1.6;
     }
 
     .job-footer {
@@ -406,10 +375,6 @@
       font-weight: 800;
     }
 
-    .apply-btn:hover {
-      filter: brightness(0.96);
-    }
-
     .state-card {
       background: #fff;
       border: 1px solid var(--line);
@@ -431,21 +396,7 @@
       background: var(--red-soft);
     }
 
-    .hidden {
-      display: none !important;
-    }
-
-    .scholarship-placeholder {
-      background: #fff;
-      border: 1px solid var(--line);
-      border-radius: 22px;
-      padding: 36px;
-      margin-top: 18px;
-    }
-
-    .scholarship-placeholder h2 {
-      margin-top: 0;
-    }
+    .hidden { display: none !important; }
 
     .footer {
       color: var(--muted);
@@ -454,37 +405,16 @@
       padding-top: 30px;
     }
 
-    @media (max-width: 900px) {
-      .stats {
-        grid-template-columns:
-          repeat(2, minmax(0, 1fr));
-      }
-
+    @media(max-width:1000px) {
       .filters {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: repeat(2,minmax(0,1fr));
       }
     }
 
-    @media (max-width: 620px) {
+    @media(max-width:650px) {
       .container,
       .topbar-inner {
-        width: min(100% - 20px, 1440px);
-      }
-
-      .topbar-inner {
-        min-height: 64px;
-      }
-
-      .verified-chip {
-        display: none;
-      }
-
-      .hero {
-        padding-top: 24px;
-      }
-
-      .hero-card {
-        padding: 24px 19px;
+        width: min(100% - 20px,1440px);
       }
 
       .stats,
@@ -507,1017 +437,581 @@
 
 <body>
 
-  <header class="topbar">
-    <div class="topbar-inner">
-      <div class="brand">
-        <div class="brand-mark">H</div>
-
-        <div>
-          <div class="brand-title">
-            HANZ Opportunity Engine
-          </div>
-
-          <div class="brand-subtitle">
-            Indonesia • Remote • Global Scholarship
-          </div>
-        </div>
-      </div>
-
-      <div class="verified-chip">
-        ✓ Verified Safe Sources
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <div class="brand-mark">H</div>
+      <div>
+        <div class="brand-title">HANZ Opportunity Engine</div>
+        <div class="brand-subtitle">Indonesia • Remote • Global Scholarship</div>
       </div>
     </div>
-  </header>
 
-  <main class="container">
+    <div class="verified-chip">✓ Verified Safe Sources</div>
+  </div>
+</header>
 
-    <section class="hero">
-      <div class="hero-card">
-        <div class="hero-label">
-          Opportunity Intelligence
-        </div>
+<main class="container">
 
-        <h1>
-          Peluang nyata.
-          Sumber resmi.
-          Lebih aman.
-        </h1>
+  <section class="hero">
+    <div class="hero-card">
+      <div class="hero-label">Opportunity Intelligence</div>
 
-        <p class="hero-description">
-          Lowongan kerja Indonesia dan Remote/WFH
-          yang melewati verifikasi sumber resmi,
-          pemeriksaan anti-scam, lokasi, dan
-          eligibility sebelum ditampilkan.
-        </p>
+      <h1>Peluang nyata. Sumber resmi. Lebih aman.</h1>
 
-        <div class="tabs">
-          <button
-            class="tab active"
-            id="jobsTab"
-            onclick="showTab('jobs')"
-          >
-            Jobs Indonesia & Remote
-          </button>
+      <p class="hero-description">
+        Lowongan Indonesia dan Remote/WFH yang sudah melewati
+        verifikasi sumber resmi, anti-scam, lokasi, eligibility,
+        serta klasifikasi pendidikan dan level karier.
+      </p>
 
-          <button
-            class="tab"
-            id="scholarshipsTab"
-            onclick="showTab('scholarships')"
-          >
-            Fully Funded Master
-          </button>
-        </div>
-      </div>
-    </section>
+      <div class="tabs">
+        <button class="tab active" id="jobsTab" onclick="showTab('jobs')">
+          Jobs Indonesia & Remote
+        </button>
 
-    <section
-      id="jobsSection"
-      class="section"
-    >
-      <div class="stats">
-
-        <div class="stat-card">
-          <div class="stat-label">
-            Verified Jobs
-          </div>
-          <div
-            class="stat-value"
-            id="verifiedCount"
-          >
-            —
-          </div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-label">
-            Indonesia
-          </div>
-          <div
-            class="stat-value"
-            id="indonesiaCount"
-          >
-            —
-          </div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-label">
-            Remote / WFH
-          </div>
-          <div
-            class="stat-value"
-            id="remoteCount"
-          >
-            —
-          </div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-label">
-            Companies
-          </div>
-          <div
-            class="stat-value"
-            id="companyCount"
-          >
-            —
-          </div>
-        </div>
-
-      </div>
-
-      <div class="filters">
-
-        <div class="field">
-          <label>
-            Search
-          </label>
-
-          <input
-            id="searchInput"
-            type="text"
-            placeholder="Job title, company, city..."
-          />
-        </div>
-
-        <div class="field">
-          <label>
-            Province
-          </label>
-
-          <select id="provinceFilter">
-            <option value="">
-              All 38 Provinces
-            </option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label>
-            Work Mode
-          </label>
-
-          <select id="workModeFilter">
-            <option value="">
-              All Work Modes
-            </option>
-
-            <option value="REMOTE">
-              Remote / WFH
-            </option>
-
-            <option value="HYBRID">
-              Hybrid
-            </option>
-
-            <option value="ONSITE">
-              On-site
-            </option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label>
-            Safety
-          </label>
-
-          <div class="verified-filter">
-            <input
-              id="safeOnly"
-              type="checkbox"
-              checked
-              disabled
-            />
-
-            Verified Safe Only
-          </div>
-        </div>
-
-      </div>
-
-      <div class="list-header">
-        <div class="list-title">
-          Verified Opportunities
-        </div>
-
-        <div
-          class="result-count"
-          id="resultCount"
-        >
-          Loading...
-        </div>
-      </div>
-
-      <div
-        id="loadingState"
-        class="state-card"
-      >
-        <div class="state-title">
-          Loading verified jobs...
-        </div>
-
-        Mengambil data terbaru dari
-        HANZ Opportunity Engine.
-      </div>
-
-      <div
-        id="errorState"
-        class="state-card error hidden"
-      >
-        <div class="state-title">
-          Gagal mengambil data
-        </div>
-
-        <div id="errorMessage"></div>
-      </div>
-
-      <div
-        id="emptyState"
-        class="state-card hidden"
-      >
-        <div class="state-title">
-          Belum ada opportunity yang cocok
-        </div>
-
-        Coba ubah filter pencarian.
-      </div>
-
-      <div
-        id="jobsList"
-        class="jobs"
-      ></div>
-
-    </section>
-
-    <section
-      id="scholarshipsSection"
-      class="section hidden"
-    >
-      <div class="scholarship-placeholder">
-        <div class="hero-label">
+        <button class="tab" id="scholarshipsTab" onclick="showTab('scholarships')">
           Fully Funded Master
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <section id="jobsSection">
+
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-label">Verified Jobs</div>
+        <div class="stat-value" id="verifiedCount">—</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-label">Indonesia</div>
+        <div class="stat-value" id="indonesiaCount">—</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-label">Fresh Graduate Confirmed</div>
+        <div class="stat-value" id="freshCount">—</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-label">Companies</div>
+        <div class="stat-value" id="companyCount">—</div>
+      </div>
+    </div>
+
+    <div class="filters">
+
+      <div class="field">
+        <label>Search</label>
+        <input id="searchInput" placeholder="Job title, company, city..." />
+      </div>
+
+      <div class="field">
+        <label>Province</label>
+        <select id="provinceFilter">
+          <option value="">All 38 Provinces</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Work Mode</label>
+        <select id="workModeFilter">
+          <option value="">All Work Modes</option>
+          <option value="REMOTE">Remote / WFH</option>
+          <option value="HYBRID">Hybrid</option>
+          <option value="ONSITE">On-site</option>
+          <option value="UNKNOWN">Unknown</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Lulusan</label>
+        <select id="educationFilter">
+          <option value="">Semua Pendidikan</option>
+          <option value="SMA_SMK">SMA / SMK</option>
+          <option value="D3">D3</option>
+          <option value="D4_S1">D4 / S1</option>
+          <option value="S2">S2</option>
+          <option value="NOT_REQUIRED">Tidak Mensyaratkan Gelar</option>
+          <option value="UNKNOWN">Belum Disebutkan</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Career Level</label>
+        <select id="careerFilter">
+          <option value="">Semua Level</option>
+          <option value="INTERNSHIP">Internship</option>
+          <option value="FRESH_GRADUATE">Fresh Graduate</option>
+          <option value="ENTRY">Entry Level</option>
+          <option value="MID">Mid Level</option>
+          <option value="SENIOR">Senior</option>
+          <option value="LEADERSHIP">Leadership</option>
+          <option value="UNKNOWN">Belum Diketahui</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Fresh Graduate</label>
+        <select id="freshFilter">
+          <option value="">Semua</option>
+          <option value="YES">Confirmed Eligible</option>
+          <option value="NO">Tidak Cocok Fresh Graduate</option>
+          <option value="UNKNOWN">Belum Jelas</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Jurusan / Bidang</label>
+        <select id="fieldFilter">
+          <option value="">Semua Jurusan</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Safety</label>
+        <div class="verified-filter">✓ Verified Safe Only</div>
+      </div>
+
+    </div>
+
+    <div class="list-header">
+      <div class="list-title">Verified Opportunities</div>
+      <div class="result-count" id="resultCount">Loading...</div>
+    </div>
+
+    <div id="loadingState" class="state-card">
+      <div class="state-title">Loading verified jobs...</div>
+      Mengambil data terbaru dari HANZ Opportunity Engine.
+    </div>
+
+    <div id="errorState" class="state-card error hidden">
+      <div class="state-title">Gagal mengambil data</div>
+      <div id="errorMessage"></div>
+    </div>
+
+    <div id="emptyState" class="state-card hidden">
+      <div class="state-title">Tidak ada lowongan yang cocok</div>
+      Coba ubah filter pendidikan, level karier, jurusan, atau lokasi.
+    </div>
+
+    <div id="jobsList" class="jobs"></div>
+
+  </section>
+
+  <section id="scholarshipsSection" class="hidden">
+    <div class="state-card">
+      <div class="state-title">Fully Funded Master Scholarship Engine</div>
+      Modul beasiswa akan dihubungkan setelah vacancy engine selesai.
+    </div>
+  </section>
+
+  <footer class="footer">
+    HANZ Opportunity Engine • Fail-closed verification architecture
+  </footer>
+
+</main>
+
+<script>
+const SUPABASE_URL =
+  "https://mjnlucjidysptonyocxi.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_g4V53o__-j1ThxsXgnJ-ig_P09KKu_Y";
+
+const PROVINCES = [
+  "Aceh","Sumatera Utara","Sumatera Barat","Riau","Kepulauan Riau",
+  "Jambi","Sumatera Selatan","Kepulauan Bangka Belitung","Bengkulu",
+  "Lampung","DKI Jakarta","Jawa Barat","Jawa Tengah","DI Yogyakarta",
+  "Jawa Timur","Banten","Bali","Nusa Tenggara Barat","Nusa Tenggara Timur",
+  "Kalimantan Barat","Kalimantan Tengah","Kalimantan Selatan",
+  "Kalimantan Timur","Kalimantan Utara","Sulawesi Utara","Gorontalo",
+  "Sulawesi Tengah","Sulawesi Barat","Sulawesi Selatan","Sulawesi Tenggara",
+  "Maluku","Maluku Utara","Papua","Papua Barat","Papua Selatan",
+  "Papua Tengah","Papua Pegunungan","Papua Barat Daya"
+];
+
+let allJobs = [];
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+function pretty(value) {
+  if (!value) return null;
+
+  return String(value)
+    .replaceAll("_"," ")
+    .toLowerCase()
+    .replace(/\b\w/g,c => c.toUpperCase());
+}
+
+function educationLabel(value) {
+  const map = {
+    SMA_SMK: "SMA / SMK",
+    D3: "D3",
+    D4_S1: "D4 / S1",
+    S2: "S2",
+    NOT_REQUIRED: "Degree tidak wajib",
+    UNKNOWN: "Pendidikan belum disebut"
+  };
+
+  return map[value] || pretty(value);
+}
+
+function freshLabel(value) {
+  if (value === true) return "Fresh Graduate Eligible";
+  if (value === false) return "Bukan untuk Fresh Graduate";
+  return "Fresh Graduate: Belum Jelas";
+}
+
+function buildProvinceOptions() {
+  const el = document.getElementById("provinceFilter");
+
+  PROVINCES.forEach(p => {
+    const o = document.createElement("option");
+    o.value = p;
+    o.textContent = p;
+    el.appendChild(o);
+  });
+}
+
+function buildStudyFieldOptions() {
+  const fields = new Set();
+
+  allJobs.forEach(job => {
+    (job.study_fields || []).forEach(field => fields.add(field));
+  });
+
+  const select = document.getElementById("fieldFilter");
+
+  [...fields]
+    .sort()
+    .forEach(field => {
+      const o = document.createElement("option");
+      o.value = field;
+      o.textContent = field;
+      select.appendChild(o);
+    });
+}
+
+async function loadJobs() {
+  const fields = [
+    "id",
+    "job_title",
+    "company_name",
+    "country_name",
+    "province_code",
+    "province_name",
+    "city",
+    "location_text",
+    "work_mode",
+    "remote_scope",
+    "indonesia_applicant_eligible",
+    "employment_type",
+    "experience_level",
+    "education_level",
+    "career_level",
+    "experience_required_years",
+    "fresh_graduate_eligible",
+    "study_fields",
+    "candidate_fit_confidence",
+    "posted_at",
+    "application_deadline",
+    "official_url",
+    "trust_score"
+  ].join(",");
+
+  const endpoint =
+    SUPABASE_URL +
+    "/rest/v1/verified_job_dashboard_v2" +
+    "?select=" + encodeURIComponent(fields) +
+    "&order=posted_at.desc.nullslast";
+
+  try {
+    const response = await fetch(endpoint,{
+      headers:{
+        apikey: SUPABASE_KEY,
+        Authorization: "Bearer " + SUPABASE_KEY
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(await response.text());
+    }
+
+    allJobs = await response.json();
+
+    buildStudyFieldOptions();
+    updateStats();
+    applyFilters();
+
+    document.getElementById("loadingState").classList.add("hidden");
+
+  } catch(error) {
+    document.getElementById("loadingState").classList.add("hidden");
+    document.getElementById("errorState").classList.remove("hidden");
+    document.getElementById("errorMessage").textContent =
+      error?.message || "Unknown error";
+  }
+}
+
+function updateStats() {
+  const fresh = allJobs.filter(j => j.fresh_graduate_eligible === true);
+
+  const companies = new Set(
+    allJobs.map(j => j.company_name).filter(Boolean)
+  );
+
+  document.getElementById("verifiedCount").textContent = allJobs.length;
+
+  document.getElementById("indonesiaCount").textContent =
+    allJobs.filter(j => j.country_name === "Indonesia").length;
+
+  document.getElementById("freshCount").textContent = fresh.length;
+
+  document.getElementById("companyCount").textContent = companies.size;
+}
+
+function applyFilters() {
+  const q =
+    document.getElementById("searchInput").value.trim().toLowerCase();
+
+  const province =
+    document.getElementById("provinceFilter").value;
+
+  const workMode =
+    document.getElementById("workModeFilter").value;
+
+  const education =
+    document.getElementById("educationFilter").value;
+
+  const career =
+    document.getElementById("careerFilter").value;
+
+  const fresh =
+    document.getElementById("freshFilter").value;
+
+  const field =
+    document.getElementById("fieldFilter").value;
+
+  const filtered = allJobs.filter(job => {
+    const haystack = [
+      job.job_title,
+      job.company_name,
+      job.city,
+      job.province_name,
+      job.location_text,
+      ...(job.study_fields || [])
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
+
+    if (q && !haystack.includes(q)) return false;
+
+    if (province && job.province_name !== province) return false;
+
+    if (workMode && job.work_mode !== workMode) return false;
+
+    if (education && job.education_level !== education) return false;
+
+    if (career && job.career_level !== career) return false;
+
+    if (fresh === "YES" && job.fresh_graduate_eligible !== true) return false;
+
+    if (fresh === "NO" && job.fresh_graduate_eligible !== false) return false;
+
+    if (
+      fresh === "UNKNOWN" &&
+      job.fresh_graduate_eligible !== null
+    ) return false;
+
+    if (
+      field &&
+      !(job.study_fields || []).includes(field)
+    ) return false;
+
+    return true;
+  });
+
+  renderJobs(filtered);
+}
+
+function renderJobs(jobs) {
+  const list = document.getElementById("jobsList");
+  const empty = document.getElementById("emptyState");
+
+  document.getElementById("resultCount").textContent =
+    jobs.length + " verified results";
+
+  if (!jobs.length) {
+    list.innerHTML = "";
+    empty.classList.remove("hidden");
+    return;
+  }
+
+  empty.classList.add("hidden");
+
+  list.innerHTML = jobs.map(job => {
+    const location =
+      [job.city,job.province_name]
+        .filter(Boolean)
+        .filter((v,i,a) => a.indexOf(v) === i)
+        .join(", ") ||
+      job.location_text ||
+      "Location not specified";
+
+    const fields =
+      (job.study_fields || []).length
+        ? job.study_fields.join(", ")
+        : "Jurusan belum disebutkan";
+
+    const experience =
+      job.experience_required_years !== null
+        ? `${job.experience_required_years}+ tahun`
+        : "Belum disebutkan";
+
+    return `
+      <article class="job-card">
+
+        <div class="job-top">
+          <div>
+            <h3 class="job-title">
+              ${escapeHtml(job.job_title)}
+            </h3>
+
+            <div class="company">
+              ${escapeHtml(job.company_name)}
+            </div>
+          </div>
+
+          <div class="verified-badge">
+            ✓ VERIFIED SAFE
+          </div>
         </div>
 
-        <h2>
-          Scholarship Engine
-        </h2>
-
-        <p class="hero-description">
-          Modul beasiswa S2 fully funded akan
-          membaca data terverifikasi dari
-          Master Scholarship Engine.
-          Hanya program dengan official source
-          dan funding yang telah lolos verification
-          yang akan ditampilkan.
-        </p>
-      </div>
-    </section>
-
-    <footer class="footer">
-      HANZ Opportunity Engine •
-      Fail-closed verification architecture
-    </footer>
-
-  </main>
-
-  <script>
-    /* =====================================================
-       SUPABASE PUBLIC CONFIG
-       ===================================================== */
-
-    const SUPABASE_URL =
-      "https://mjnlucjidysptonyocxi.supabase.co";
-
-    const SUPABASE_KEY =
-      "sb_publishable_g4V53o__-j1ThxsXgnJ-ig_P09KKu_Y";
-
-
-    /* =====================================================
-       38 INDONESIAN PROVINCES
-       ===================================================== */
-
-    const PROVINCES = [
-      "Aceh",
-      "Sumatera Utara",
-      "Sumatera Barat",
-      "Riau",
-      "Kepulauan Riau",
-      "Jambi",
-      "Sumatera Selatan",
-      "Kepulauan Bangka Belitung",
-      "Bengkulu",
-      "Lampung",
-
-      "DKI Jakarta",
-      "Jawa Barat",
-      "Jawa Tengah",
-      "DI Yogyakarta",
-      "Jawa Timur",
-      "Banten",
-
-      "Bali",
-      "Nusa Tenggara Barat",
-      "Nusa Tenggara Timur",
-
-      "Kalimantan Barat",
-      "Kalimantan Tengah",
-      "Kalimantan Selatan",
-      "Kalimantan Timur",
-      "Kalimantan Utara",
-
-      "Sulawesi Utara",
-      "Gorontalo",
-      "Sulawesi Tengah",
-      "Sulawesi Barat",
-      "Sulawesi Selatan",
-      "Sulawesi Tenggara",
-
-      "Maluku",
-      "Maluku Utara",
-
-      "Papua",
-      "Papua Barat",
-      "Papua Selatan",
-      "Papua Tengah",
-      "Papua Pegunungan",
-      "Papua Barat Daya"
-    ];
-
-
-    /* =====================================================
-       STATE
-       ===================================================== */
-
-    let allJobs = [];
-
-
-    /* =====================================================
-       HELPERS
-       ===================================================== */
-
-    function escapeHtml(value) {
-      return String(value ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-    }
-
-
-    function pretty(value) {
-      if (!value) {
-        return null;
-      }
-
-      return String(value)
-        .replaceAll("_", " ")
-        .toLowerCase()
-        .replace(
-          /\b\w/g,
-          char => char.toUpperCase()
-        );
-    }
-
-
-    function formatDate(value) {
-      if (!value) {
-        return null;
-      }
-
-      const date =
-        new Date(value);
-
-      if (
-        Number.isNaN(
-          date.getTime()
-        )
-      ) {
-        return null;
-      }
-
-      return new Intl.DateTimeFormat(
-        "id-ID",
-        {
-          day: "numeric",
-          month: "short",
-          year: "numeric"
-        }
-      ).format(date);
-    }
-
-
-    /* =====================================================
-       PROVINCE SELECT
-       ===================================================== */
-
-    function buildProvinceOptions() {
-      const select =
-        document.getElementById(
-          "provinceFilter"
-        );
-
-      PROVINCES.forEach(
-        province => {
-          const option =
-            document.createElement(
-              "option"
-            );
-
-          option.value =
-            province;
-
-          option.textContent =
-            province;
-
-          select.appendChild(
-            option
-          );
-        }
-      );
-    }
-
-
-    /* =====================================================
-       LOAD VERIFIED JOBS
-       ===================================================== */
-
-    async function loadJobs() {
-      const loadingState =
-        document.getElementById(
-          "loadingState"
-        );
-
-      const errorState =
-        document.getElementById(
-          "errorState"
-        );
-
-      const jobsList =
-        document.getElementById(
-          "jobsList"
-        );
-
-      loadingState.classList.remove(
-        "hidden"
-      );
-
-      errorState.classList.add(
-        "hidden"
-      );
-
-      jobsList.innerHTML = "";
-
-      const fields = [
-        "id",
-        "job_title",
-        "company_name",
-        "country_name",
-        "province_code",
-        "province_name",
-        "city",
-        "location_text",
-        "work_mode",
-        "remote_scope",
-        "indonesia_applicant_eligible",
-        "employment_type",
-        "experience_level",
-        "posted_at",
-        "application_deadline",
-        "official_url",
-        "trust_score"
-      ].join(",");
-
-      const endpoint =
-        SUPABASE_URL +
-        "/rest/v1/verified_job_dashboard" +
-        "?select=" +
-        encodeURIComponent(fields) +
-        "&order=posted_at.desc.nullslast";
-
-      try {
-        const response =
-          await fetch(
-            endpoint,
-            {
-              headers: {
-                apikey:
-                  SUPABASE_KEY,
-
-                Authorization:
-                  "Bearer " +
-                  SUPABASE_KEY
-              }
-            }
-          );
-
-        if (!response.ok) {
-          const errorText =
-            await response.text();
-
-          throw new Error(
-            "Supabase HTTP " +
-            response.status +
-            " — " +
-            errorText
-          );
-        }
-
-        const data =
-          await response.json();
-
-        allJobs =
-          Array.isArray(data)
-            ? data
-            : [];
-
-        updateStats();
-        applyFilters();
-
-      } catch (error) {
-        console.error(error);
-
-        loadingState.classList.add(
-          "hidden"
-        );
-
-        errorState.classList.remove(
-          "hidden"
-        );
-
-        document.getElementById(
-          "errorMessage"
-        ).textContent =
-          error?.message ||
-          "Unknown error";
-      }
-    }
-
-
-    /* =====================================================
-       STATS
-       ===================================================== */
-
-    function updateStats() {
-      const indonesiaJobs =
-        allJobs.filter(
-          job =>
-            String(
-              job.country_name || ""
-            ).toLowerCase() ===
-            "indonesia"
-        );
-
-      const remoteJobs =
-        allJobs.filter(
-          job =>
-            job.work_mode ===
-            "REMOTE"
-        );
-
-      const companies =
-        new Set(
-          allJobs
-            .map(
-              job =>
-                job.company_name
-            )
-            .filter(Boolean)
-        );
-
-      document.getElementById(
-        "verifiedCount"
-      ).textContent =
-        allJobs.length;
-
-      document.getElementById(
-        "indonesiaCount"
-      ).textContent =
-        indonesiaJobs.length;
-
-      document.getElementById(
-        "remoteCount"
-      ).textContent =
-        remoteJobs.length;
-
-      document.getElementById(
-        "companyCount"
-      ).textContent =
-        companies.size;
-    }
-
-
-    /* =====================================================
-       FILTER
-       ===================================================== */
-
-    function applyFilters() {
-      const q =
-        document
-          .getElementById(
-            "searchInput"
-          )
-          .value
-          .trim()
-          .toLowerCase();
-
-      const province =
-        document.getElementById(
-          "provinceFilter"
-        ).value;
-
-      const workMode =
-        document.getElementById(
-          "workModeFilter"
-        ).value;
-
-      const filtered =
-        allJobs.filter(
-          job => {
-            const haystack =
-              [
-                job.job_title,
-                job.company_name,
-                job.city,
-                job.province_name,
-                job.country_name,
-                job.location_text
-              ]
-                .filter(Boolean)
-                .join(" ")
-                .toLowerCase();
-
-            if (
-              q &&
-              !haystack.includes(q)
-            ) {
-              return false;
-            }
-
-            if (
-              province &&
-              job.province_name !==
-              province
-            ) {
-              return false;
-            }
-
-            if (
-              workMode &&
-              job.work_mode !==
-              workMode
-            ) {
-              return false;
-            }
-
-            return true;
+        <div class="meta">
+          <span class="badge">📍 ${escapeHtml(location)}</span>
+
+          <span class="badge blue">
+            ${escapeHtml(pretty(job.work_mode))}
+          </span>
+
+          <span class="badge">
+            ${escapeHtml(pretty(job.employment_type))}
+          </span>
+
+          <span class="badge orange">
+            ${escapeHtml(educationLabel(job.education_level))}
+          </span>
+
+          <span class="badge">
+            ${escapeHtml(pretty(job.career_level))}
+          </span>
+
+          <span class="badge ${
+            job.fresh_graduate_eligible === true ? "green" : ""
+          }">
+            ${escapeHtml(freshLabel(job.fresh_graduate_eligible))}
+          </span>
+        </div>
+
+        <div class="candidate-box">
+          <div class="candidate-title">Candidate Fit</div>
+
+          <div class="candidate-text">
+            <strong>Pendidikan:</strong>
+            ${escapeHtml(educationLabel(job.education_level))}
+            <br>
+
+            <strong>Level:</strong>
+            ${escapeHtml(pretty(job.career_level) || "Belum diketahui")}
+            <br>
+
+            <strong>Pengalaman minimum:</strong>
+            ${escapeHtml(experience)}
+            <br>
+
+            <strong>Jurusan/Bidang:</strong>
+            ${escapeHtml(fields)}
+            <br>
+
+            <strong>Confidence:</strong>
+            ${escapeHtml(job.candidate_fit_confidence ?? 0)}%
+          </div>
+        </div>
+
+        <div class="job-footer">
+          <div class="deadline">
+            Sumber resmi terverifikasi
+          </div>
+
+          ${
+            job.official_url
+              ? `
+                <a
+                  class="apply-btn"
+                  href="${escapeHtml(job.official_url)}"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  View Official Vacancy ↗
+                </a>
+              `
+              : ""
           }
-        );
+        </div>
 
-      renderJobs(
-        filtered
-      );
-    }
+      </article>
+    `;
+  }).join("");
+}
 
+function showTab(tab) {
+  const jobs = document.getElementById("jobsSection");
+  const scholarships = document.getElementById("scholarshipsSection");
+  const jobsTab = document.getElementById("jobsTab");
+  const scholarshipsTab = document.getElementById("scholarshipsTab");
 
-    /* =====================================================
-       RENDER
-       ===================================================== */
+  if (tab === "scholarships") {
+    jobs.classList.add("hidden");
+    scholarships.classList.remove("hidden");
+    jobsTab.classList.remove("active");
+    scholarshipsTab.classList.add("active");
+  } else {
+    scholarships.classList.add("hidden");
+    jobs.classList.remove("hidden");
+    scholarshipsTab.classList.remove("active");
+    jobsTab.classList.add("active");
+  }
+}
 
-    function renderJobs(jobs) {
-      const loadingState =
-        document.getElementById(
-          "loadingState"
-        );
+[
+  "searchInput",
+  "provinceFilter",
+  "workModeFilter",
+  "educationFilter",
+  "careerFilter",
+  "freshFilter",
+  "fieldFilter"
+].forEach(id => {
+  document.getElementById(id).addEventListener(
+    id === "searchInput" ? "input" : "change",
+    applyFilters
+  );
+});
 
-      const emptyState =
-        document.getElementById(
-          "emptyState"
-        );
-
-      const jobsList =
-        document.getElementById(
-          "jobsList"
-        );
-
-      loadingState.classList.add(
-        "hidden"
-      );
-
-      document.getElementById(
-        "resultCount"
-      ).textContent =
-        jobs.length +
-        " verified result" +
-        (
-          jobs.length === 1
-            ? ""
-            : "s"
-        );
-
-      if (!jobs.length) {
-        jobsList.innerHTML = "";
-
-        emptyState.classList.remove(
-          "hidden"
-        );
-
-        return;
-      }
-
-      emptyState.classList.add(
-        "hidden"
-      );
-
-      jobsList.innerHTML =
-        jobs
-          .map(
-            job => {
-              const location =
-                [
-                  job.city,
-                  job.province_name
-                ]
-                  .filter(Boolean)
-                  .filter(
-                    (value, index, array) =>
-                      array.indexOf(value) ===
-                      index
-                  )
-                  .join(", ") ||
-                job.location_text ||
-                job.country_name ||
-                "Location not specified";
-
-              const deadline =
-                formatDate(
-                  job.application_deadline
-                );
-
-              const posted =
-                formatDate(
-                  job.posted_at
-                );
-
-              const trust =
-                job.trust_score !==
-                  null &&
-                job.trust_score !==
-                  undefined
-                  ? job.trust_score
-                  : null;
-
-              const url =
-                job.official_url
-                  ? escapeHtml(
-                      job.official_url
-                    )
-                  : "";
-
-              return `
-                <article class="job-card">
-
-                  <div class="job-top">
-
-                    <div>
-                      <h3 class="job-title">
-                        ${escapeHtml(
-                          job.job_title ||
-                          "Untitled Vacancy"
-                        )}
-                      </h3>
-
-                      <div class="company">
-                        ${escapeHtml(
-                          job.company_name ||
-                          "Unknown Company"
-                        )}
-                      </div>
-                    </div>
-
-                    <div class="verified-badge">
-                      ✓ VERIFIED SAFE
-                    </div>
-
-                  </div>
-
-                  <div class="meta">
-
-                    <span class="badge">
-                      📍 ${escapeHtml(location)}
-                    </span>
-
-                    ${
-                      job.work_mode
-                        ? `
-                          <span class="badge ${
-                            job.work_mode ===
-                            "REMOTE"
-                              ? "remote"
-                              : ""
-                          }">
-                            ${escapeHtml(
-                              pretty(
-                                job.work_mode
-                              )
-                            )}
-                          </span>
-                        `
-                        : ""
-                    }
-
-                    ${
-                      job.employment_type
-                        ? `
-                          <span class="badge">
-                            ${escapeHtml(
-                              pretty(
-                                job.employment_type
-                              )
-                            )}
-                          </span>
-                        `
-                        : ""
-                    }
-
-                    ${
-                      job.experience_level
-                        ? `
-                          <span class="badge">
-                            ${escapeHtml(
-                              pretty(
-                                job.experience_level
-                              )
-                            )}
-                          </span>
-                        `
-                        : ""
-                    }
-
-                    ${
-                      trust !== null
-                        ? `
-                          <span class="badge score">
-                            Trust ${escapeHtml(
-                              trust
-                            )}
-                          </span>
-                        `
-                        : ""
-                    }
-
-                  </div>
-
-                  <div class="job-footer">
-
-                    <div class="deadline">
-
-                      ${
-                        posted
-                          ? "Posted: " +
-                            escapeHtml(posted)
-                          : "Official vacancy verified"
-                      }
-
-                      ${
-                        deadline
-                          ? " • Deadline: " +
-                            escapeHtml(deadline)
-                          : ""
-                      }
-
-                    </div>
-
-                    ${
-                      url
-                        ? `
-                          <a
-                            class="apply-btn"
-                            href="${url}"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            View Official Vacancy ↗
-                          </a>
-                        `
-                        : ""
-                    }
-
-                  </div>
-
-                </article>
-              `;
-            }
-          )
-          .join("");
-    }
-
-
-    /* =====================================================
-       TABS
-       ===================================================== */
-
-    function showTab(tab) {
-      const jobs =
-        document.getElementById(
-          "jobsSection"
-        );
-
-      const scholarships =
-        document.getElementById(
-          "scholarshipsSection"
-        );
-
-      const jobsTab =
-        document.getElementById(
-          "jobsTab"
-        );
-
-      const scholarshipsTab =
-        document.getElementById(
-          "scholarshipsTab"
-        );
-
-      if (
-        tab ===
-        "scholarships"
-      ) {
-        jobs.classList.add(
-          "hidden"
-        );
-
-        scholarships.classList.remove(
-          "hidden"
-        );
-
-        jobsTab.classList.remove(
-          "active"
-        );
-
-        scholarshipsTab.classList.add(
-          "active"
-        );
-
-      } else {
-        scholarships.classList.add(
-          "hidden"
-        );
-
-        jobs.classList.remove(
-          "hidden"
-        );
-
-        scholarshipsTab.classList.remove(
-          "active"
-        );
-
-        jobsTab.classList.add(
-          "active"
-        );
-      }
-    }
-
-
-    /* =====================================================
-       EVENTS
-       ===================================================== */
-
-    document
-      .getElementById(
-        "searchInput"
-      )
-      .addEventListener(
-        "input",
-        applyFilters
-      );
-
-    document
-      .getElementById(
-        "provinceFilter"
-      )
-      .addEventListener(
-        "change",
-        applyFilters
-      );
-
-    document
-      .getElementById(
-        "workModeFilter"
-      )
-      .addEventListener(
-        "change",
-        applyFilters
-      );
-
-
-    /* =====================================================
-       BOOT
-       ===================================================== */
-
-    buildProvinceOptions();
-    loadJobs();
-
-  </script>
+buildProvinceOptions();
+loadJobs();
+</script>
 
 </body>
 </html>
