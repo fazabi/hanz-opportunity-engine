@@ -1,2399 +1,1523 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Career Opportunity Engine V2.0</title>
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+
+  <title>HANZ Opportunity Engine</title>
+
   <style>
-    :root{
-      --bg:#f5f7fb;
-      --panel:#ffffff;
-      --text:#142033;
-      --muted:#6b778c;
-      --border:#e5e9f0;
-      --shadow:0 10px 30px rgba(18,38,63,.08);
-      --green:#0f9f6e;
-      --green-bg:#e9f8f2;
-      --blue:#2f6fed;
-      --blue-bg:#eef4ff;
-      --amber:#c98200;
-      --amber-bg:#fff6dd;
-      --red:#cf3c4f;
-      --red-bg:#fff0f2;
-      --gray:#667085;
-      --gray-bg:#f2f4f7;
-      --purple:#7a5af8;
-      --purple-bg:#f4f0ff;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-      background:var(--bg);
-      color:var(--text);
-    }
-    button,input,select{font:inherit}
-    .shell{max-width:1440px;margin:0 auto;padding:24px}
-    .topbar{
-      display:flex;align-items:center;justify-content:space-between;gap:16px;
-      margin-bottom:22px;
-    }
-    .brand h1{margin:0;font-size:26px;line-height:1.15}
-    .brand p{margin:6px 0 0;color:var(--muted);font-size:14px}
-    .actions{display:flex;gap:10px;flex-wrap:wrap}
-    .btn{
-      border:1px solid var(--border);background:#fff;color:var(--text);
-      padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:700;
-      transition:.15s ease;display:inline-flex;align-items:center;gap:8px;
-    }
-    .btn:hover{transform:translateY(-1px);box-shadow:0 5px 14px rgba(0,0,0,.06)}
-    .btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
-    .btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
-    .stats{
-      display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;margin-bottom:18px;
-    }
-    .stat{
-      background:var(--panel);border:1px solid var(--border);border-radius:14px;
-      padding:16px 18px;box-shadow:var(--shadow);
-    }
-    .stat .label{color:var(--muted);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.04em}
-    .stat .value{font-size:28px;font-weight:850;margin-top:6px}
-    .stat .sub{font-size:12px;color:var(--muted);margin-top:2px}
-    .toolbar{
-      display:grid;grid-template-columns:2fr repeat(5,1fr);gap:10px;
-      background:var(--panel);border:1px solid var(--border);border-radius:14px;
-      padding:14px;box-shadow:var(--shadow);margin-bottom:18px;
-    }
-    .field input,.field select{
-      width:100%;height:42px;border:1px solid var(--border);border-radius:9px;
-      background:#fff;padding:0 11px;color:var(--text);outline:none;
-    }
-    .field input:focus,.field select:focus{border-color:#aac2ff;box-shadow:0 0 0 3px #eef4ff}
-    .statusline{
-      display:flex;justify-content:space-between;gap:12px;align-items:center;
-      margin:0 2px 12px;color:var(--muted);font-size:13px;flex-wrap:wrap;
-    }
-    .jobs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
-    .job{
-      background:var(--panel);border:1px solid var(--border);border-radius:14px;
-      padding:18px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:14px;
-    }
-    .job-head{display:flex;justify-content:space-between;gap:14px}
-    .job-title{font-size:18px;font-weight:850;line-height:1.3;margin:0}
-    .company{font-weight:750;margin-top:5px}
-    .meta{color:var(--muted);font-size:13px;margin-top:3px}
-    .badges{display:flex;flex-wrap:wrap;gap:7px}
-    .badge{
-      display:inline-flex;align-items:center;border-radius:999px;padding:5px 9px;
-      font-size:11px;font-weight:850;white-space:nowrap;
-    }
-    .green{color:var(--green);background:var(--green-bg)}
-    .blue{color:var(--blue);background:var(--blue-bg)}
-    .amber{color:var(--amber);background:var(--amber-bg)}
-    .red{color:var(--red);background:var(--red-bg)}
-    .gray{color:var(--gray);background:var(--gray-bg)}
-    .purple{color:var(--purple);background:var(--purple-bg)}
-    .metrics{
-      display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;
-      border-top:1px solid var(--border);border-bottom:1px solid var(--border);
-      padding:12px 0;
-    }
-    .metric .k{font-size:11px;color:var(--muted);font-weight:750}
-    .metric .v{font-size:14px;font-weight:850;margin-top:3px}
-    .job-footer{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
-    .link{color:var(--blue);font-weight:800;text-decoration:none;font-size:13px}
-    .small{font-size:12px;color:var(--muted)}
-    .empty,.error{
-      background:#fff;border:1px solid var(--border);border-radius:14px;padding:30px;text-align:center;
-      box-shadow:var(--shadow);grid-column:1/-1;
-    }
-    .error{color:var(--red)}
-    .modal-backdrop{
-      position:fixed;inset:0;background:rgba(14,23,38,.45);display:none;
-      align-items:center;justify-content:center;padding:20px;z-index:50;
-    }
-    .modal-backdrop.open{display:flex}
-    .modal{
-      width:min(620px,100%);background:#fff;border-radius:16px;padding:22px;
-      box-shadow:0 24px 70px rgba(0,0,0,.2)
-    }
-    .modal h2{margin:0 0 6px}.modal p{color:var(--muted);font-size:13px;margin:0 0 16px}
-    .modal .row{margin-bottom:12px}
-    .modal label{display:block;font-size:12px;font-weight:800;margin-bottom:6px}
-    .modal input{
-      width:100%;height:42px;border:1px solid var(--border);border-radius:9px;padding:0 10px;
-    }
-    .modal .footer{display:flex;justify-content:flex-end;gap:10px;margin-top:16px}
-    .toast{
-      position:fixed;right:20px;bottom:20px;background:#142033;color:#fff;
-      padding:12px 15px;border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,.18);
-      opacity:0;transform:translateY(10px);pointer-events:none;transition:.2s;z-index:100;
-      max-width:360px;font-size:13px
-    }
-    .toast.show{opacity:1;transform:translateY(0)}
-    @media(max-width:1100px){
-      .stats{grid-template-columns:repeat(3,1fr)}
-      .toolbar{grid-template-columns:repeat(3,1fr)}
-      .toolbar .search{grid-column:1/-1}
-    }
-    @media(max-width:760px){
-      .shell{padding:14px}
-      .topbar{align-items:flex-start;flex-direction:column}
-      .stats{grid-template-columns:repeat(2,1fr)}
-      .toolbar{grid-template-columns:1fr 1fr}
-      .jobs{grid-template-columns:1fr}
-      .metrics{grid-template-columns:repeat(2,1fr)}
-    }
-    @media(max-width:480px){
-      .stats,.toolbar{grid-template-columns:1fr}
-      .brand h1{font-size:22px}
-    }
-  
-    .cv-gate{background:var(--panel);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);padding:18px;margin-bottom:18px}
-    .cv-gate h2{margin:0 0 6px;font-size:20px}
-    .cv-gate p{margin:0;color:var(--muted);font-size:13px}
-    .upload-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:14px;margin-top:14px}
-    .dropzone{border:2px dashed #c9d4e7;border-radius:13px;padding:24px;text-align:center;background:#fbfcff;cursor:pointer}
-    .dropzone.drag{border-color:var(--blue);background:var(--blue-bg)}
-    .profile-card{border:1px solid var(--border);border-radius:13px;padding:14px;background:#fff}
-    .profile-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
-    .profile-grid label{font-size:12px;font-weight:800;color:var(--muted)}
-    .profile-grid input,.profile-grid textarea{width:100%;margin-top:5px;border:1px solid var(--border);border-radius:9px;padding:9px 10px;background:#fff}
-    .profile-grid textarea{min-height:76px;resize:vertical}
-    .country-pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-    .country-pill{display:flex;align-items:center;gap:6px;border:1px solid var(--border);padding:7px 9px;border-radius:999px;font-size:12px}
-    .cv-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
-    .hidden{display:none!important}
-    .profile-summary{margin-top:10px;font-size:12px;color:var(--muted)}
-    @media(max-width:900px){.upload-grid{grid-template-columns:1fr}.profile-grid{grid-template-columns:1fr}}
-
-
-    .cv-standard-card{
-      margin-top:14px;border:1px solid var(--border);border-radius:13px;padding:14px;background:#fff;
-    }
-    .cv-standard-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
-    .quality-box{border:1px solid var(--border);border-radius:10px;padding:12px;background:#fbfcff}
-    .quality-score{font-size:24px;font-weight:900;line-height:1}
-    .quality-list{margin:9px 0 0;padding-left:18px;color:var(--muted);font-size:12px}
-    .quality-list li{margin:4px 0}
-    .regen-preview{
-      white-space:pre-wrap;border:1px solid var(--border);border-radius:10px;
-      background:#fcfdff;padding:12px;min-height:180px;font-size:12px;line-height:1.5;
-      overflow:auto;max-height:360px;
-    }
-    .status-pass{color:#087b55;font-weight:900}
-    .status-fail{color:#a15c00;font-weight:900}
-    .gate-note{font-size:12px;color:var(--muted);margin-top:8px}
-    @media(max-width:900px){.cv-standard-grid{grid-template-columns:1fr}}
-
-
-    .lang-switch{
-      display:flex;align-items:center;gap:6px;padding:4px;border:1px solid var(--border);
-      border-radius:999px;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.04)
-    }
-    .lang-btn{
-      border:0;background:transparent;cursor:pointer;border-radius:999px;padding:7px 10px;
-      font-size:16px;line-height:1;display:flex;align-items:center;gap:6px;color:var(--muted);font-weight:800
-    }
-    .lang-btn.active{background:#eef4ff;color:var(--text);box-shadow:inset 0 0 0 1px #cddcff}
-    .lang-code{font-size:11px;letter-spacing:.04em}
-    @media(max-width:640px){.lang-code{display:none}.lang-btn{padding:7px 9px}}
-
-    .opportunity-tabs{
-      display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 14px;
-      padding:6px;border:1px solid var(--border);border-radius:14px;background:#fff;
-    }
-    .opportunity-tab{
-      border:0;background:transparent;padding:10px 14px;border-radius:10px;
-      cursor:pointer;font-weight:900;color:var(--muted);
-    }
-    .opportunity-tab.active{background:#eef4ff;color:var(--text);box-shadow:inset 0 0 0 1px #cddcff}
-    .opportunity-card .benefit-line{font-weight:800;margin-top:6px}
-    .opportunity-card .screen-result{margin-top:12px;padding:10px;border:1px solid var(--border);border-radius:10px;background:#fafcff}
-    .hidden-section{display:none!important}
-    .master-summary{margin-top:14px;padding:14px;border:1px solid var(--border);border-radius:12px;background:#fbfdff}
-    .master-summary-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:10px}
-    .master-score{border:1px solid var(--border);border-radius:10px;padding:10px;background:#fff}
-    .master-score .n{font-size:18px;font-weight:900;margin-top:3px}
-    .source-tag{font-size:11px;font-weight:800;padding:3px 7px;border-radius:999px;background:#eef4ff;display:inline-block}
-    .master-review-row{display:grid;grid-template-columns:170px 1fr auto;gap:10px;align-items:start;padding:8px 0;border-bottom:1px solid var(--border)}
-    .master-review-row:last-child{border-bottom:0}
-    .modal-card.wide{max-width:760px}
-    .missing-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:14px}
-    .missing-grid label{font-size:12px;font-weight:800;color:var(--muted)}
-    .missing-grid input,.missing-grid select{width:100%;margin-top:5px;padding:10px;border:1px solid var(--border);border-radius:9px;background:#fff}
-    .modal-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:16px}
-    @media(max-width:800px){.master-summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.missing-grid{grid-template-columns:1fr}.master-review-row{grid-template-columns:1fr}}
-</style>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js">
-  ["provinceFilter","workModeFilter","verifiedOnlyFilter"].forEach(id=>{
-    const el=$(id);
-    if(el) el.addEventListener("change",render);
-  });
-
-</script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js"></script>
-</head>
-<body>
-  <div class="shell">
-    <div class="topbar">
-      <div class="brand">
-        <h1 id="appTitle">HANZ Opportunity Engine</h1>
-        <p>Verified Indonesia jobs, Remote/WFH opportunities, and fully funded Master's scholarships.</p>
-      </div>
-      <div class="actions">
-        
-        <div class="lang-switch" aria-label="Language selector">
-          <button class="lang-btn" id="langIdBtn" type="button" title="Bahasa Indonesia"><span>🇮🇩</span><span class="lang-code">ID</span></button>
-          <button class="lang-btn" id="langEnBtn" type="button" title="English"><span>🇬🇧</span><span class="lang-code">EN</span></button>
-        </div>
-        <button class="btn" id="reloadBtn">↻ Reload Data</button>
-        <button class="btn primary" id="refreshJobsBtn">⚡ Refresh Current Candidate</button>
-      </div>
-    </div>
-
-    <section class="cv-gate" id="cvGate">
-      <h2>Master CV Feeder</h2>
-      <p>Vacancies are discovered and screened from the candidate's education, field of study, technical skills and career level. This CV applies only to the current browser session. <strong>Parser V2.5</strong></p>
-      <div class="upload-grid">
-        <div>
-          <div class="dropzone" id="cvDropzone">
-            <strong>Drop CV here or click to choose</strong>
-            <div class="small" style="margin-top:7px">PDF, DOCX or TXT</div>
-            <input id="cvFile" type="file" accept=".pdf,.docx,.txt" class="hidden">
-          </div>
-          <div id="cvParseStatus" class="profile-summary">No CV loaded.</div>
-          <textarea id="cvRawText" class="hidden"></textarea>
-        </div>
-        <div class="profile-card">
-          <strong>Detected Candidate Profile</strong>
-          <div class="small" style="margin-top:4px">Review/edit before discovery. The engine does not invent skills missing from the CV.</div>
-          <div class="profile-grid">
-            <div><label>Education level</label><input id="candidateEducationLevel" placeholder="e.g. D4 / Bachelor / Master"></div>
-            <div><label>Field / major</label><input id="candidateMajor" placeholder="e.g. Internet Engineering Technology"></div>
-            <div style="grid-column:1/-1"><label>Technical skills</label><textarea id="candidateSkills" placeholder="Networking, TCP/IP, Python, Docker"></textarea></div>
-            <div><label>Career level</label><input id="candidateCareerLevel" placeholder="Fresh Graduate / Junior / Experienced"></div>
-            <div><label>Languages</label><input id="candidateLanguages" placeholder="English, Japanese"></div>
-          </div>
-          <div class="small" style="margin-top:12px"><strong>Target geography</strong> (optional)</div>
-          <div class="country-pills">
-            <label class="country-pill"><input type="checkbox" id="geoJapan"> Japan</label>
-            <label class="country-pill"><input type="checkbox" id="geoIndonesia"> Indonesia</label>
-            <label class="country-pill"><input type="checkbox" id="geoMiddleEast"> Middle East</label>
-            <label class="country-pill"><input type="checkbox" id="geoGlobal" checked> All available locations</label>
-          </div>
-          <div class="cv-actions">
-            <button class="btn primary" id="findMatchesBtn" disabled>Find Matching Opportunities</button>
-            <button class="btn" id="clearCvBtn" disabled>Clear CV</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="cv-standard-card" id="cvStandardGate">
-        <strong>Master CV & Candidate Profile</strong>
-        <div class="small" style="margin-top:4px">
-          Every uploaded CV is screened before vacancy matching. If the CV is not sufficiently structured,
-          HANZ regenerates a fact-preserving standardized version first. Matching stays locked until the standardized profile is confirmed.
-        </div>
-
-        <div class="cv-standard-grid">
-          <div class="quality-box">
-            <div class="small">CV Quality Score</div>
-            <div class="quality-score" id="cvQualityScore">—</div>
-            <div id="cvQualityStatus" class="status-fail" style="margin-top:6px">Waiting for CV</div>
-            <ul id="cvQualityIssues" class="quality-list"></ul>
-          </div>
-
-          <div class="quality-box">
-            <div class="small">Gate Action</div>
-            <div id="cvGateAction" style="font-weight:800;margin-top:5px">Upload a CV first.</div>
-            <div class="cv-actions" style="margin-top:10px">
-              <button class="btn" id="regenerateCvBtn" disabled>Regenerate Master Profile</button>
-              <button class="btn primary" id="confirmStandardCvBtn" disabled>Confirm Master Profile</button>
-            </div>
-            <div class="gate-note">
-              Regeneration restructures only facts detected from the uploaded CV. It does not add unverified skills, achievements, certifications, or experience.
-            </div>
-          </div>
-        </div>
-
-        <div style="margin-top:12px">
-          <div class="small"><strong>Master CV / Profile Preview</strong></div>
-          <div id="standardCvPreview" class="regen-preview">No standardized CV generated yet.</div>
-        </div>
-        <div class="master-summary" id="masterProfileSummary">
-          <strong id="masterProfileTitle">Master Candidate Profile</strong>
-          <div class="small" id="masterProfileDesc" style="margin-top:4px">One confirmed master profile is used for Jobs, Jobs and Master's Scholarship.</div>
-          <div class="master-summary-grid">
-            <div class="master-score"><div class="small" id="masterJobsLabel">Jobs readiness</div><div class="n" id="masterJobsScore">0%</div></div>
-            <div class="master-score"><div class="small" id="masterScholarshipLabel">Scholarship readiness</div><div class="n" id="masterScholarshipScore">0%</div></div>
-            <div class="master-score"><div class="small" id="masterInternshipLabel">Internship readiness</div><div class="n" id="masterInternshipScore">0%</div></div>
-            <div class="master-score"><div class="small" id="masterStatusLabel">Profile status</div><div class="n" id="masterStatusValue" style="font-size:14px">DRAFT</div></div>
-          </div>
-          <div id="masterReviewList" style="margin-top:12px"></div>
-        </div>
-      </div>
-    </section>
-
-
-    <nav class="opportunity-tabs" id="opportunityTabs" aria-label="Opportunity type">
-      <button class="opportunity-tab active" type="button" data-tab="jobs">💼 Jobs Indonesia & Remote</button>
-      <button class="opportunity-tab" type="button" data-tab="scholarship-s2">🎓 Fully Funded Master</button>
-    </nav>
-
-    <section class="stats" id="jobStats">
-      <div class="stat"><div class="label">Total Jobs</div><div class="value" id="sTotal">0</div><div class="sub">Persisted screening results</div></div>
-      <div class="stat"><div class="label">Recommended</div><div class="value" id="sRecommended">0</div><div class="sub">Strong / Good</div></div>
-      <div class="stat"><div class="label">Other Suitable</div><div class="value" id="sSuitable">0</div><div class="sub">Fair</div></div>
-      <div class="stat"><div class="label">Explore Other</div><div class="value" id="sExplore">0</div><div class="sub">Low</div></div>
-      <div class="stat"><div class="label">Verified Safe</div><div class="value" id="sSafe">0</div><div class="sub">Safety gate passed</div></div>
-    </section>
-
-    <section class="toolbar" id="jobToolbar">
-      <div class="field search"><input id="searchInput" placeholder="Search job, company, skill, city..." /></div>
-      <div class="field">
-        <select id="provinceFilter">
-          <option value="">All 38 Provinces</option>
-          <option>Aceh</option><option>Sumatera Utara</option><option>Sumatera Barat</option><option>Riau</option>
-          <option>Kepulauan Riau</option><option>Jambi</option><option>Sumatera Selatan</option><option>Kepulauan Bangka Belitung</option>
-          <option>Bengkulu</option><option>Lampung</option><option>DKI Jakarta</option><option>Jawa Barat</option>
-          <option>Jawa Tengah</option><option>DI Yogyakarta</option><option>Jawa Timur</option><option>Banten</option>
-          <option>Bali</option><option>Nusa Tenggara Barat</option><option>Nusa Tenggara Timur</option>
-          <option>Kalimantan Barat</option><option>Kalimantan Tengah</option><option>Kalimantan Selatan</option>
-          <option>Kalimantan Timur</option><option>Kalimantan Utara</option><option>Sulawesi Utara</option>
-          <option>Gorontalo</option><option>Sulawesi Tengah</option><option>Sulawesi Barat</option>
-          <option>Sulawesi Selatan</option><option>Sulawesi Tenggara</option><option>Maluku</option><option>Maluku Utara</option>
-          <option>Papua</option><option>Papua Barat</option><option>Papua Selatan</option><option>Papua Tengah</option>
-          <option>Papua Pegunungan</option><option>Papua Barat Daya</option>
-        </select>
-      </div>
-      <div class="field">
-        <select id="workModeFilter">
-          <option value="">All Work Modes</option>
-          <option value="REMOTE">Remote / WFH</option>
-          <option value="HYBRID">Hybrid</option>
-          <option value="ONSITE">On-site</option>
-        </select>
-      </div>
-      <div class="field"><select id="recommendationFilter"><option value="">All recommendations</option></select></div>
-      <div class="field"><select id="matchFilter"><option value="">All recruiter match</option></select></div>
-      <div class="field"><select id="companyFilter"><option value="">All companies</option></select></div>
-      <label class="country-pill" style="min-height:42px;justify-content:center">
-        <input type="checkbox" id="verifiedOnlyFilter" checked> Verified Safe Only
-      </label>
-    </section>
-
-    <div class="statusline">
-      <div id="resultInfo">Ready.</div>
-      <div id="lastUpdated">Last updated: —</div>
-    </div>
-
-    <main class="jobs" id="jobs"></main>
-  </div>
-
-  <div class="modal-backdrop" id="settingsModal">
-    <div class="modal">
-      <h2>Dashboard Settings</h2>
-      <p>Use the Supabase project URL and publishable key only. Never paste a service-role or secret key into a browser dashboard.</p>
-      <div class="row">
-        <label>App title</label>
-        <input id="cfgTitle" value="HANZ Opportunity Engine" />
-      </div>
-      <div class="row">
-        <label>Supabase URL</label>
-        <input id="cfgUrl" placeholder="https://YOUR-PROJECT.supabase.co" />
-      </div>
-      <div class="row">
-        <label>Supabase anon key</label>
-        <input id="cfgAnon" placeholder="eyJ..." />
-      </div>
-      <div class="row">
-        <label>Dashboard view</label>
-        <input id="cfgView" value="job_recommendation_dashboard" />
-      </div>
-      <div class="row">
-        <label>Refresh batch size</label>
-        <input id="cfgBatch" type="number" min="1" max="10" value="10" />
-      </div>
-      <div class="footer">
-        <button class="btn" id="closeSettingsBtn">Cancel</button>
-        <button class="btn primary" id="saveSettingsBtn">Save & Load</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal" id="missingDataModal">
-    <div class="modal-card wide">
-      <div class="modal-head">
-        <div>
-          <h2 id="missingDataTitle">Additional Information Required</h2>
-          <p class="small" id="missingDataDesc">Fill only information you can confirm. HANZ will never invent missing candidate facts.</p>
-        </div>
-        <button class="icon-btn" id="closeMissingDataBtn" type="button">✕</button>
-      </div>
-      <div class="missing-grid">
-        <div><label id="missingNationalityLabel">Nationality</label><input id="missingNationality"></div>
-        <div><label id="missingResidencyLabel">Residency country</label><input id="missingResidency"></div>
-        <div><label id="missingGpaLabel">GPA</label><input id="missingGpa" type="number" step="0.01" min="0"></div>
-        <div><label id="missingGpaScaleLabel">GPA scale</label><select id="missingGpaScale"><option value=""></option><option value="4">4.00</option><option value="5">5.00</option><option value="100">100</option></select></div>
-        <div><label id="missingGraduationYearLabel">Graduation year</label><input id="missingGraduationYear" type="number" min="1950" max="2100"></div>
-        <div><label id="missingLanguageTestLabel">Language test</label><select id="missingLanguageTest"><option value=""></option><option>IELTS</option><option>TOEFL iBT</option><option>TOEFL ITP</option><option>PTE</option><option>Duolingo</option><option>JLPT</option><option>HSK</option><option>TOPIK</option></select></div>
-        <div><label id="missingLanguageScoreLabel">Language score / level</label><input id="missingLanguageScore"></div>
-      </div>
-      <div class="small" id="missingDataNote" style="margin-top:12px">Unknown fields may stay blank. They remain NOT_STATED and are never treated as verified facts.</div>
-      <div class="modal-actions">
-        <button class="btn" id="skipMissingDataBtn" type="button">Continue with Unknown Fields</button>
-        <button class="btn primary" id="saveMissingDataBtn" type="button">Save & Regenerate Master Profile</button>
-      </div>
-    </div>
-  </div>
-  <div class="toast" id="toast"></div>
-
-<script>
-(() => {
-  const $ = (id) => document.getElementById(id);
-
-  const LANG_KEY = "hanzcareer_language_v1";
-  let currentLang = localStorage.getItem(LANG_KEY) || "en";
-  let activeOpportunityTab = "jobs";
-  let opportunityRows = [];
-  let candidateSessionId = crypto.randomUUID();
-  let masterSupplement={nationality:"",residency_country:"",gpa:null,gpa_scale:null,graduation_year:null,language_tests:[]};
-  let masterProfileStatus="DRAFT";
-  let masterFieldSources={};
-
-  const I18N = {
-    en: {
-      appSubtitle:"Verified vacancy discovery, recruiter-grade screening, and recommendation tracking.",
-      reload:"↻ Reload Data", refreshCandidate:"⚡ Refresh Current Candidate",
-      uploadTitle:"Upload CV → Find Matching Opportunities",
-      uploadDesc:"Vacancies are discovered and screened from the candidate's education, field of study, technical skills and career level. This CV applies only to the current browser session.",
-      dropCv:"Drop CV here or click to choose", noCv:"No CV loaded.",
-      detectedProfile:"Detected Candidate Profile",
-      reviewProfile:"Review/edit before discovery. The engine does not invent skills missing from the CV.",
-      educationLevel:"Education level", major:"Field / major", technicalSkills:"Technical skills",
-      careerLevel:"Career level", languages:"Languages", targetGeography:"Target geography",
-      optional:"(optional)", allLocations:"All available locations",
-      findMatches:"Find Matching Opportunities", clearCv:"Clear CV",
-      cvGate:"CV Standardization Gate",
-      cvGateDesc:"Every uploaded CV is screened before vacancy matching. If the CV is not sufficiently structured, HANZ regenerates a fact-preserving standardized version first. Matching stays locked until the standardized profile is confirmed.",
-      cvQuality:"CV Quality Score", waitingCv:"Waiting for CV", gateAction:"Gate Action", uploadFirst:"Upload a CV first.",
-      regenerate:"Regenerate Standardized CV", confirm:"Confirm Standardized CV",
-      regenNote:"Regeneration restructures only facts detected from the uploaded CV. It does not add unverified skills, achievements, certifications, or experience.",
-      preview:"Standardized CV Preview", noPreview:"No standardized CV generated yet.",
-      totalJobs:"Total Jobs", totalJobsSub:"Persisted screening results",
-      recommended:"Recommended", strongGood:"Strong / Good", suitable:"Other Suitable", fair:"Fair",
-      explore:"Explore Other", low:"Low", verifiedSafe:"Verified Safe", safetyPassed:"Safety gate passed",
-      searchPlaceholder:"Search title, company, location...",
-      allRecommendations:"All recommendations", allMatch:"All recruiter match",
-      allCompanies:"All companies", allLocationsFilter:"All locations", allSafety:"All safety status",
-      ready:"Ready.", lastUpdated:"Last updated: —", blockedVacancyIssue:"Blocked — Vacancy Issue",
-      settingsTitle:"Dashboard Settings",
-      settingsDesc:"Use the Supabase project URL and publishable key only. Never paste a service-role or secret key into a browser dashboard.",
-      appTitleLabel:"App title", supabaseUrl:"Supabase URL", anonKey:"Supabase anon key",
-      dashboardView:"Dashboard view", batchSize:"Refresh batch size", cancel:"Cancel", saveLoad:"Save & Load"
-    },
-    id: {
-      appSubtitle:"Pencarian lowongan terverifikasi, screening setara recruiter, dan pelacakan rekomendasi.",
-      reload:"↻ Muat Ulang Data", refreshCandidate:"⚡ Refresh Kandidat Saat Ini",
-      uploadTitle:"Upload CV → Cari Lowongan yang Cocok",
-      uploadDesc:"Lowongan dicari dan disaring berdasarkan pendidikan, bidang studi, technical skills, dan level karier kandidat. CV ini hanya digunakan untuk sesi browser saat ini.",
-      dropCv:"Taruh CV di sini atau klik untuk memilih", noCv:"Belum ada CV yang dimuat.",
-      detectedProfile:"Profil Kandidat Terdeteksi",
-      reviewProfile:"Periksa/edit sebelum pencarian. Sistem tidak menambahkan skill yang tidak ada di CV.",
-      educationLevel:"Tingkat pendidikan", major:"Bidang / jurusan", technicalSkills:"Technical skills",
-      careerLevel:"Level karier", languages:"Bahasa", targetGeography:"Target wilayah",
-      optional:"(opsional)", allLocations:"Semua lokasi yang tersedia",
-      findMatches:"Cari Lowongan yang Cocok", clearCv:"Hapus CV",
-      cvGate:"Gerbang Standardisasi CV",
-      cvGateDesc:"Setiap CV diperiksa sebelum proses matching. Jika struktur CV belum memadai, HANZ akan membuat versi standar yang tetap mempertahankan fakta. Matching tetap terkunci sampai profil standar dikonfirmasi.",
-      cvQuality:"Skor Kualitas CV", waitingCv:"Menunggu CV", gateAction:"Tindakan", uploadFirst:"Upload CV terlebih dahulu.",
-      regenerate:"Buat Ulang CV Standar", confirm:"Konfirmasi CV Standar",
-      regenNote:"Proses standardisasi hanya menata ulang fakta yang terdeteksi di CV. Sistem tidak menambahkan skill, pencapaian, sertifikasi, atau pengalaman yang belum terverifikasi.",
-      preview:"Preview CV Standar", noPreview:"Belum ada CV standar yang dibuat.",
-      totalJobs:"Total Lowongan", totalJobsSub:"Hasil screening tersimpan",
-      recommended:"Direkomendasikan", strongGood:"Strong / Good", suitable:"Cocok Lainnya", fair:"Fair",
-      explore:"Eksplorasi Lain", low:"Low", verifiedSafe:"Terverifikasi Aman", safetyPassed:"Lolos safety gate",
-      searchPlaceholder:"Cari posisi, perusahaan, lokasi...",
-      allRecommendations:"Semua rekomendasi", allMatch:"Semua recruiter match",
-      allCompanies:"Semua perusahaan", allLocationsFilter:"Semua lokasi", allSafety:"Semua status keamanan",
-      ready:"Siap.", lastUpdated:"Terakhir diperbarui: —", blockedVacancyIssue:"Dihentikan — Masalah pada Lowongan",
-      settingsTitle:"Pengaturan Dashboard",
-      settingsDesc:"Gunakan hanya URL project Supabase dan publishable/anon key. Jangan pernah memasukkan service-role atau secret key ke dashboard browser.",
-      appTitleLabel:"Judul aplikasi", supabaseUrl:"URL Supabase", anonKey:"Supabase anon key",
-      dashboardView:"Tampilan dashboard", batchSize:"Ukuran batch refresh", cancel:"Batal", saveLoad:"Simpan & Muat"
-    }
-  };
-
-  function t(key){ return I18N[currentLang]?.[key] ?? I18N.en[key] ?? key; }
-  function setText(selector,value){ const el=document.querySelector(selector); if(el) el.textContent=value; }
-  function setPlaceholder(selector,value){ const el=document.querySelector(selector); if(el) el.placeholder=value; }
-
-  function applyLanguage(lang){
-    currentLang = lang === "id" ? "id" : "en";
-    localStorage.setItem(LANG_KEY,currentLang);
-    document.documentElement.lang=currentLang;
-
-    $("langIdBtn")?.classList.toggle("active",currentLang==="id");
-    $("langEnBtn")?.classList.toggle("active",currentLang==="en");
-
-    setText(".brand p",t("appSubtitle"));
-    setText("#reloadBtn",t("reload"));
-    setText("#refreshJobsBtn",t("refreshCandidate"));
-    setText("#cvGate > h2",t("uploadTitle"));
-
-    const cvDesc=document.querySelector("#cvGate > p");
-    if(cvDesc) cvDesc.innerHTML=`${t("uploadDesc")} <strong>Parser V2.5</strong>`;
-
-    setText("#cvDropzone strong",t("dropCv"));
-    if(!$("cvRawText")?.value && $("cvParseStatus")) $("cvParseStatus").textContent=t("noCv");
-
-    setText(".profile-card > strong",t("detectedProfile"));
-    const profileHelp=document.querySelector(".profile-card > .small");
-    if(profileHelp) profileHelp.textContent=t("reviewProfile");
-
-    const profileLabels=document.querySelectorAll(".profile-grid label");
-    ["educationLevel","major","technicalSkills","careerLevel","languages"].forEach((key,i)=>{
-      if(profileLabels[i]) profileLabels[i].textContent=t(key);
-    });
-
-    const geoTitle=document.querySelector(".profile-card > .small[style*='margin-top:12px']");
-    if(geoTitle) geoTitle.innerHTML=`<strong>${t("targetGeography")}</strong> ${t("optional")}`;
-
-    const geoGlobal=$("geoGlobal")?.parentElement;
-    if(geoGlobal) geoGlobal.lastChild.textContent=` ${t("allLocations")}`;
-
-    setText("#findMatchesBtn",t("findMatches"));
-    setText("#clearCvBtn",t("clearCv"));
-
-    setText("#cvStandardGate > strong",t("cvGate"));
-    const gateDesc=document.querySelector("#cvStandardGate > .small");
-    if(gateDesc) gateDesc.textContent=t("cvGateDesc");
-
-    const qualityBoxes=document.querySelectorAll(".quality-box");
-    if(qualityBoxes[0]?.querySelector(".small")) qualityBoxes[0].querySelector(".small").textContent=t("cvQuality");
-    if(qualityBoxes[1]?.querySelector(".small")) qualityBoxes[1].querySelector(".small").textContent=t("gateAction");
-
-    if($("cvQualityScore")?.textContent==="—" && $("cvQualityStatus")) $("cvQualityStatus").textContent=t("waitingCv");
-    if(!$("cvRawText")?.value && $("cvGateAction")) $("cvGateAction").textContent=t("uploadFirst");
-
-    setText("#regenerateCvBtn",t("regenerate"));
-    setText("#confirmStandardCvBtn",t("confirm"));
-    const gateNote=document.querySelector(".gate-note");
-    if(gateNote) gateNote.textContent=t("regenNote");
-
-    const previewLabel=document.querySelector("#cvStandardGate [style*='margin-top:12px'] .small strong");
-    if(previewLabel) previewLabel.textContent=t("preview");
-
-    if($("standardCvPreview") && /No standardized CV generated yet|Belum ada CV standar yang dibuat/.test($("standardCvPreview").textContent)){
-      $("standardCvPreview").textContent=t("noPreview");
+    * {
+      box-sizing: border-box;
     }
 
-    const stats=document.querySelectorAll(".stat");
-    [["totalJobs","totalJobsSub"],["recommended","strongGood"],["suitable","fair"],["explore","low"],["verifiedSafe","safetyPassed"]]
-      .forEach((pair,i)=>{
-        if(!stats[i]) return;
-        const label=stats[i].querySelector(".label"), sub=stats[i].querySelector(".sub");
-        if(label) label.textContent=t(pair[0]);
-        if(sub) sub.textContent=t(pair[1]);
-      });
-
-    setPlaceholder("#searchInput",t("searchPlaceholder"));
-
-    [["recommendationFilter","allRecommendations"],["matchFilter","allMatch"],["companyFilter","allCompanies"],["locationFilter","allLocationsFilter"],["safetyFilter","allSafety"]]
-      .forEach(([id,key])=>{
-        const sel=$(id);
-        if(sel?.options?.length) sel.options[0].textContent=t(key);
-      });
-
-    if(["Ready.","Siap."].includes($("resultInfo")?.textContent)) $("resultInfo").textContent=t("ready");
-    if(["Last updated: —","Terakhir diperbarui: —"].includes($("lastUpdated")?.textContent)) $("lastUpdated").textContent=t("lastUpdated");
-
-    setText("#settingsModal h2",t("settingsTitle"));
-    setText("#settingsModal .modal > p",t("settingsDesc"));
-
-    const settingLabels=document.querySelectorAll("#settingsModal .row > label");
-    ["appTitleLabel","supabaseUrl","anonKey","dashboardView","batchSize"].forEach((key,i)=>{
-      if(settingLabels[i]) settingLabels[i].textContent=t(key);
-    });
-    setText("#closeSettingsBtn",t("cancel"));
-    setText("#saveSettingsBtn",t("saveLoad"));
-
-    if(typeof populateFilters==="function") populateFilters();
-    if(typeof renderMasterSummary==="function") renderMasterSummary();
-    if(typeof localizeVisibleText==="function") setTimeout(localizeVisibleText,0);
-  }
-
-  const STORAGE_KEY = "career_dashboard_config_v19";
-
-  const defaultConfig = {
-    title: "HANZ Opportunity Engine",
-    url: "https://nfaagtushvuofooqilkv.supabase.co",
-    batch: 10
-  };
-
-  let config = {...defaultConfig};
-  let rows = [];
-  let normalized = [];
-  let activeCandidateProfile = null;
-  let activeCvName = "";
-  let derivedRoleFamilies = [];
-  let cvQualityResult = null;
-  let standardizedCvConfirmed = false;
-  let standardizedCvText = "";
-
-  function val(...xs){
-    for (const x of xs) if (x !== undefined && x !== null && String(x).trim() !== "") return x;
-    return null;
-  }
-  function text(v){ return v == null ? "" : String(v); }
-  function upper(v){ return text(v).trim().toUpperCase(); }
-  function pct(v){
-    const n = Number(v);
-    return Number.isFinite(n) ? `${Math.round(n)}%` : "—";
-  }
-  function dateFmt(v){
-    if(!v) return "—";
-    const d = new Date(v);
-    return isNaN(d) ? text(v) : d.toLocaleString();
-  }
-  function esc(s){
-    return text(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-  }
-
-  function isValidHttpUrl(v){
-    if(!v) return false;
-    try{
-      const u = new URL(String(v));
-      return u.protocol === "http:" || u.protocol === "https:";
-    }catch{
-      return false;
-    }
-  }
-
-  function sourceLabel(v){
-    if(!isValidHttpUrl(v)) return "Official source";
-    try{
-      const host = new URL(String(v)).hostname.replace(/^www\./,"");
-      if(host.includes("greenhouse.io")) return "Greenhouse";
-      if(host.includes("lever.co")) return "Lever";
-      return host;
-    }catch{
-      return "Official source";
-    }
-  }
-
-  function displayStatus(v, fallback="PENDING"){
-    const x = upper(v);
-    return !x || x === "UNKNOWN" ? fallback : x;
-  }
-
-
-  const INDONESIA_LOCATION_TOKENS = [
-    "indonesia","aceh","sumatera","sumatra","riau","jambi","bengkulu","lampung",
-    "bangka","belitung","banten","jakarta","jawa barat","west java","jawa tengah",
-    "central java","jawa timur","east java","yogyakarta","bali","nusa tenggara",
-    "kalimantan","sulawesi","maluku","papua","medan","binjai","pekanbaru","dumai",
-    "padang","palembang","batam","tanjungpinang","tangerang","cilegon","serang",
-    "bandung","bekasi","bogor","cimahi","cirebon","depok","sukabumi","tasikmalaya",
-    "semarang","surakarta","solo","salatiga","magelang","pekalongan","tegal",
-    "surabaya","malang","kediri","madiun","mojokerto","pasuruan","probolinggo",
-    "denpasar","mataram","kupang","pontianak","palangka raya","banjarmasin",
-    "banjarbaru","samarinda","balikpapan","bontang","tarakan","manado","gorontalo",
-    "palu","makassar","kendari","ambon","ternate","jayapura","sorong","cikarang",
-    "karawang","purwakarta","subang","gresik","sidoarjo","kendal","cilacap",
-    "morowali","bintan","karimun","nusantara","ikn","timika","mimika","konawe",
-    "weda bay","halmahera"
-  ];
-
-  function isIndonesiaLocation(v){
-    const s = text(v).toLowerCase();
-    return INDONESIA_LOCATION_TOKENS.some(token => s.includes(token));
-  }
-
-  function locationFilterGroup(v){
-    if(isIndonesiaLocation(v)) return "Indonesia";
-    return text(v);
-  }
-
-
-  const SKILL_PHRASES=[
-    "Python","Java","JavaScript","TypeScript","C","C++","C#","PHP","Laravel","React","Node.js","HTML","CSS","SQL","MySQL","PostgreSQL","Firebase","Docker","Kubernetes","Linux","AWS","Azure","GCP","Terraform","Ansible","Git","Networking","TCP/IP","DNS","DHCP","VLAN","VPN","BGP","OSPF","Cisco","MikroTik","GNS3","Wireshark","Cybersecurity","SOC","SIEM","Firewall","Cloud","DevOps","SRE","Infrastructure","Data Center","IoT","Arduino","ESP32","Raspberry Pi","MQTT","Android Studio","Qt","Figma","REST API","Machine Learning","Artificial Intelligence","PLC","SCADA","Siemens","MATLAB","AutoCAD","SolidWorks",
-    "Project Management","Manajemen Proyek","Human Resources","Sumber Daya Manusia","Pengelolaan Sumber Daya Manusia","Recruitment","Rekrutmen","Employee Onboarding","Orientasi Karyawan","Performance Management","Pemantauan Kinerja","Training and Development","Program Pelatihan","Strategic Planning","Perencanaan Strategis","Financial Analysis","Analisis Keuangan","Market Research","Riset Pasar","Marketing","Pemasaran","Industry Trend Analysis","Analisis Tren Industri","Business Strategy","Strategi Bisnis","Business Development","Operations","Microsoft Excel","PowerPoint","SPSS","Data Analysis","Analisis Data","Leadership","Kepemimpinan","Communication","Komunikasi Efektif","Teamwork","Kerja Tim","Problem Solving","Pemecahan Masalah",
-    "Flight Planning","Dispatch Coordination","Crew Resource Management","CRM","Safety Management System","SMS",
-    "Weather Assessment","Fuel Management","Risk Assessment","MEL","NOTAM","PBN","RNAV","UPRT","Multi-Engine Instrument Rating",
-    "Commercial Pilot Licence","CPL","ATPL","Charter Operations","VIP Charter","International Route Operations"
-  ];
-
-  const MAJOR_PATTERNS=[
-    /internet engineering technology/i,/computer science/i,/computer engineering/i,/information technology/i,/information systems/i,/informatics/i,/telecommunication[s]? engineering/i,/network engineering/i,/electrical engineering/i,/electronics engineering/i,/mechatronics/i,/mechanical engineering/i,/chemical engineering/i,/civil engineering/i,/industrial engineering/i,/data science/i,/cyber ?security/i,/software engineering/i,
-    /manajemen\b/i,/management\b/i,/business administration/i,/administrasi bisnis/i,/accounting/i,/akuntansi/i,/finance/i,/keuangan/i,/marketing/i,/pemasaran/i,/economics/i,/ekonomi/i,/psychology/i,/psikologi/i,/law\b/i,/hukum\b/i,/international relations/i,/hubungan internasional/i,/communication science/i,/ilmu komunikasi/i,/public administration/i,/administrasi publik/i
-  ];
-
-  function uniq(arr){return [...new Set(arr.filter(Boolean))]}
-  function escapeRegExp(s){return String(s).replace(/[.*+?^${}()|[\]\\]/g,"\\$&")}
-
-  function phrasePresent(textValue,phrase){
-    const text=String(textValue||"");
-    const p=String(phrase||"");
-    const pl=p.toLowerCase();
-
-    if(pl==="artificial intelligence") return /\bartificial intelligence\b/i.test(text);
-    if(pl==="c") return /(^|[^a-z])c([^a-z+#+]|$)/i.test(text);
-    if(pl==="c++") return /c\+\+/i.test(text);
-    if(pl==="c#") return /c#/i.test(text);
-
-    const escaped=escapeRegExp(pl);
-    return new RegExp(`(^|[^a-z0-9])${escaped}([^a-z0-9]|$)`,"i").test(text.toLowerCase());
-  }
-
-  function detectEducationLevel(t){
-    const s=String(t||"").toLowerCase();
-    const educationScope=extractEducationScope(t).toLowerCase();
-
-    if(/\b(phd|doctorate|doctoral|s3)\b/.test(educationScope||s))return"Doctoral / PhD";
-    if(/\b(master|master's|msc|m\.sc|s2)\b/.test(educationScope||s))return"Master";
-    if(/\b(d4|sarjana terapan|bachelor|bachelor's|b\.sc|bsc|s1)\b/.test(educationScope||s))return"D4 / Bachelor-equivalent";
-    if(/\b(d3|associate degree|diploma iii)\b/.test(educationScope||s))return"D3 / Associate";
-
-    // Do not invent D3/D4 equivalence when the CV only says "Diploma".
-    if(/\bdiploma in aviation\b|\bprofessional pilot program\b/.test(educationScope||s))return"Diploma / Professional Pilot Program";
-
-    if(/\b(sma|smk|high school|senior high school)\b/.test(educationScope||s))return"High School";
-    return"";
-  }
-
-  function extractEducationScope(t){
-    const raw=String(t||"");
-    const lower=raw.toLowerCase();
-
-    const starts=[
-      "education & aviation training",
-      "education and aviation training",
-      "education",
-      "pendidikan",
-      "academic background",
-      "academic qualifications"
-    ];
-
-    let start=-1;
-    for(const label of starts){
-      const i=lower.indexOf(label);
-      if(i>=0 && (start<0 || i<start)) start=i;
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #172033;
+      --muted: #6f7787;
+      --line: #e3e8f1;
+      --primary: #165dff;
+      --primary-soft: #edf3ff;
+      --green: #0a8f55;
+      --green-soft: #eaf8f1;
+      --orange: #c96b00;
+      --orange-soft: #fff4e5;
+      --red: #c73737;
+      --red-soft: #fff0f0;
+      --shadow:
+        0 10px 30px rgba(31, 42, 68, 0.08);
     }
 
-    if(start<0) return "";
-
-    const after=raw.slice(start);
-    const stopLabels=[
-      "professional experience",
-      "work experience",
-      "experience",
-      "core skills",
-      "skills",
-      "languages",
-      "additional information",
-      "certifications",
-      "licences & ratings",
-      "licenses & ratings"
-    ];
-
-    let stop=after.length;
-    const afterLower=after.toLowerCase();
-    for(const label of stopLabels){
-      const i=afterLower.indexOf(label, 10);
-      if(i>0 && i<stop) stop=i;
+    body {
+      margin: 0;
+      font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Arial,
+        sans-serif;
+      background: var(--bg);
+      color: var(--text);
     }
 
-    return after.slice(0, Math.min(stop, 2500));
-  }
-
-  function detectMajor(t){
-    const raw=String(t||"");
-    const educationScope=extractEducationScope(raw);
-
-    // Aviation must be derived from the education/training section,
-    // not from generic words such as "management" elsewhere in the CV.
-    const aviationText=educationScope || raw;
-    if(/\b(diploma in aviation|professional pilot program|aviation academy|pilot training|commercial pilot licence training)\b/i.test(aviationText)){
-      return "Aviation / Professional Pilot";
+    button,
+    select,
+    input {
+      font: inherit;
     }
 
-    // Only classify ordinary academic majors from the education section.
-    // This prevents "fuel management" / "safety management system" from
-    // being incorrectly interpreted as a Management degree.
-    const scope=educationScope;
-    if(!scope) return "";
-
-    for(const p of MAJOR_PATTERNS){
-      const m=scope.match(p);
-      if(m){
-        const rawMajor=m[0];
-        const map={
-          "manajemen":"Management","management":"Management",
-          "akuntansi":"Accounting","accounting":"Accounting",
-          "keuangan":"Finance","finance":"Finance",
-          "pemasaran":"Marketing","marketing":"Marketing",
-          "ekonomi":"Economics","economics":"Economics",
-          "psikologi":"Psychology","psychology":"Psychology",
-          "hukum":"Law","law":"Law",
-          "administrasi bisnis":"Business Administration",
-          "business administration":"Business Administration",
-          "administrasi publik":"Public Administration",
-          "public administration":"Public Administration",
-          "hubungan internasional":"International Relations",
-          "international relations":"International Relations",
-          "ilmu komunikasi":"Communication Science",
-          "communication science":"Communication Science"
-        };
-        return map[rawMajor.toLowerCase()]||rawMajor.replace(/\b\w/g,c=>c.toUpperCase());
-      }
-    }
-    return"";
-  }
-  function detectSkills(t){
-    const found=uniq(SKILL_PHRASES.filter(skill=>phrasePresent(t,skill)));
-    const map={
-      "Manajemen Proyek":"Project Management","Sumber Daya Manusia":"Human Resources",
-      "Pengelolaan Sumber Daya Manusia":"Human Resources","Rekrutmen":"Recruitment",
-      "Orientasi Karyawan":"Employee Onboarding","Pemantauan Kinerja":"Performance Management",
-      "Program Pelatihan":"Training and Development","Perencanaan Strategis":"Strategic Planning",
-      "Analisis Keuangan":"Financial Analysis","Riset Pasar":"Market Research","Pemasaran":"Marketing",
-      "Analisis Tren Industri":"Industry Trend Analysis","Analisis Data":"Data Analysis",
-      "Kepemimpinan":"Leadership","Komunikasi Efektif":"Communication","Kerja Tim":"Teamwork",
-      "Pemecahan Masalah":"Problem Solving"
-    };
-    return uniq(found.map(skill=>map[skill]||skill));
-  }
-
-  function detectCareerLevel(t){
-    const s=String(t||"").toLowerCase();
-    const currentYear=new Date().getFullYear();
-
-    const currentMatches=[...s.matchAll(/((?:19|20)\d{2})\s*[-–—]\s*(?:sekarang|present|current)/g)];
-    if(currentMatches.length){
-      const starts=currentMatches.map(m=>Number(m[1])).filter(y=>y>=1990&&y<=currentYear);
-      if(starts.length){
-        const years=Math.max(...starts.map(y=>currentYear-y));
-        if(years>=5)return"Experienced";
-        if(years>=3)return"Early / Mid Career";
-        if(years>=1)return"Junior / Early Career";
-      }
+    a {
+      color: inherit;
     }
 
-    if(/\b(fresh graduate|new graduate|recent graduate)\b/.test(s))return"Fresh Graduate";
-
-    const years=[...s.matchAll(/(\d+)\+?\s*(?:years?|yrs?|tahun)/g)]
-      .map(m=>Number(m[1])).filter(Number.isFinite);
-
-    if(years.length){
-      const max=Math.max(...years);
-      if(max>=5)return"Experienced";
-      if(max>=3)return"Early / Mid Career";
-      if(max>=1)return"Junior / Early Career";
+    .container {
+      width: min(1440px, calc(100% - 32px));
+      margin: 0 auto;
+      padding-bottom: 48px;
     }
 
-    if(/\bintern(ship)?\b/.test(s)||/\bmagang\b/.test(s))return"Student / Early Career";
-    return"";
-  }
-
-  function detectLanguages(t){
-    const langs=[
-      ["English",/\b(english|bahasa inggris)\b/i],["Japanese",/\b(japanese|bahasa jepang)\b/i],
-      ["Indonesian",/\b(indonesian|bahasa indonesia)\b/i],["Mandarin",/\b(mandarin|chinese|bahasa mandarin)\b/i],
-      ["Arabic",/\b(arabic|bahasa arab)\b/i],["Korean",/\b(korean|bahasa korea)\b/i],
-      ["German",/\b(german|bahasa jerman)\b/i],["French",/\b(french|bahasa perancis)\b/i]
-    ];
-    return uniq(langs.filter(([,p])=>p.test(t)).map(([name])=>name));
-  }
-
-  function deriveRoleFamilies(major,skills){
-    const text=`${major||""} ${(skills||[]).join(" ")}`.toLowerCase();
-    const roles=[];
-
-    if(/management|human resources|recruitment|employee|training/.test(text)){
-      roles.push("Human Resources","HR","Recruitment","Talent Acquisition","People Operations","Management Trainee");
-    }
-    if(/marketing|market research/.test(text)){
-      roles.push("Marketing","Market Research","Digital Marketing","Brand","Business Development");
-    }
-    if(/financial analysis|finance|accounting/.test(text)){
-      roles.push("Finance","Financial Analyst","Accounting","Business Analyst");
-    }
-    if(/project management|strategic planning|operations|management/.test(text)){
-      roles.push("Project Management","Operations","Business Operations","Strategy","Management Trainee");
-    }
-    if(/network|tcp\/ip|cloud|devops|infrastructure|cybersecurity/.test(text)){
-      roles.push("Network Engineer","NOC","Cloud","Infrastructure","DevOps","Cybersecurity","Data Center");
-    }
-    if(/software|python|java|javascript|react|php|laravel/.test(text)){
-      roles.push("Software Engineer","Backend","Frontend","Full Stack","Application Developer");
-    }
-    if(/iot|arduino|esp32|raspberry/.test(text)){
-      roles.push("IoT Engineer","Embedded Systems","Automation");
-    }
-    if(/aviation|pilot|flight planning|crew resource management|charter operations|commercial pilot/.test(text)){
-      roles.push("Charter Pilot","Commercial Pilot","Corporate Pilot","First Officer","Flight Operations");
+    .topbar {
+      background: rgba(255, 255, 255, 0.94);
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(12px);
     }
 
-    return uniq(roles);
-  }
-
-
-  function containsAny(textValue, patterns){
-    const s=String(textValue||"").toLowerCase();
-    return patterns.some(p=>s.includes(p));
-  }
-
-  function assessCvQuality(rawText){
-    const raw=String(rawText||"");
-    const lower=raw.toLowerCase();
-    let score=0;
-    const issues=[];
-
-    const hasContact =
-      /@/.test(raw) &&
-      /(\+?\d[\d\s-]{7,})/.test(raw);
-
-    const hasEducation =
-      containsAny(lower,["education","pendidikan","university","universitas","college","politeknik","institute","institut"]);
-
-    const hasExperience =
-      containsAny(lower,["experience","pengalaman","intern","assistant","officer","engineer","manager","staff","specialist","coordinator"]);
-
-    const hasSkills =
-      containsAny(lower,["skills","keahlian","competencies","kompetensi","technical skills","hard skills","software skills"]);
-
-    const hasLanguages =
-      containsAny(lower,["language","bahasa"]);
-
-    const hasSummary =
-      containsAny(lower,["summary","profile","profil","professional profile","objective"]);
-
-    const hasBullets =
-      /(^|\n)\s*[-•▪◦]/m.test(raw);
-
-    const wordCount =
-      raw.trim() ? raw.trim().split(/\s+/).filter(Boolean).length : 0;
-
-    if(hasContact) score+=15; else issues.push("Contact details are incomplete or not clearly structured.");
-    if(hasEducation) score+=15; else issues.push("Education section is not clearly identifiable.");
-    if(hasExperience) score+=20; else issues.push("Experience section is weak or not clearly identifiable.");
-    if(hasSkills) score+=15; else issues.push("Skills section is missing or not clearly structured.");
-    if(hasLanguages) score+=5; else issues.push("Languages are not clearly listed.");
-    if(hasSummary) score+=10; else issues.push("Professional summary/profile is missing.");
-    if(hasBullets) score+=10; else issues.push("Experience is not written in ATS-friendly bullet format.");
-
-    if(wordCount>=250 && wordCount<=900) score+=10;
-    else if(wordCount<250) issues.push("CV is too short for a robust professional profile.");
-    else issues.push("CV is long/dense and may benefit from tighter structuring.");
-
-    const detectedMajor=$("candidateMajor").value.trim();
-    const detectedSkills=splitCsv($("candidateSkills").value);
-
-    if(!detectedMajor) issues.push("Field / major could not be confidently detected.");
-    if(detectedSkills.length<3) issues.push("Too few role-relevant skills were detected.");
-
-    const pass = score >= 75 && Boolean(detectedMajor) && detectedSkills.length >= 3;
-
-    return {
-      score:Math.min(score,100),
-      pass,
-      issues,
-      wordCount
-    };
-  }
-
-
-  function uiText(en,id){return currentLang==="id"?id:en}
-
-  function localizedStatus(v){
-    const x=upper(v);
-    const en={MATCH:"Match",PARTIAL_MATCH:"Partial Match",MISMATCH:"Mismatch",NOT_STATED:"Not Stated",NOT_APPLICABLE:"Not Applicable",VERIFIED_SAFE:"Verified Safe",VERIFY_REQUIRED:"Verification Required",VERIFIED:"Verified",STRONG:"Strong",GOOD:"Good",FAIR:"Fair",LOW:"Low",NOT_EVALUATED:"Not Evaluated",RECOMMENDED_JOBS:"Recommended Jobs",OTHER_SUITABLE_JOBS:"Other Suitable Jobs",EXPLORE_OTHER_JOBS:"Explore Other Jobs",FULLY_FUNDED:"Fully Funded",FULL_TUITION_ONLY:"Full Tuition Only",PAID:"Paid",HIGHLY_ELIGIBLE:"Highly Eligible",POTENTIALLY_ELIGIBLE:"Potentially Eligible",CONDITIONAL_ACTION_REQUIRED:"Conditional / Action Required",NOT_CURRENTLY_ELIGIBLE:"Not Currently Eligible",HIGHLY_SUITABLE:"Highly Suitable",SUITABLE:"Suitable",NOT_ELIGIBLE:"Not Eligible",EXPIRED:"Expired",BLOCKED:"Blocked — Vacancy Issue",COMPLETE:"Complete",CLOSED:"Closed"};
-    const id={MATCH:"Cocok",PARTIAL_MATCH:"Cocok Sebagian",MISMATCH:"Tidak Cocok",NOT_STATED:"Tidak Dicantumkan",NOT_APPLICABLE:"Tidak Berlaku",VERIFIED_SAFE:"Terverifikasi Aman",VERIFY_REQUIRED:"Perlu Verifikasi",VERIFIED:"Terverifikasi",STRONG:"Kuat",GOOD:"Baik",FAIR:"Cukup",LOW:"Rendah",NOT_EVALUATED:"Belum Dinilai",RECOMMENDED_JOBS:"Lowongan Direkomendasikan",OTHER_SUITABLE_JOBS:"Lowongan Cocok Lainnya",EXPLORE_OTHER_JOBS:"Eksplorasi Lowongan Lain",FULLY_FUNDED:"Pendanaan Penuh",FULL_TUITION_ONLY:"Biaya Kuliah Penuh",PAID:"Berbayar",HIGHLY_ELIGIBLE:"Sangat Memenuhi Syarat",POTENTIALLY_ELIGIBLE:"Berpotensi Memenuhi Syarat",CONDITIONAL_ACTION_REQUIRED:"Bersyarat / Perlu Tindakan",NOT_CURRENTLY_ELIGIBLE:"Belum Memenuhi Syarat Saat Ini",HIGHLY_SUITABLE:"Sangat Cocok",SUITABLE:"Cocok",NOT_ELIGIBLE:"Tidak Memenuhi Syarat",EXPIRED:"Kedaluwarsa",BLOCKED:"Dihentikan — Masalah pada Lowongan",COMPLETE:"Selesai",CLOSED:"Ditutup"};
-    return (currentLang==="id"?id:en)[x]||pretty(v);
-  }
-
-  function localizeVisibleText(){
-    const exactId={
-      "Jobs":"Lowongan Kerja","Scholarship S1":"Beasiswa S1","Scholarship S2":"Beasiswa S2","Internship":"Magang",
-      "Recommendation:":"Rekomendasi:","Recruiter Match:":"Kecocokan Recruiter:","Safety:":"Keamanan:","Official:":"Sumber Resmi:","Eligibility:":"Kelayakan:","Vacancy:":"Lowongan:",
-      "Evidence Coverage":"Cakupan Bukti","Screening Status":"Status Screening","Recruiter Match":"Kecocokan Recruiter","Last Screened":"Screening Terakhir",
-      "Funding verified":"Pendanaan terverifikasi","Compensation verified":"Kompensasi terverifikasi","Deadline":"Batas waktu","Deadline not stated":"Batas waktu tidak dicantumkan",
-      "Screen Candidate":"Screen Kandidat","Open official source ↗":"Buka sumber resmi ↗","Open vacancy ↗":"Buka lowongan ↗","Open discovery source ↗":"Buka sumber discovery ↗",
-      "Closed / Expired":"Ditutup / Kedaluwarsa","Official hint check":"Pengecekan sumber resmi","Reused screening":"Screening digunakan ulang"
-    };
-    const exactEn={};
-    Object.entries(exactId).forEach(([en,id])=>exactEn[id]=en);
-
-    document.querySelectorAll(".opportunity-tab").forEach(btn=>{
-      const k=btn.dataset.tab;
-      btn.textContent=k==="jobs"?`💼 ${uiText("Jobs","Lowongan Kerja")}`:k==="scholarship-s1"?`🎓 ${uiText("Scholarship S1","Beasiswa S1")}`:k==="scholarship-s2"?`🎓 ${uiText("Scholarship S2","Beasiswa S2")}`:`🧑‍💻 ${uiText("Internship","Magang")}`;
-    });
-
-    const map=currentLang==="id"?exactId:exactEn;
-    const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
-    const nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);
-    for(const n of nodes){
-      const raw=n.nodeValue||"",trim=raw.trim();
-      if(map[trim]) n.nodeValue=raw.replace(trim,map[trim]);
+    .topbar-inner {
+      width: min(1440px, calc(100% - 32px));
+      margin: 0 auto;
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
     }
 
-    document.querySelectorAll(".badge,.metric .v").forEach(el=>{
-      const s=el.textContent.trim();
-      if(!s)return;
-      const parts=s.split(":");
-      if(parts.length===1){
-        const translated=localizedStatus(s);
-        if(translated!==pretty(s))el.textContent=translated;
-      }else{
-        const last=parts.pop().trim();
-        const translated=localizedStatus(last);
-        if(translated!==pretty(last))el.textContent=`${parts.join(":")}: ${translated}`;
-      }
-    });
-  }
-
-  function masterProfileObject(){
-    const b=buildCandidateProfile();
-    return {...b,nationality:masterSupplement.nationality||"",residency_country:masterSupplement.residency_country||"",gpa:masterSupplement.gpa,gpa_scale:masterSupplement.gpa_scale,graduation_year:masterSupplement.graduation_year,language_tests:masterSupplement.language_tests,master_profile_status:masterProfileStatus,candidate_session_id:candidateSessionId};
-  }
-
-  function readinessScore(keys){
-    const p=masterProfileObject();
-    const present=k=>{const v=p[k];return Array.isArray(v)?v.length>0:(v!==null&&v!==undefined&&String(v).trim()!=="")};
-    return Math.round(keys.filter(present).length/keys.length*100);
-  }
-
-  function renderMasterSummary(){
-    if(!$("masterJobsScore"))return;
-    const p=masterProfileObject();
-    $("masterJobsScore").textContent=`${readinessScore(["education_level","major","skills","career_level","languages"])}%`;
-    $("masterScholarshipScore").textContent=`${readinessScore(["education_level","major","gpa","gpa_scale","graduation_year","languages","nationality"])}%`;
-    $("masterInternshipScore").textContent=`${readinessScore(["education_level","major","graduation_year","skills","languages","nationality","residency_country"])}%`;
-    $("masterStatusValue").textContent=masterProfileStatus==="CONFIRMED"?uiText("Confirmed","Terkonfirmasi"):masterProfileStatus==="REVISED"?uiText("Revised — Rescreen Required","Direvisi — Perlu Screening Ulang"):masterProfileStatus==="REVIEW_REQUIRED"?uiText("Review Required","Perlu Ditinjau"):uiText("Draft","Draf");
-
-    $("masterProfileTitle").textContent=uiText("Master Candidate Profile","Profil Kandidat Master");
-    $("masterProfileDesc").textContent=uiText("One confirmed master profile is used for Jobs, Jobs and Master's Scholarship.","Satu Profil Master yang dikonfirmasi dipakai untuk Lowongan Kerja, Beasiswa S1/S2, dan Magang.");
-    $("masterJobsLabel").textContent=uiText("Jobs readiness","Kesiapan Lowongan");
-    $("masterScholarshipLabel").textContent=uiText("Scholarship readiness","Kesiapan Beasiswa");
-    $("masterInternshipLabel").textContent=uiText("Internship readiness","Kesiapan Magang");
-    $("masterStatusLabel").textContent=uiText("Profile status","Status profil");
-
-    const rows=[
-      [uiText("Education level","Tingkat pendidikan"),p.education_level,"education_level"],
-      [uiText("Field / major","Bidang / jurusan"),p.major,"major"],
-      [uiText("Technical skills","Keahlian teknis"),Array.isArray(p.skills)?p.skills.join(", "):p.skills,"skills"],
-      [uiText("Career level","Level karier"),p.career_level,"career_level"],
-      [uiText("Languages","Bahasa"),Array.isArray(p.languages)?p.languages.join(", "):p.languages,"languages"],
-      [uiText("GPA","IPK / Nilai akademik"),p.gpa!==null&&p.gpa!==undefined?`${p.gpa}${p.gpa_scale?` / ${p.gpa_scale}`:""}`:"","gpa"],
-      [uiText("Graduation year","Tahun lulus"),p.graduation_year,"graduation_year"],
-      [uiText("Nationality","Kewarganegaraan"),p.nationality,"nationality"],
-      [uiText("Residency country","Negara domisili"),p.residency_country,"residency_country"],
-      [uiText("Language test","Tes bahasa"),p.language_tests?.length?p.language_tests.map(x=>`${x.test||""} ${x.score||x.level||""}`.trim()).join(", "):"","language_tests"]
-    ];
-    $("masterReviewList").innerHTML=rows.map(([label,v,key])=>{
-      const source=masterFieldSources[key]==="USER"?uiText("Source: User confirmed","Sumber: Dikonfirmasi user"):v?uiText("Source: CV","Sumber: CV"):uiText("Source: Not stated","Sumber: Tidak dicantumkan");
-      return `<div class="master-review-row"><strong>${esc(label)}</strong><div>${v?esc(String(v)):`<span class="small">${esc(localizedStatus("NOT_STATED"))}</span>`}</div><span class="source-tag">${esc(source)}</span></div>`;
-    }).join("");
-  }
-
-  function openMissingDataModal(){
-    const p=masterProfileObject(),lt=p.language_tests?.[0]||{};
-    $("missingDataTitle").textContent=uiText("Additional Information Required","Informasi Tambahan Diperlukan");
-    $("missingDataDesc").textContent=uiText("Fill only information you can confirm. HANZ will never invent missing candidate facts.","Isi hanya informasi yang dapat kamu konfirmasi. HANZ tidak akan mengarang fakta kandidat yang belum ada.");
-    $("missingNationalityLabel").textContent=uiText("Nationality","Kewarganegaraan");
-    $("missingResidencyLabel").textContent=uiText("Residency country","Negara domisili");
-    $("missingGpaLabel").textContent=uiText("GPA","IPK / Nilai akademik");
-    $("missingGpaScaleLabel").textContent=uiText("GPA scale","Skala IPK / nilai");
-    $("missingGraduationYearLabel").textContent=uiText("Graduation year","Tahun lulus");
-    $("missingLanguageTestLabel").textContent=uiText("Language test","Tes bahasa");
-    $("missingLanguageScoreLabel").textContent=uiText("Language score / level","Nilai / level bahasa");
-    $("missingDataNote").textContent=uiText("Unknown fields may stay blank. They remain NOT_STATED and are never treated as verified facts.","Field yang belum diketahui boleh dikosongkan. Statusnya tetap TIDAK DICANTUMKAN dan tidak dianggap fakta terverifikasi.");
-    $("skipMissingDataBtn").textContent=uiText("Continue with Unknown Fields","Lanjutkan dengan Field Belum Diketahui");
-    $("saveMissingDataBtn").textContent=uiText("Save & Regenerate Master Profile","Simpan & Buat Ulang Profil Master");
-
-    $("missingNationality").value=p.nationality||"";
-    $("missingResidency").value=p.residency_country||"";
-    $("missingGpa").value=p.gpa??"";
-    $("missingGpaScale").value=p.gpa_scale??"";
-    $("missingGraduationYear").value=p.graduation_year??"";
-    $("missingLanguageTest").value=lt.test||"";
-    $("missingLanguageScore").value=lt.score??lt.level??"";
-    $("missingDataModal").classList.add("open");
-  }
-  function closeMissingDataModal(){$("missingDataModal").classList.remove("open")}
-
-  function saveMissingData(){
-    const nat=$("missingNationality").value.trim(),res=$("missingResidency").value.trim(),gpa=$("missingGpa").value.trim(),scale=$("missingGpaScale").value.trim(),grad=$("missingGraduationYear").value.trim(),test=$("missingLanguageTest").value.trim(),score=$("missingLanguageScore").value.trim();
-    masterSupplement={nationality:nat,residency_country:res,gpa:gpa?Number(gpa):null,gpa_scale:scale?Number(scale):null,graduation_year:grad?Number(grad):null,language_tests:test?[{test,score:score&&!Number.isNaN(Number(score))?Number(score):null,level:score&&Number.isNaN(Number(score))?score:""}]:[]};
-    [["nationality",nat],["residency_country",res],["gpa",gpa],["gpa_scale",scale],["graduation_year",grad],["language_tests",test||score]].forEach(([k,v])=>{if(v)masterFieldSources[k]="USER"});
-    masterProfileStatus="REVIEW_REQUIRED";
-    closeMissingDataModal();
-    buildStandardizedCvText();
-    $("confirmStandardCvBtn").disabled=false;
-    renderMasterSummary();
-  }
-
-  function markMasterProfileRevised(){
-    if(masterProfileStatus==="CONFIRMED"){
-      masterProfileStatus="REVISED";
-      standardizedCvConfirmed=false;
-      activeCandidateProfile=null;
-      candidateSessionId=crypto.randomUUID();
-      updateFindButton();
-      renderMasterSummary();
-    }
-  }
-
-  function renderCvQuality(){
-    const q=cvQualityResult;
-    if(!q){
-      $("cvQualityScore").textContent="—";
-      $("cvQualityStatus").textContent="Waiting for CV";
-      $("cvQualityStatus").className="status-fail";
-      $("cvQualityIssues").innerHTML="";
-      $("cvGateAction").textContent="Upload a CV first.";
-      $("regenerateCvBtn").disabled=true;
-      $("confirmStandardCvBtn").disabled=true;
-      standardizedCvConfirmed=false;
-      updateFindButton();
-      return;
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
 
-    $("cvQualityScore").textContent=`${q.score}/100`;
-    $("cvQualityStatus").textContent=q.pass ? "STANDARD / ATS-SAFE ENOUGH" : "NEEDS REGENERATION";
-    $("cvQualityStatus").className=q.pass ? "status-pass" : "status-fail";
-
-    $("cvQualityIssues").innerHTML=q.issues.length
-      ? q.issues.map(x=>`<li>${esc(x)}</li>`).join("")
-      : "<li>No major structural issues detected.</li>";
-
-    if(q.pass){
-      $("cvGateAction").textContent="CV passed the standardization gate. Confirm the standardized profile before matching.";
-      $("regenerateCvBtn").disabled=false;
-      $("confirmStandardCvBtn").disabled=false;
-    }else{
-      $("cvGateAction").textContent="CV must be regenerated before matching can start.";
-      $("regenerateCvBtn").disabled=false;
-      $("confirmStandardCvBtn").disabled=true;
-    }
-
-    standardizedCvConfirmed=false;
-    updateFindButton();
-  }
-
-  function buildStandardizedCvText(){
-    const p=masterProfileObject();
-    const roles=derivedRoleFamilies.length?derivedRoleFamilies.join(", "):localizedStatus("NOT_STATED");
-    standardizedCvText=[
-      uiText("MASTER CANDIDATE PROFILE","PROFIL KANDIDAT MASTER"),"",
-      `${uiText("Education level","Tingkat pendidikan")}: ${p.education_level||localizedStatus("NOT_STATED")}`,
-      `${uiText("Field / major","Bidang / jurusan")}: ${p.major||localizedStatus("NOT_STATED")}`,
-      `${uiText("Technical skills","Keahlian teknis")}: ${p.skills?.length?p.skills.join(", "):localizedStatus("NOT_STATED")}`,
-      `${uiText("Career level","Level karier")}: ${p.career_level||localizedStatus("NOT_STATED")}`,
-      `${uiText("Languages","Bahasa")}: ${p.languages?.length?p.languages.join(", "):localizedStatus("NOT_STATED")}`,
-      `${uiText("GPA","IPK / Nilai akademik")}: ${p.gpa!==null&&p.gpa!==undefined?`${p.gpa}${p.gpa_scale?` / ${p.gpa_scale}`:""}`:localizedStatus("NOT_STATED")}`,
-      `${uiText("Graduation year","Tahun lulus")}: ${p.graduation_year||localizedStatus("NOT_STATED")}`,
-      `${uiText("Nationality","Kewarganegaraan")}: ${p.nationality||localizedStatus("NOT_STATED")}`,
-      `${uiText("Residency country","Negara domisili")}: ${p.residency_country||localizedStatus("NOT_STATED")}`,
-      `${uiText("Language test","Tes bahasa")}: ${p.language_tests?.length?p.language_tests.map(x=>`${x.test||""} ${x.score||x.level||""}`.trim()).join(", "):localizedStatus("NOT_STATED")}`,
-      `${uiText("Target role families","Kelompok target peran")}: ${roles}`,"",
-      uiText("FACT-PRESERVING NOTE","CATATAN PENJAGAAN FAKTA"),
-      uiText("This Master Profile contains only CV-extracted facts and user-confirmed additions.","Profil Master ini hanya berisi fakta yang diekstrak dari CV dan tambahan yang dikonfirmasi user.")
-    ].join("\n");
-    $("standardCvPreview").textContent=standardizedCvText;
-  }
-
-  function regenerateStandardCv(){
-    buildStandardizedCvText();
-    masterProfileStatus="REVIEW_REQUIRED";
-    standardizedCvConfirmed=false;
-    activeCandidateProfile=null;
-    $("confirmStandardCvBtn").disabled=false;
-    $("cvGateAction").textContent=uiText("Master Profile generated. Review and confirm it before screening.","Profil Master sudah dibuat. Periksa lalu konfirmasi sebelum screening.");
-    renderMasterSummary();
-    showToast(uiText("Master Profile regenerated.","Profil Master dibuat ulang."));
-  }
-
-  function confirmStandardCv(){
-    if(!standardizedCvText)buildStandardizedCvText();
-    standardizedCvConfirmed=true;
-    masterProfileStatus="CONFIRMED";
-    candidateSessionId=crypto.randomUUID();
-    activeCandidateProfile=masterProfileObject();
-    $("cvGateAction").textContent=uiText("Master Profile confirmed. Matching is unlocked.","Profil Master dikonfirmasi. Matching dibuka.");
-    $("confirmStandardCvBtn").disabled=true;
-    updateFindButton();
-    renderMasterSummary();
-    showToast(uiText("Master Profile confirmed.","Profil Master dikonfirmasi."));
-  }
-
-  let candidateSessionEpoch = 0;
-
-  function resetCandidateSessionForNewUpload(nextFileName=""){
-    candidateSessionEpoch += 1;
-    candidateSessionId = crypto.randomUUID();
-    masterSupplement={nationality:"",residency_country:"",gpa:null,gpa_scale:null,graduation_year:null,language_tests:[]};
-    masterProfileStatus="DRAFT";
-    masterFieldSources={};
-
-    // Clear ONLY candidate/session state. Keep app settings and language.
-    activeCandidateProfile=null;
-    activeCvName=String(nextFileName||"");
-    derivedRoleFamilies=[];
-    cvQualityResult=null;
-    standardizedCvConfirmed=false;
-    standardizedCvText="";
-
-    rows=[];
-    normalized=[];
-
-    $("cvRawText").value="";
-    ["candidateEducationLevel","candidateMajor","candidateSkills","candidateCareerLevel","candidateLanguages"]
-      .forEach(id=>$(id).value="");
-
-    $("standardCvPreview").textContent=currentLang==="id"
-      ? "Belum ada CV standar yang dibuat."
-      : "No standardized CV generated yet.";
-
-    $("findMatchesBtn").disabled=true;
-
-    // Reset geography to neutral/global for every new CV.
-    $("geoJapan").checked=false;
-    $("geoIndonesia").checked=false;
-    $("geoMiddleEast").checked=false;
-    $("geoGlobal").checked=true;
-
-    // Remove any old candidate/session keys without touching settings/language.
-    for(const storage of [sessionStorage, localStorage]){
-      try{
-        const remove=[];
-        for(let i=0;i<storage.length;i++){
-          const key=storage.key(i)||"";
-          if(/candidate|cv_profile|cv_session|screening_session|active_cv/i.test(key)){
-            remove.push(key);
-          }
-        }
-        remove.forEach(k=>storage.removeItem(k));
-      }catch{}
-    }
-
-    // Clear Cache Storage entries related to this app when available.
-    // Network requests themselves already use cache:"no-store".
-    if("caches" in window){
-      caches.keys()
-        .then(keys=>Promise.all(
-          keys
-            .filter(k=>/hanz|career|candidate|cv/i.test(k))
-            .map(k=>caches.delete(k))
-        ))
-        .catch(()=>{});
-    }
-
-    updateStats();
-    populateFilters();
-    render();
-    renderCvQuality();
-    renderMasterSummary();
-  }
-
-  function applyDetectedProfile(raw){
-    masterFieldSources={education_level:"CV",major:"CV",skills:"CV",career_level:"CV",languages:"CV"};
-    masterProfileStatus="REVIEW_REQUIRED";
-    const major=detectMajor(raw);
-    const skills=detectSkills(raw);
-
-    $("candidateEducationLevel").value=detectEducationLevel(raw);
-    $("candidateMajor").value=major;
-    $("candidateSkills").value=skills.join(", ");
-    $("candidateCareerLevel").value=detectCareerLevel(raw);
-    $("candidateLanguages").value=detectLanguages(raw).join(", ");
-
-    derivedRoleFamilies=deriveRoleFamilies(major,skills);
-    standardizedCvConfirmed=false;
-    standardizedCvText="";
-    $("standardCvPreview").textContent="No standardized CV generated yet.";
-    cvQualityResult=assessCvQuality(raw);
-    renderCvQuality();
-  }
-  function splitCsv(v){return uniq(String(v||"").split(",").map(x=>x.trim()).filter(Boolean))}
-  function buildTargetGeographies(){
-    if($("geoGlobal").checked)return[];
-    const out=[];
-    if($("geoJapan").checked)out.push("Japan");
-    if($("geoIndonesia").checked)out.push("Indonesia");
-    if($("geoMiddleEast").checked)out.push("United Arab Emirates","Saudi Arabia","Qatar","Oman","Bahrain","Kuwait","Jordan","Turkey","Iraq","Lebanon","Egypt");
-    return uniq(out);
-  }
-  function buildCandidateProfile(){
-    const level=$("candidateEducationLevel").value.trim();
-    const major=$("candidateMajor").value.trim();
-    const skills=splitCsv($("candidateSkills").value);
-    const career=$("candidateCareerLevel").value.trim();
-    const languages=splitCsv($("candidateLanguages").value);
-    const geos=buildTargetGeographies();
-    return{
-      source:"USER_UPLOADED_CV_SESSION",
-      education_level:level||null,
-      field_of_study:major||null,
-      major:major||null,
-      education:{level:level||null,field_of_study:major||null},
-      skills,
-      technical_skills:skills,
-      technical_areas:skills,
-      target_roles:derivedRoleFamilies,
-      career_level:career||null,
-      languages,
-      target_geographies:geos,
-      target_location_keywords:geos,
-      cv_filename:activeCvName||null
-    };
-  }
-  function updateFindButton(){
-    const hasProfile =
-      $("candidateEducationLevel").value.trim() ||
-      $("candidateMajor").value.trim() ||
-      $("candidateSkills").value.trim();
-
-    $("findMatchesBtn").disabled =
-      !hasProfile ||
-      !standardizedCvConfirmed;
-  }
-
-  async function parsePdf(file){
-    if(!window.pdfjsLib){
-      throw new Error("PDF parser library failed to load. Check internet connection and reload the page.");
-    }
-
-    window.pdfjsLib.GlobalWorkerOptions.workerSrc =
-      "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-
-    const buf = await file.arrayBuffer();
-    const pdf = await window.pdfjsLib.getDocument({data: new Uint8Array(buf)}).promise;
-
-    let out = "";
-    for(let p = 1; p <= pdf.numPages; p++){
-      const page = await pdf.getPage(p);
-      const content = await page.getTextContent();
-      const line = (content?.items || [])
-        .map(item => (item && typeof item.str === "string") ? item.str : "")
-        .filter(Boolean)
-        .join(" ");
-      out += line + "\n";
-    }
-
-    return String(out || "");
-  }
-  async function parseDocx(file){
-    if(!window.mammoth || typeof window.mammoth.extractRawText !== "function"){
-      throw new Error("DOCX parser library failed to load. Check internet connection and reload the page.");
-    }
-
-    const buf = await file.arrayBuffer();
-    const result = await window.mammoth.extractRawText({arrayBuffer: buf});
-    return String(result?.value || "");
-  }
-  async function parseCvFile(file){
-    if(!file || !file.name){
-      throw new Error("No CV file selected.");
-    }
-
-    const n = String(file.name).toLowerCase();
-
-    if(n.endsWith(".pdf")){
-      return String(await parsePdf(file) || "");
-    }
-
-    if(n.endsWith(".docx")){
-      return String(await parseDocx(file) || "");
-    }
-
-    if(n.endsWith(".txt")){
-      return String(await file.text() || "");
-    }
-
-    throw new Error("Unsupported file type. Use PDF, DOCX or TXT.");
-  }
-  async function handleCvFile(file){
-    if(!file) return;
-
-    // CRITICAL: wipe the previous CV session BEFORE reading the new file.
-    resetCandidateSessionForNewUpload(file.name || "CV");
-    const myEpoch=candidateSessionEpoch;
-
-    $("cvParseStatus").textContent =
-      currentLang==="id"
-        ? `Membersihkan sesi lama & membaca ${activeCvName}…`
-        : `Clearing previous session & reading ${activeCvName}…`;
-
-    $("clearCvBtn").disabled=false;
-
-    try{
-      const parsed=await parseCvFile(file);
-
-      // If another CV was selected while this file was still parsing,
-      // discard this older async result completely.
-      if(myEpoch!==candidateSessionEpoch) return;
-
-      const raw=String(parsed||"").replace(/\u0000/g," ").trim();
-
-      if(raw.length<40){
-        throw new Error("Very little readable text was found in this CV. If this is a scanned/image PDF, use a text-based PDF or DOCX.");
-      }
-
-      $("cvRawText").value=raw;
-      applyDetectedProfile(raw);
-
-      const wordCount=raw
-        ? raw.split(/\s+/).filter(Boolean).length
-        : 0;
-
-      $("cvParseStatus").textContent =
-        currentLang==="id"
-          ? `${activeCvName} berhasil dibaca. ${wordCount.toLocaleString()} kata. Sesi CV sebelumnya sudah dibersihkan. Periksa profil yang terdeteksi.`
-          : `${activeCvName} loaded. ${wordCount.toLocaleString()} words read. Previous CV session was cleared. Review the detected profile.`;
-
-      masterProfileStatus="REVIEW_REQUIRED";
-      renderMasterSummary();
-      openMissingDataModal();
-      showToast(uiText("Master CV parsed from a clean session.","CV Master dibaca dari sesi bersih."));
-    }catch(err){
-      if(myEpoch!==candidateSessionEpoch) return;
-
-      console.error("CV parse error:",err);
-
-      // On parse failure, DO NOT restore or retain the previous candidate.
-      activeCandidateProfile=null;
-      const message=err?.message||String(err);
-
-      $("cvParseStatus").textContent =
-        currentLang==="id"
-          ? `Gagal membaca CV — ${message}`
-          : `CV parse failed — ${message}`;
-
-      showToast(
-        currentLang==="id"
-          ? `Gagal membaca CV: ${message}`
-          : `CV parse failed: ${message}`
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 13px;
+      background: linear-gradient(
+        135deg,
+        #165dff,
+        #4d84ff
       );
-
-      updateFindButton();
-    }
-  }
-
-  function isHintPlatformRow(r){
-    const source = text(val(
-      r?.source_platform,
-      r?.source_name,
-      r?.source,
-      r?.platform
-    )).toLowerCase();
-
-    const url = text(val(
-      r?.source_url,
-      r?.job_url,
-      r?.url,
-      r?.apply_url
-    )).toLowerCase();
-
-    return /linkedin|jobstreet|indeed|karirhub/.test(source)
-      || /linkedin\.com\/jobs|jobstreet\.|indeed\.|karirhub/.test(url)
-      || upper(val(r?.hint_resolution_status, r?.hint_status)) !== "";
-  }
-
-  function hintPayloadFromRow(r){
-    return {
-      job_title: val(r.job_title, r.title, r.vacancy_title, r.position_title),
-      company_name: val(r.company, r.company_name, r.employer, r.organization),
-      source_platform: val(r.source_platform, r.source_name, r.source, r.platform, "Platform Hint"),
-      source_url: val(r.source_url, r.job_url, r.url, r.apply_url),
-      location: val(r.location, r.job_location, r.work_location, r.location_text),
-      description: val(r.description, r.job_description, r.job_text, "")
-    };
-  }
-
-  async function runHintScreeningForRow(r){
-    const base = `${config.url.replace(/\/+$/,"")}/functions/v1/hint-screening-orchestrator`;
-
-    const res = await fetch(base,{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({
-        hint: hintPayloadFromRow(r),
-        candidate_profile_result: activeCandidateProfile,
-        max_steps: 10
-      })
-    });
-
-    const payload = await res.json().catch(()=>null);
-
-    if(!res.ok || payload?.ok !== true){
-      throw new Error(payload?.error || `HTTP ${res.status}`);
+      color: white;
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      font-size: 18px;
+      box-shadow:
+        0 7px 18px rgba(22, 93, 255, 0.25);
     }
 
-    return payload;
-  }
+    .brand-title {
+      font-weight: 800;
+      font-size: 17px;
+      line-height: 1.15;
+    }
 
-  function mergeHintResultIntoRow(r, hintResult){
-    const exact = hintResult?.exact_vacancy || {};
-    const summary = hintResult?.summary || {};
-    const stopped = hintResult?.pipeline_started === false;
-    const stopReason = text(hintResult?.stop_reason);
+    .brand-subtitle {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 3px;
+    }
 
-    const expired =
-      stopReason === "OFFICIAL_VACANCY_EXPIRED"
-      || exact?.expired === true
-      || upper(exact?.freshness_status) === "EXPIRED";
+    .verified-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: var(--green-soft);
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
 
-    const notFound =
-      stopReason === "EXACT_JOB_TITLE_NOT_FOUND_ON_OFFICIAL_SOURCE";
+    .hero {
+      padding: 44px 0 26px;
+    }
 
-    const unresolved =
-      stopReason === "OFFICIAL_EMPLOYER_SOURCE_NOT_RESOLVED"
-      || upper(hintResult?.resolver?.resolution?.status) === "VERIFY_REQUIRED";
-
-    return {
-      ...r,
-
-      hint_orchestrated: true,
-      hint_pipeline_started: hintResult?.pipeline_started === true,
-      hint_stage: val(hintResult?.stage),
-      hint_stop_reason: stopReason || null,
-
-      exact_vacancy_found:
-        exact?.found ?? null,
-
-      closing_date:
-        val(exact?.closing_date, r.closing_date),
-
-      freshness_status:
-        val(
-          exact?.freshness_status,
-          expired ? "EXPIRED" : null
+    .hero-card {
+      padding: 34px;
+      border-radius: 26px;
+      background:
+        radial-gradient(
+          circle at top right,
+          rgba(22, 93, 255, 0.14),
+          transparent 36%
         ),
+        #fff;
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
 
-      vacancy_lifecycle:
-        expired
-          ? "EXPIRED"
-          : notFound
-          ? "NOT_FOUND_ON_OFFICIAL_SOURCE"
-          : unresolved
-          ? "VERIFY_REQUIRED"
-          : hintResult?.pipeline_started === true
-          ? "ACTIVE_SCREENING"
-          : val(r.vacancy_lifecycle, "PENDING"),
+    .hero-label {
+      display: inline-flex;
+      padding: 7px 11px;
+      border-radius: 999px;
+      background: var(--primary-soft);
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
 
-      screening_blocked_before_matching:
-        expired || notFound || unresolved,
+    h1 {
+      margin: 18px 0 10px;
+      font-size: clamp(30px, 5vw, 49px);
+      line-height: 1.04;
+      letter-spacing: -0.04em;
+      max-width: 850px;
+    }
 
-      screening_status:
-        expired
-          ? "CLOSED"
-          : notFound
-          ? "VERIFY_REQUIRED"
-          : val(summary?.screening_status, r.screening_status),
+    .hero-description {
+      color: var(--muted);
+      max-width: 780px;
+      line-height: 1.7;
+      font-size: 15px;
+      margin: 0;
+    }
 
-      safety_status:
-        val(summary?.safety_status, r.safety_status),
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-top: 26px;
+      flex-wrap: wrap;
+    }
 
-      official_status:
-        expired
-          ? "EXPIRED"
-          : notFound
-          ? "FAILED"
-          : val(summary?.official_status, r.official_status),
+    .tab {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--muted);
+      border-radius: 12px;
+      padding: 11px 16px;
+      cursor: pointer;
+      font-weight: 700;
+    }
 
-      eligibility:
-        expired || notFound || unresolved
-          ? "NOT_APPLICABLE"
-          : val(summary?.eligibility, r.eligibility),
+    .tab.active {
+      background: var(--text);
+      color: #fff;
+      border-color: var(--text);
+    }
 
-      recruiter_match:
-        expired || notFound || unresolved
-          ? "NOT_EVALUATED"
-          : val(summary?.recruiter_match, r.recruiter_match),
+    .section {
+      margin-top: 22px;
+    }
 
-      recommendation_group:
-        expired
-          ? "CLOSED_EXPIRED"
-          : notFound
-          ? "VERIFY_REQUIRED"
-          : unresolved
-          ? "VERIFY_REQUIRED"
-          : val(summary?.recommendation_group, r.recommendation_group),
+    .stats {
+      display: grid;
+      grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
 
-      recommendation:
-        expired
-          ? "CLOSED_EXPIRED"
-          : val(summary?.recommendation, r.recommendation),
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 20px;
+    }
 
-      processed_at:
-        val(hintResult?.processed_at, r.processed_at),
+    .stat-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
 
-      hint_result:
-        hintResult
-    };
-  }
+    .stat-value {
+      font-size: 30px;
+      font-weight: 850;
+      margin-top: 9px;
+      letter-spacing: -0.03em;
+    }
 
-  async function resolveVisibleHintsProgressively(){
-    const hintIndexes = rows
-      .map((r,i)=>({r,i}))
-      .filter(x=>isHintPlatformRow(x.r))
-      .slice(0, Math.max(1, Math.min(Number(config.batch||10),10)));
+    .filters {
+      margin-top: 18px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 18px;
+      display: grid;
+      grid-template-columns:
+        1.7fr 1fr 1fr 1fr;
+      gap: 12px;
+      align-items: end;
+    }
 
-    if(!hintIndexes.length) return;
+    .field label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 7px;
+    }
 
-    $("resultInfo").textContent =
-      `${normalized.length} vacancies found. Verifying platform hints against official employer sources…`;
+    .field input,
+    .field select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      padding: 11px 12px;
+      background: #fff;
+      color: var(--text);
+      outline: none;
+      min-height: 43px;
+    }
 
-    for(const item of hintIndexes){
-      try{
-        const hintResult = await runHintScreeningForRow(item.r);
-        rows[item.i] = mergeHintResultIntoRow(item.r, hintResult);
-      }catch(err){
-        console.warn("Hint screening failed:", err);
-        rows[item.i] = {
-          ...item.r,
-          hint_orchestrated: true,
-          vacancy_lifecycle: "VERIFY_REQUIRED",
-          hint_stop_reason: err?.message || String(err),
-          official_status: "VERIFY_REQUIRED",
-          recommendation_group: "VERIFY_REQUIRED"
-        };
+    .field input:focus,
+    .field select:focus {
+      border-color: var(--primary);
+      box-shadow:
+        0 0 0 3px rgba(22, 93, 255, 0.08);
+    }
+
+    .verified-filter {
+      min-height: 43px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 0 12px;
+      border-radius: 11px;
+      background: var(--green-soft);
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .verified-filter input {
+      width: auto;
+      accent-color: var(--green);
+    }
+
+    .list-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      margin: 26px 2px 12px;
+    }
+
+    .list-title {
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .result-count {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .jobs {
+      display: grid;
+      gap: 12px;
+    }
+
+    .job-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 19px;
+      padding: 21px;
+      transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease;
+    }
+
+    .job-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .job-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: flex-start;
+    }
+
+    .job-title {
+      font-size: 18px;
+      font-weight: 820;
+      margin: 0 0 7px;
+    }
+
+    .company {
+      font-size: 14px;
+      font-weight: 650;
+      color: #3f4859;
+    }
+
+    .verified-badge {
+      background: var(--green-soft);
+      color: var(--green);
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 16px;
+    }
+
+    .badge {
+      padding: 6px 9px;
+      border-radius: 9px;
+      background: #f2f4f8;
+      color: #566072;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .badge.remote {
+      background: var(--primary-soft);
+      color: var(--primary);
+    }
+
+    .badge.score {
+      background: var(--orange-soft);
+      color: var(--orange);
+    }
+
+    .job-footer {
+      margin-top: 18px;
+      padding-top: 15px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    .deadline {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .apply-btn {
+      text-decoration: none;
+      background: var(--primary);
+      color: #fff;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .apply-btn:hover {
+      filter: brightness(0.96);
+    }
+
+    .state-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 42px 22px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .state-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .error {
+      color: var(--red);
+      background: var(--red-soft);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .scholarship-placeholder {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 36px;
+      margin-top: 18px;
+    }
+
+    .scholarship-placeholder h2 {
+      margin-top: 0;
+    }
+
+    .footer {
+      color: var(--muted);
+      font-size: 11px;
+      text-align: center;
+      padding-top: 30px;
+    }
+
+    @media (max-width: 900px) {
+      .stats {
+        grid-template-columns:
+          repeat(2, minmax(0, 1fr));
       }
 
-      normalized = rows
-        .map(normalize)
-        .filter(x => x.url && upper(x.company) !== "TEST COMPANY");
-
-      updateStats();
-      populateFilters();
-      render();
+      .filters {
+        grid-template-columns: 1fr 1fr;
+      }
     }
 
-    $("lastUpdated").textContent=`${currentLang==="id" ? "Terakhir diperbarui" : "Last updated"}: ${new Date().toLocaleString()}`;
-  }
-
-  async function candidateDiscovery(){
-    if(!isConfigured()){showToast("Configure Supabase first.");return}
-
-    if(!standardizedCvConfirmed){
-      showToast("CV must pass the standardization gate and be confirmed before matching.");
-      return;
-    }
-
-    activeCandidateProfile=masterProfileObject();
-    if(!activeCandidateProfile.education_level&&!activeCandidateProfile.field_of_study&&activeCandidateProfile.skills.length===0){
-      showToast("Education or skills are required.");
-      return;
-    }
-
-    const btn=$("findMatchesBtn");
-    btn.disabled=true;
-    btn.textContent="⏳ Finding relevant vacancies…";
-    $("resultInfo").textContent="Fast discovery: finding vacancies relevant to education and skills…";
-
-    const batch=Math.max(1,Math.min(Number(config.batch||10),10));
-    const base=`${config.url.replace(/\/+$/,"")}/functions/v1/career-dashboard-api`;
-
-    try{
-      // Stage 1: fast discovery, no full screening wait.
-      const fastRes=await fetch(`${base}?action=candidate-discovery-fast`,{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({
-          batch,
-          candidate_profile_result:activeCandidateProfile
-        })
-      });
-
-      const fastPayload=await fastRes.json().catch(()=>null);
-      if(!fastRes.ok||fastPayload?.ok!==true){
-        throw new Error(fastPayload?.error||`HTTP ${fastRes.status}`);
+    @media (max-width: 620px) {
+      .container,
+      .topbar-inner {
+        width: min(100% - 20px, 1440px);
       }
 
-      rows=Array.isArray(fastPayload?.result?.rows)?fastPayload.result.rows:[];
-      normalized=rows.map(normalize).filter(x=>x.url&&upper(x.company)!=="TEST COMPANY");
-
-      updateStats();
-      populateFilters();
-      render();
-      $("lastUpdated").textContent=`${currentLang==="id" ? "Terakhir diperbarui" : "Last updated"}: ${new Date().toLocaleString()}`;
-      $("resultInfo").textContent=
-        `${normalized.length} relevant vacancies found. Platform hints are checked for official source and freshness before matching…`;
-
-      btn.disabled=false;
-      btn.textContent=t("findMatches");
-      showToast(`${normalized.length} vacancies found. Screening continues in background.`);
-
-      // Stage 1B: platform-hint rows are checked through the registry-first
-      // official-source + exact-vacancy freshness flow.
-      await resolveVisibleHintsProgressively();
-
-      // Stage 2: progressive screening in chunks of 3.
-      let offset=0;
-      const chunk=3;
-      const screenableNormalized = normalized.filter(x => !x.blockedBeforeMatching);
-      const maxToScreen=screenableNormalized.length;
-
-      while(offset<maxToScreen){
-        try{
-          const screenRes=await fetch(`${base}?action=candidate-screen-batch`,{
-            method:"POST",
-            headers:{"Content-Type":"application/json"},
-            body:JSON.stringify({
-              batch:Math.min(chunk,maxToScreen-offset),
-              offset,
-              candidate_profile_result:activeCandidateProfile
-            })
-          });
-
-          const screenPayload=await screenRes.json().catch(()=>null);
-          if(!screenRes.ok||screenPayload?.ok!==true){
-            throw new Error(screenPayload?.error||`HTTP ${screenRes.status}`);
-          }
-
-          const screenedRows=Array.isArray(screenPayload?.result?.rows)?screenPayload.result.rows:[];
-
-          // Merge screened cards by stable vacancy URL first, then title+company.
-          const keyOf=r=>{
-            const url=val(r.job_url,r.source_url,r.url,r.apply_url);
-            if(url)return `url:${url}`;
-            return `tc:${text(val(r.job_title,r.title)).toLowerCase()}|${text(val(r.company,r.company_name)).toLowerCase()}`;
-          };
-
-          const merged=new Map(rows.map(r=>[keyOf(r),r]));
-          for(const r of screenedRows) merged.set(keyOf(r),r);
-          rows=[...merged.values()];
-
-          normalized=rows.map(normalize).filter(x=>x.url&&upper(x.company)!=="TEST COMPANY");
-          updateStats();
-          populateFilters();
-          render();
-
-          offset+=chunk;
-          const done=Math.min(offset,maxToScreen);
-          $("resultInfo").textContent=
-            `${normalized.length} relevant vacancies • screening ${done}/${maxToScreen} completed progressively`;
-        }catch(screenErr){
-          console.error("Progressive screening batch failed:",screenErr);
-          $("resultInfo").textContent=
-            `${normalized.length} relevant vacancies shown • background screening paused at ${Math.min(offset,maxToScreen)}/${maxToScreen}`;
-          break;
-        }
-
-        // Yield to browser so the page stays responsive.
-        await new Promise(resolve=>setTimeout(resolve,80));
+      .topbar-inner {
+        min-height: 64px;
       }
 
-      if(offset>=maxToScreen){
-        $("resultInfo").textContent=
-          `${normalized.length} relevant vacancies • progressive screening complete`;
-        showToast("Background screening complete.");
+      .verified-chip {
+        display: none;
       }
-    }catch(err){
-      console.error(err);
-      $("resultInfo").textContent=`Candidate discovery failed — ${err?.message||String(err)}`;
-      showToast(`Candidate discovery failed: ${err?.message||String(err)}`);
-      btn.disabled=false;
-      btn.textContent=t("findMatches");
+
+      .hero {
+        padding-top: 24px;
+      }
+
+      .hero-card {
+        padding: 24px 19px;
+      }
+
+      .stats,
+      .filters {
+        grid-template-columns: 1fr;
+      }
+
+      .job-top,
+      .job-footer {
+        flex-direction: column;
+      }
+
+      .apply-btn {
+        width: 100%;
+        text-align: center;
+      }
     }
-  }
+  </style>
+</head>
 
-  function clearCandidate(){
-    resetCandidateSessionForNewUpload("");
-    $("cvFile").value="";
-    $("cvParseStatus").textContent=currentLang==="id" ? "Belum ada CV yang dimuat." : "No CV loaded.";
-    $("clearCvBtn").disabled=true;
-    $("resultInfo").textContent=currentLang==="id"
-      ? "Upload CV untuk memulai pencarian lowongan sesuai kandidat."
-      : "Upload a CV to start candidate-specific discovery.";
-  }
+<body>
 
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="brand-mark">H</div>
 
-  const INDONESIA_PROVINCES = [
-    "Aceh","Sumatera Utara","Sumatera Barat","Riau","Kepulauan Riau","Jambi","Sumatera Selatan",
-    "Kepulauan Bangka Belitung","Bengkulu","Lampung","DKI Jakarta","Jawa Barat","Jawa Tengah",
-    "DI Yogyakarta","Jawa Timur","Banten","Bali","Nusa Tenggara Barat","Nusa Tenggara Timur",
-    "Kalimantan Barat","Kalimantan Tengah","Kalimantan Selatan","Kalimantan Timur","Kalimantan Utara",
-    "Sulawesi Utara","Gorontalo","Sulawesi Tengah","Sulawesi Barat","Sulawesi Selatan","Sulawesi Tenggara",
-    "Maluku","Maluku Utara","Papua","Papua Barat","Papua Selatan","Papua Tengah","Papua Pegunungan","Papua Barat Daya"
-  ];
-
-  const PROVINCE_ALIASES = {
-    "jakarta":"DKI Jakarta","dki":"DKI Jakarta","yogyakarta":"DI Yogyakarta","jogja":"DI Yogyakarta",
-    "surabaya":"Jawa Timur","sidoarjo":"Jawa Timur","gresik":"Jawa Timur","malang":"Jawa Timur",
-    "semarang":"Jawa Tengah","solo":"Jawa Tengah","surakarta":"Jawa Tengah",
-    "bandung":"Jawa Barat","bekasi":"Jawa Barat","bogor":"Jawa Barat","depok":"Jawa Barat","karawang":"Jawa Barat",
-    "tangerang":"Banten","serang":"Banten","denpasar":"Bali","makassar":"Sulawesi Selatan",
-    "balikpapan":"Kalimantan Timur","samarinda":"Kalimantan Timur","medan":"Sumatera Utara",
-    "palembang":"Sumatera Selatan","batam":"Kepulauan Riau","pekanbaru":"Riau"
-  };
-
-  function inferProvince(location){
-    const s = text(location).toLowerCase();
-    for(const p of INDONESIA_PROVINCES){
-      if(s.includes(p.toLowerCase())) return p;
-    }
-    for(const [alias,p] of Object.entries(PROVINCE_ALIASES)){
-      if(s.includes(alias)) return p;
-    }
-    return "";
-  }
-
-  function inferWorkMode(r, location){
-    const explicit = upper(val(r.work_mode, r.work_arrangement, r.remote_type, r.workplace_type));
-    if(explicit.includes("REMOTE") || explicit.includes("WFH") || explicit.includes("WORK FROM HOME")) return "REMOTE";
-    if(explicit.includes("HYBRID")) return "HYBRID";
-    if(explicit.includes("ONSITE") || explicit.includes("ON-SITE") || explicit.includes("OFFICE")) return "ONSITE";
-    const s = upper(`${location} ${val(r.job_title,r.title)} ${val(r.description,r.job_description)}`);
-    if(/REMOTE|WORK FROM HOME|\bWFH\b/.test(s)) return "REMOTE";
-    if(/HYBRID/.test(s)) return "HYBRID";
-    return "ONSITE";
-  }
-
-  function hardVerified(x){
-    return x.safety === "VERIFIED_SAFE"
-      && ["VERIFIED","PASS","COMPLETE"].includes(upper(x.official))
-      && !["EXPIRED","CLOSED","CLOSED_EXPIRED"].includes(upper(x.lifecycle))
-      && !x.blockedBeforeMatching;
-  }
-
-  function normalize(r){
-    const rawUrl = val(r.job_url, r.source_url, r.url, r.apply_url);
-    const validUrl = isValidHttpUrl(rawUrl) ? rawUrl : null;
-
-    return {
-      raw: r,
-      id: val(r.screening_run_id, r.id, r.run_id),
-      title: val(r.job_title, r.title, r.vacancy_title, r.position_title, "Untitled role"),
-      company: val(r.company, r.company_name, r.employer, "Unknown company"),
-      location: val(r.location, r.job_location, r.work_location, r.location_text, "Unspecified"),
-      location_filter: locationFilterGroup(val(r.location, r.job_location, r.work_location, r.location_text, "Unspecified")),
-      province: inferProvince(val(r.province, r.location, r.job_location, r.work_location, r.location_text, "")),
-      workMode: inferWorkMode(r, val(r.location, r.job_location, r.work_location, r.location_text, "")),
-      url: validUrl,
-      source: sourceLabel(validUrl),
-      recommendation: displayStatus(val(r.recommendation_group, r.recommendation_bucket, r.recommendation), "PENDING"),
-      match: displayStatus(val(r.recruiter_match, r.recruiter_classification, r.match_classification), "NOT EVALUATED"),
-      evidence: val(r.evidence_coverage, r.coverage_percent, r.matcher_coverage),
-      eligibility: displayStatus(val(r.eligibility, r.eligibility_status), "PENDING"),
-      safety: displayStatus(val(r.safety_status, r.safety), "PENDING"),
-      official: displayStatus(val(r.official_status, r.verification_status), "PENDING"),
-      status: displayStatus(val(r.screening_status, r.status), "PENDING"),
-      lifecycle: displayStatus(val(r.vacancy_lifecycle, r.freshness_status), "ACTIVE"),
-      closingDate: val(r.closing_date),
-      blockedBeforeMatching: Boolean(val(r.screening_blocked_before_matching, false)),
-      hintStopReason: val(r.hint_stop_reason),
-      hintOrchestrated: Boolean(val(r.hint_orchestrated, false)),
-      updated: val(r.updated_at, r.processed_at, r.screened_at, r.created_at),
-      reused: Boolean(val(r.screening_reused, r.reused, false))
-    };
-  }
-
-  function badgeClass(v){
-    const x = upper(v);
-    if(["VERIFIED_SAFE","VERIFIED","PASS","STRONG","GOOD","COMPLETE","RECOMMENDED_JOBS"].includes(x)) return "green";
-    if(["FAIR","OTHER_SUITABLE_JOBS"].includes(x)) return "blue";
-    if(["LOW","EXPLORE_OTHER_JOBS"].includes(x)) return "amber";
-    if(["HIGH_RISK","SCAM_OR_EXPLOITATION_SUSPECTED","FAILED","BLOCKED","MISMATCH","EXPIRED","CLOSED","CLOSED_EXPIRED","NOT_FOUND_ON_OFFICIAL_SOURCE"].includes(x)) return "red";
-    if(["VERIFY_REQUIRED","WAITING_REVIEW","PARTIAL"].includes(x)) return "purple";
-    if(["NOT_APPLICABLE","NOT EVALUATED","NOT_EVALUATED"].includes(x)) return "gray";
-    if(["SCREENING","IN PROGRESS","PENDING"].includes(x)) return "blue";
-    return "gray";
-  }
-
-  function pretty(v){
-    return text(v).replaceAll("_"," ").replace(/\b\w/g, c => c.toUpperCase());
-  }
-
-  function displayScreeningStatus(v){
-    const x = upper(v);
-    if(x === "BLOCKED"){
-      return t("blockedVacancyIssue");
-    }
-    if(x === "VERIFY_REQUIRED"){
-      return currentLang === "id" ? "Perlu Verifikasi" : "Verification Required";
-    }
-    if(x === "CLOSED"){
-      return currentLang === "id" ? "Ditutup" : "Closed";
-    }
-    return pretty(v);
-  }
-
-  function showToast(msg){
-    const t = $("toast");
-    t.textContent = msg;
-    t.classList.add("show");
-    setTimeout(() => t.classList.remove("show"), 2800);
-  }
-
-  function applyConfigToUI(){
-    $("appTitle").textContent = config.title || defaultConfig.title;
-    document.title = config.title || defaultConfig.title;
-    $("cfgTitle").value = config.title || "";
-    $("cfgUrl").value = config.url || "";
-    $("cfgAnon").value = config.anon || "";
-    $("cfgView").value = config.view || defaultConfig.view;
-    $("cfgBatch").value = config.batch || 10;
-  }
-
-  function isConfigured(){
-    return true;
-  }
-
-  async function dashboardApi(action, batch = 10){
-    const base = "https://nfaagtushvuofooqilkv.supabase.co/functions/v1/career-dashboard-api";
-    const url = `${base}?action=${encodeURIComponent(action)}&batch=${encodeURIComponent(batch)}`;
-
-    const res = await fetch(url, {
-      method: "GET",
-      mode: "cors",
-      cache: "no-store"
-    });
-
-    const bodyText = await res.text();
-    let body = null;
-
-    try {
-      body = bodyText ? JSON.parse(bodyText) : null;
-    } catch {
-      body = bodyText;
-    }
-
-    if (!res.ok) {
-      throw new Error(
-        body?.error ||
-        body?.message ||
-        bodyText ||
-        `HTTP ${res.status}`
-      );
-    }
-
-    if (body?.ok !== true) {
-      throw new Error(
-        body?.error ||
-        "Dashboard API returned ok=false."
-      );
-    }
-
-    return body;
-  }
-
-  function uniqueValues(key){
-    return [...new Set(normalized.map(x => text(x[key])).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
-  }
-
-  function fillSelect(id, values, firstText){
-    const el = $(id);
-    const current = el.value;
-    el.innerHTML = `<option value="">${esc(firstText)}</option>` + values.map(v => `<option value="${esc(v)}">${esc(pretty(v))}</option>`).join("");
-    if(values.includes(current)) el.value = current;
-  }
-
-  function populateFilters(){
-    fillSelect("recommendationFilter", uniqueValues("recommendation"), t("allRecommendations"));
-    fillSelect("matchFilter", uniqueValues("match"), t("allMatch"));
-    fillSelect("companyFilter", uniqueValues("company"), t("allCompanies"));
-  }
-
-  function updateStats(){
-    $("sTotal").textContent = normalized.length;
-    $("sRecommended").textContent = normalized.filter(x => x.recommendation === "RECOMMENDED_JOBS").length;
-    $("sSuitable").textContent = normalized.filter(x => x.recommendation === "OTHER_SUITABLE_JOBS").length;
-    $("sExplore").textContent = normalized.filter(x => x.recommendation === "EXPLORE_OTHER_JOBS").length;
-    $("sSafe").textContent = normalized.filter(x => x.safety === "VERIFIED_SAFE").length;
-  }
-
-  function filtered(){
-    const q = upper($("searchInput").value);
-    const rec = $("recommendationFilter").value;
-    const match = $("matchFilter").value;
-    const company = $("companyFilter").value;
-    const province = $("provinceFilter")?.value || "";
-    const workMode = $("workModeFilter")?.value || "";
-    const verifiedOnly = $("verifiedOnlyFilter")?.checked ?? true;
-
-    return normalized.filter(x => {
-      const hay = upper(`${x.title} ${x.company} ${x.location} ${x.province} ${x.workMode}`);
-      return (!q || hay.includes(q))
-        && (!rec || x.recommendation === rec)
-        && (!match || x.match === match)
-        && (!company || x.company === company)
-        && (!province || x.province === province)
-        && (!workMode || x.workMode === workMode)
-        && (!verifiedOnly || hardVerified(x));
-    }).sort((a,b) => {
-      const rank = {STRONG:5, GOOD:4, FAIR:3, LOW:2, NOT_EVALUATED:1};
-      const verifiedDiff = Number(hardVerified(b)) - Number(hardVerified(a));
-      return verifiedDiff
-        || (rank[b.match]||0) - (rank[a.match]||0)
-        || (Number(b.evidence)||0) - (Number(a.evidence)||0);
-    });
-  }
-
-  function render(){
-    const list = filtered();
-    $("resultInfo").textContent = `${list.length} of ${normalized.length} jobs shown`;
-    const root = $("jobs");
-
-    if(!list.length){
-      root.innerHTML = `<div class="empty"><strong>No valid production vacancies match the current filters.</strong><div class="small" style="margin-top:6px">Try clearing one or more filters.</div></div>`;
-      return;
-    }
-
-    root.innerHTML = list.map(x => `
-      <article class="job">
-        <div class="job-head">
-          <div>
-            <h3 class="job-title">${esc(x.title)}</h3>
-            <div class="company">${esc(x.company)}</div>
-            <div class="meta">${esc(x.location)}${x.province ? ` • ${esc(x.province)}` : ""} • ${esc(pretty(x.workMode))}</div>
+        <div>
+          <div class="brand-title">
+            HANZ Opportunity Engine
           </div>
-          ${x.lifecycle==="EXPIRED" ? `<span class="badge red">Closed / Expired</span>` : `<span class="badge ${badgeClass(x.recommendation)}">Recommendation: ${esc(pretty(x.recommendation))}</span>`}
+
+          <div class="brand-subtitle">
+            Indonesia • Remote • Global Scholarship
+          </div>
+        </div>
+      </div>
+
+      <div class="verified-chip">
+        ✓ Verified Safe Sources
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <section class="hero">
+      <div class="hero-card">
+        <div class="hero-label">
+          Opportunity Intelligence
         </div>
 
-        <div class="badges">
-          <span class="badge ${badgeClass(x.match)}">Recruiter Match: ${esc(pretty(x.match))}</span>
-          <span class="badge ${badgeClass(x.safety)}">Safety: ${esc(pretty(x.safety))}</span>
-          <span class="badge ${badgeClass(x.official)}">Official: ${esc(pretty(x.official))}</span>
-          <span class="badge ${badgeClass(x.eligibility)}">Eligibility: ${esc(pretty(x.eligibility))}</span>
-          <span class="badge ${badgeClass(x.lifecycle)}">Vacancy: ${esc(pretty(x.lifecycle))}</span>
-          ${x.hintOrchestrated ? `<span class="badge purple">Official hint check</span>` : ""}
-          ${x.reused ? `<span class="badge gray">Reused screening</span>` : ""}
+        <h1>
+          Peluang nyata.
+          Sumber resmi.
+          Lebih aman.
+        </h1>
+
+        <p class="hero-description">
+          Lowongan kerja Indonesia dan Remote/WFH
+          yang melewati verifikasi sumber resmi,
+          pemeriksaan anti-scam, lokasi, dan
+          eligibility sebelum ditampilkan.
+        </p>
+
+        <div class="tabs">
+          <button
+            class="tab active"
+            id="jobsTab"
+            onclick="showTab('jobs')"
+          >
+            Jobs Indonesia & Remote
+          </button>
+
+          <button
+            class="tab"
+            id="scholarshipsTab"
+            onclick="showTab('scholarships')"
+          >
+            Fully Funded Master
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section
+      id="jobsSection"
+      class="section"
+    >
+      <div class="stats">
+
+        <div class="stat-card">
+          <div class="stat-label">
+            Verified Jobs
+          </div>
+          <div
+            class="stat-value"
+            id="verifiedCount"
+          >
+            —
+          </div>
         </div>
 
-        ${x.blockedBeforeMatching ? `
-          <div class="error" style="margin-top:12px">
-            <strong>${x.lifecycle==="EXPIRED"
-              ? (currentLang==="id" ? "Expired / Ditutup — dihentikan sebelum matching" : "Expired / Closed — blocked before matching")
-              : (currentLang==="id" ? "Dihentikan — masalah pada lowongan / perlu verifikasi" : "Blocked — vacancy issue / verification required")}</strong>
-            <div class="small" style="margin-top:6px">
-              ${x.closingDate ? `Closing date: ${esc(dateFmt(x.closingDate))}. ` : ""}
-              ${x.hintStopReason ? `Reason: ${esc(pretty(x.hintStopReason))}.` : ""}
-            </div>
+        <div class="stat-card">
+          <div class="stat-label">
+            Indonesia
           </div>
-        ` : ""}
-
-        <div class="metrics">
-          <div class="metric"><div class="k">Evidence Coverage</div><div class="v">${pct(x.evidence)}</div></div>
-          <div class="metric"><div class="k">${currentLang==="id" ? "Status Screening" : "Screening Status"}</div><div class="v">${esc(displayScreeningStatus(x.status))}</div></div>
-          <div class="metric"><div class="k">Recruiter Match</div><div class="v">${esc(pretty(x.match))}</div></div>
-          <div class="metric"><div class="k">Last Screened</div><div class="v" style="font-size:12px">${esc(dateFmt(x.updated))}</div></div>
+          <div
+            class="stat-value"
+            id="indonesiaCount"
+          >
+            —
+          </div>
         </div>
 
-        <div class="job-footer">
-          <div class="small">${x.id ? `Run: ${esc(x.id)}` : ""}</div>
-          ${x.url ? `<div style="display:flex;gap:12px;align-items:center"><span class="small">Source: ${esc(x.source)}</span><a class="link" href="${esc(x.url)}" target="_blank" rel="noopener noreferrer">${x.hintOrchestrated ? "Open discovery source ↗" : "Open vacancy ↗"}</a></div>` : `<span class="small">Invalid production record — hidden on next reload</span>`}
+        <div class="stat-card">
+          <div class="stat-label">
+            Remote / WFH
+          </div>
+          <div
+            class="stat-value"
+            id="remoteCount"
+          >
+            —
+          </div>
         </div>
-      </article>
-    `).join("");
-    setTimeout(localizeVisibleText,0);
-  }
 
-
-  async function unifiedApi(action, options={}){
-    const base = `${config.url.replace(/\/+$/,"")}/functions/v1/career-dashboard-api`;
-    const qs = new URLSearchParams({action});
-    if(options.degree) qs.set("degree", options.degree);
-
-    const res = await fetch(`${base}?${qs.toString()}`,{
-      method: options.method || "GET",
-      headers: options.body ? {"Content-Type":"application/json"} : {},
-      body: options.body ? JSON.stringify(options.body) : undefined,
-      cache:"no-store"
-    });
-
-    const body = await res.json().catch(()=>null);
-    if(!res.ok || body?.ok !== true){
-      throw new Error(body?.error || `HTTP ${res.status}`);
-    }
-    return body;
-  }
-
-  function opportunityLabel(){
-    if(activeOpportunityTab==="scholarship-s1") return currentLang==="id" ? "Beasiswa S1" : "Scholarship S1";
-    if(activeOpportunityTab==="scholarship-s2") return currentLang==="id" ? "Beasiswa S2" : "Scholarship S2";
-    if(activeOpportunityTab==="internship") return currentLang==="id" ? "Magang Berbayar" : "Paid Internship";
-    return currentLang==="id" ? "Lowongan" : "Jobs";
-  }
-
-  function switchOpportunityTab(tab){
-    activeOpportunityTab=tab;
-    document.querySelectorAll(".opportunity-tab").forEach(btn=>{
-      btn.classList.toggle("active",btn.dataset.tab===tab);
-    });
-
-    const jobsMode=tab==="jobs";
-    $("jobStats").classList.toggle("hidden-section",!jobsMode);
-    $("jobToolbar").classList.toggle("hidden-section",!jobsMode);
-
-    if(jobsMode){
-      render();
-      $("resultInfo").textContent=`${normalized.length} ${currentLang==="id" ? "lowongan tersedia" : "jobs available"}`;
-      return;
-    }
-
-    loadOpportunityData();
-  }
-
-  function renderOpportunityCards(){
-    const root=$("jobs");
-    const rows=opportunityRows;
-
-    if(!rows.length){
-      root.innerHTML=`<div class="empty"><strong>${currentLang==="id" ? "Belum ada opportunity yang lolos gate." : "No opportunities currently pass the gate."}</strong><div class="small" style="margin-top:6px">${activeOpportunityTab==="internship"
-        ? (currentLang==="id" ? "Hanya internship PAID / FULLY FUNDED yang ditampilkan." : "Only PAID / FULLY FUNDED internships are shown.")
-        : (currentLang==="id" ? "Hanya scholarship FULLY FUNDED / FULL TUITION ONLY yang ditampilkan." : "Only FULLY FUNDED / FULL TUITION ONLY scholarships are shown.")}</div></div>`;
-      return;
-    }
-
-    root.innerHTML=rows.map((r,idx)=>{
-      const scholarship=activeOpportunityTab.startsWith("scholarship");
-      const title=scholarship ? r.scholarship_name : r.program_name;
-      const provider=r.provider || "";
-      const location=scholarship ? r.destination_country : (r.location_text || r.destination_country || "");
-      const funding=scholarship ? r.funding_class : r.compensation_class;
-      const deadline=r.application_deadline || "";
-      const benefit=!scholarship && r.compensation_amount_text ? r.compensation_amount_text : "";
-      const source=r.official_url || "";
-      return `
-        <article class="job opportunity-card" data-opportunity-index="${idx}">
-          <div class="job-head">
-            <div>
-              <h3 class="job-title">${esc(title)}</h3>
-              <div class="company">${esc(provider)}</div>
-              <div class="meta">${esc(location)}</div>
-            </div>
-            <span class="badge green">${esc(pretty(funding))}</span>
+        <div class="stat-card">
+          <div class="stat-label">
+            Companies
           </div>
-
-          <div class="badges">
-            <span class="badge green">${scholarship ? "Funding verified" : "Compensation verified"}</span>
-            ${deadline ? `<span class="badge gray">Deadline: ${esc(dateFmt(deadline))}</span>` : `<span class="badge gray">Deadline not stated</span>`}
-            ${scholarship ? `<span class="badge purple">${esc(r.degree_code || "")}</span>` : ""}
+          <div
+            class="stat-value"
+            id="companyCount"
+          >
+            —
           </div>
+        </div>
 
-          ${benefit ? `<div class="benefit-line">${esc(benefit)}</div>` : ""}
+      </div>
 
-          <div class="screen-result" id="opResult-${idx}">
-            <div class="small">${activeCandidateProfile
-              ? (currentLang==="id" ? "Siap discreen dengan CV aktif." : "Ready to screen against the active CV.")
-              : (currentLang==="id" ? "Upload dan konfirmasi CV terlebih dahulu." : "Upload and confirm a CV first.")}</div>
+      <div class="filters">
+
+        <div class="field">
+          <label>
+            Search
+          </label>
+
+          <input
+            id="searchInput"
+            type="text"
+            placeholder="Job title, company, city..."
+          />
+        </div>
+
+        <div class="field">
+          <label>
+            Province
+          </label>
+
+          <select id="provinceFilter">
+            <option value="">
+              All 38 Provinces
+            </option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>
+            Work Mode
+          </label>
+
+          <select id="workModeFilter">
+            <option value="">
+              All Work Modes
+            </option>
+
+            <option value="REMOTE">
+              Remote / WFH
+            </option>
+
+            <option value="HYBRID">
+              Hybrid
+            </option>
+
+            <option value="ONSITE">
+              On-site
+            </option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>
+            Safety
+          </label>
+
+          <div class="verified-filter">
+            <input
+              id="safeOnly"
+              type="checkbox"
+              checked
+              disabled
+            />
+
+            Verified Safe Only
           </div>
+        </div>
 
-          <div class="job-footer">
-            <button class="btn primary" type="button" onclick="window.__screenOpportunity(${idx})" ${!activeCandidateProfile ? "disabled" : ""}>
-              ${currentLang==="id" ? "Screen Kandidat" : "Screen Candidate"}
-            </button>
-            ${source ? `<a class="link" href="${esc(source)}" target="_blank" rel="noopener noreferrer">${currentLang==="id" ? "Buka sumber resmi ↗" : "Open official source ↗"}</a>` : ""}
-          </div>
-        </article>`;
-    }).join("");
-    setTimeout(localizeVisibleText,0);
-  }
+      </div>
 
-  async function loadOpportunityData(){
-    if(!isConfigured()){
-      $("jobs").innerHTML=`<div class="empty"><strong>${currentLang==="id" ? "Hubungkan Supabase terlebih dahulu." : "Connect Supabase first."}</strong></div>`;
-      return;
+      <div class="list-header">
+        <div class="list-title">
+          Verified Opportunities
+        </div>
+
+        <div
+          class="result-count"
+          id="resultCount"
+        >
+          Loading...
+        </div>
+      </div>
+
+      <div
+        id="loadingState"
+        class="state-card"
+      >
+        <div class="state-title">
+          Loading verified jobs...
+        </div>
+
+        Mengambil data terbaru dari
+        HANZ Opportunity Engine.
+      </div>
+
+      <div
+        id="errorState"
+        class="state-card error hidden"
+      >
+        <div class="state-title">
+          Gagal mengambil data
+        </div>
+
+        <div id="errorMessage"></div>
+      </div>
+
+      <div
+        id="emptyState"
+        class="state-card hidden"
+      >
+        <div class="state-title">
+          Belum ada opportunity yang cocok
+        </div>
+
+        Coba ubah filter pencarian.
+      </div>
+
+      <div
+        id="jobsList"
+        class="jobs"
+      ></div>
+
+    </section>
+
+    <section
+      id="scholarshipsSection"
+      class="section hidden"
+    >
+      <div class="scholarship-placeholder">
+        <div class="hero-label">
+          Fully Funded Master
+        </div>
+
+        <h2>
+          Scholarship Engine
+        </h2>
+
+        <p class="hero-description">
+          Modul beasiswa S2 fully funded akan
+          membaca data terverifikasi dari
+          Master Scholarship Engine.
+          Hanya program dengan official source
+          dan funding yang telah lolos verification
+          yang akan ditampilkan.
+        </p>
+      </div>
+    </section>
+
+    <footer class="footer">
+      HANZ Opportunity Engine •
+      Fail-closed verification architecture
+    </footer>
+
+  </main>
+
+  <script>
+    /* =====================================================
+       SUPABASE PUBLIC CONFIG
+       ===================================================== */
+
+    const SUPABASE_URL =
+      "https://mjnlucjidysptonyocxi.supabase.co";
+
+    const SUPABASE_KEY =
+      "sb_publishable_g4V53o__-j1ThxsXgnJ-ig_P09KKu_Y";
+
+
+    /* =====================================================
+       38 INDONESIAN PROVINCES
+       ===================================================== */
+
+    const PROVINCES = [
+      "Aceh",
+      "Sumatera Utara",
+      "Sumatera Barat",
+      "Riau",
+      "Kepulauan Riau",
+      "Jambi",
+      "Sumatera Selatan",
+      "Kepulauan Bangka Belitung",
+      "Bengkulu",
+      "Lampung",
+
+      "DKI Jakarta",
+      "Jawa Barat",
+      "Jawa Tengah",
+      "DI Yogyakarta",
+      "Jawa Timur",
+      "Banten",
+
+      "Bali",
+      "Nusa Tenggara Barat",
+      "Nusa Tenggara Timur",
+
+      "Kalimantan Barat",
+      "Kalimantan Tengah",
+      "Kalimantan Selatan",
+      "Kalimantan Timur",
+      "Kalimantan Utara",
+
+      "Sulawesi Utara",
+      "Gorontalo",
+      "Sulawesi Tengah",
+      "Sulawesi Barat",
+      "Sulawesi Selatan",
+      "Sulawesi Tenggara",
+
+      "Maluku",
+      "Maluku Utara",
+
+      "Papua",
+      "Papua Barat",
+      "Papua Selatan",
+      "Papua Tengah",
+      "Papua Pegunungan",
+      "Papua Barat Daya"
+    ];
+
+
+    /* =====================================================
+       STATE
+       ===================================================== */
+
+    let allJobs = [];
+
+
+    /* =====================================================
+       HELPERS
+       ===================================================== */
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
     }
 
-    $("resultInfo").textContent=`${currentLang==="id" ? "Memuat" : "Loading"} ${opportunityLabel()}…`;
 
-    try{
-      let response;
-      if(activeOpportunityTab==="internship"){
-        response=await unifiedApi("internship-data");
-      }else{
-        response=await unifiedApi("scholarship-data",{
-          degree:activeOpportunityTab==="scholarship-s1" ? "S1" : "S2"
-        });
+    function pretty(value) {
+      if (!value) {
+        return null;
       }
 
-      opportunityRows=Array.isArray(response?.result?.rows) ? response.result.rows : [];
-      $("resultInfo").textContent=`${opportunityRows.length} ${opportunityLabel()} ${currentLang==="id" ? "lolos pre-screen gate" : "passed the pre-screen gate"}`;
-      $("lastUpdated").textContent=`${currentLang==="id" ? "Terakhir diperbarui" : "Last updated"}: ${new Date().toLocaleString()}`;
-      renderOpportunityCards();
-    }catch(err){
-      console.error(err);
-      opportunityRows=[];
-      $("jobs").innerHTML=`<div class="error"><strong>${currentLang==="id" ? "Gagal memuat opportunity." : "Could not load opportunities."}</strong><div class="small" style="margin-top:7px">${esc(err?.message||String(err))}</div></div>`;
-      $("resultInfo").textContent=`${currentLang==="id" ? "Gagal memuat" : "Load failed"} — ${err?.message||String(err)}`;
-    }
-  }
-
-  window.__screenOpportunity=async function(index){
-    const r=opportunityRows[index];
-    if(!r || !activeCandidateProfile) return;
-
-    const box=$(`opResult-${index}`);
-    box.innerHTML=`<div class="small">⏳ ${currentLang==="id" ? "Screening…" : "Screening…"}</div>`;
-
-    try{
-      const scholarship=activeOpportunityTab.startsWith("scholarship");
-      const response=await unifiedApi(
-        scholarship ? "scholarship-screen" : "internship-screen",
-        {
-          method:"POST",
-          body: scholarship
-            ? {
-                candidate_session_id:candidateSessionId,
-                candidate_profile_result:activeCandidateProfile,
-                scholarship_id:r.id
-              }
-            : {
-                candidate_session_id:candidateSessionId,
-                candidate_profile_result:activeCandidateProfile,
-                internship_id:r.id
-              }
-        }
-      );
-
-      const result=response?.result || {};
-      if(scholarship){
-        box.innerHTML=`
-          <strong>${esc(pretty(result.final_eligibility || "UNKNOWN"))}</strong>
-          <div class="small" style="margin-top:6px">
-            Academic: ${esc(pretty(result?.academic?.status || "NOT_STATED"))} ·
-            Language: ${esc(pretty(result?.language?.status || "NOT_STATED"))}
-          </div>
-          ${Array.isArray(result.blocking_reasons)&&result.blocking_reasons.length ? `<div class="small" style="margin-top:5px">Blocking: ${esc(result.blocking_reasons.map(pretty).join(", "))}</div>` : ""}
-          ${Array.isArray(result.action_items)&&result.action_items.length ? `<div class="small" style="margin-top:5px">Action: ${esc(result.action_items.map(pretty).join(", "))}</div>` : ""}
-        `;
-      }else{
-        const d=result?.dimensions || {};
-        box.innerHTML=`
-          <strong>${esc(pretty(result.final_suitability || "UNKNOWN"))}</strong>
-          <div class="small" style="margin-top:6px">
-            Fresh Graduate: ${esc(pretty(d.fresh_graduate || "NOT_STATED"))} ·
-            Degree: ${esc(pretty(d.degree || "NOT_STATED"))} ·
-            Field: ${esc(pretty(d.field || "NOT_STATED"))} ·
-            Skills: ${esc(pretty(d.skills || "NOT_STATED"))} ·
-            Language: ${esc(pretty(d.language || "NOT_STATED"))}
-          </div>
-          ${Array.isArray(result.blocking_reasons)&&result.blocking_reasons.length ? `<div class="small" style="margin-top:5px">Blocking: ${esc(result.blocking_reasons.map(pretty).join(", "))}</div>` : ""}
-        `;
-      }
-    }catch(err){
-      box.innerHTML=`<div class="error"><strong>${currentLang==="id" ? "Screening gagal" : "Screening failed"}</strong><div class="small">${esc(err?.message||String(err))}</div></div>`;
-    }
-  };
-
-  async function loadData(){
-    if(!isConfigured()){
-      $("jobs").innerHTML = `<div class="empty"><strong>Connect Supabase first.</strong><div class="small" style="margin-top:6px">Open Settings and enter the project URL plus public anon key.</div></div>`;
-      $("resultInfo").textContent = "Supabase not configured";
-      return;
-    }
-
-    $("reloadBtn").disabled = true;
-    $("resultInfo").textContent = "Loading screening results…";
-
-    try{
-      const response = await dashboardApi("data", config.batch);
-      const data = response?.result?.rows ?? [];
-      rows = Array.isArray(data) ? data : [];
-      normalized = rows
-        .map(normalize)
-        .filter(x =>
-          x.url &&
-          upper(x.company) !== "TEST COMPANY"
+      return String(value)
+        .replaceAll("_", " ")
+        .toLowerCase()
+        .replace(
+          /\b\w/g,
+          char => char.toUpperCase()
         );
-      updateStats();
-      populateFilters();
-      if(activeOpportunityTab==="jobs"){
-        render();
-      }
-      $("lastUpdated").textContent = `${currentLang==="id" ? "Terakhir diperbarui" : "Last updated"}: ${new Date().toLocaleString()}`;
-    }catch(err){
-      console.error(err);
-      $("jobs").innerHTML = `<div class="error"><strong>Could not load dashboard data.</strong><div class="small" style="margin-top:7px">${esc(err?.message || String(err))}</div></div>`;
-      $("resultInfo").textContent = `Load failed — ${err?.message || String(err)}`;
-    }finally{
-      $("reloadBtn").disabled = false;
     }
-  }
 
-  async function refreshJobs(){
-    if(!activeCandidateProfile){showToast("Upload a CV and run matching first.");return;}
-    await candidateDiscovery();
-  }
 
-  function saveSettings(){
-    config = {
-      title: $("cfgTitle").value.trim() || defaultConfig.title,
-      url: $("cfgUrl").value.trim(),
-      anon: $("cfgAnon").value.trim(),
-      view: $("cfgView").value.trim() || defaultConfig.view,
-      batch: Math.max(1, Math.min(Number($("cfgBatch").value || 10), 10))
-    };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
-    applyConfigToUI();
-    $("settingsModal").classList.remove("open");
-    loadData();
-  }
-
-  $("cvDropzone").addEventListener("click", ()=>$("cvFile").click());
-  $("cvFile").addEventListener("change", e=>handleCvFile(e.target.files?.[0]));
-  $("cvDropzone").addEventListener("dragover", e=>{e.preventDefault();$("cvDropzone").classList.add("drag")});
-  $("cvDropzone").addEventListener("dragleave", ()=>$("cvDropzone").classList.remove("drag"));
-  $("cvDropzone").addEventListener("drop", e=>{e.preventDefault();$("cvDropzone").classList.remove("drag");handleCvFile(e.dataTransfer?.files?.[0])});
-  $("regenerateCvBtn").addEventListener("click", regenerateStandardCv);
-  $("confirmStandardCvBtn").addEventListener("click", confirmStandardCv);
-  $("findMatchesBtn").addEventListener("click", candidateDiscovery);
-  $("clearCvBtn").addEventListener("click", clearCandidate);
-  ["candidateEducationLevel","candidateMajor","candidateSkills","candidateCareerLevel","candidateLanguages"].forEach(id=>{
-    $(id).addEventListener("input", ()=>{
-      standardizedCvConfirmed=false;
-      standardizedCvText="";
-      $("standardCvPreview").textContent="Profile changed. Regenerate standardized CV before matching.";
-      const raw=$("cvRawText").value||"";
-      if(raw){
-        cvQualityResult=assessCvQuality(raw);
-        renderCvQuality();
-      }else{
-        updateFindButton();
+    function formatDate(value) {
+      if (!value) {
+        return null;
       }
-    });
-  });
-  $("geoGlobal").addEventListener("change",()=>{if($("geoGlobal").checked){$("geoJapan").checked=false;$("geoIndonesia").checked=false;$("geoMiddleEast").checked=false}});
-  ["geoJapan","geoIndonesia","geoMiddleEast"].forEach(id=>$(id).addEventListener("change",()=>{if($(id).checked)$("geoGlobal").checked=false;if(!$("geoJapan").checked&&!$("geoIndonesia").checked&&!$("geoMiddleEast").checked)$("geoGlobal").checked=true}));
 
-  if ($("settingsBtn")) $("settingsBtn").addEventListener("click", () => $("settingsModal").classList.add("open"));
-  $("langIdBtn").addEventListener("click",()=>applyLanguage("id"));
-  $("langEnBtn").addEventListener("click",()=>applyLanguage("en"));
-  $("closeSettingsBtn").addEventListener("click", () => $("settingsModal").classList.remove("open"));
-  $("saveSettingsBtn").addEventListener("click", saveSettings);
-  $("reloadBtn").addEventListener("click", ()=> activeOpportunityTab==="jobs" ? loadData() : loadOpportunityData());
-  $("refreshJobsBtn").addEventListener("click", refreshJobs);
-  document.querySelectorAll(".opportunity-tab").forEach(btn=>{
-    btn.addEventListener("click",()=>switchOpportunityTab(btn.dataset.tab));
-  });
-  $("closeMissingDataBtn").addEventListener("click",closeMissingDataModal);
-  $("skipMissingDataBtn").addEventListener("click",()=>{closeMissingDataModal();buildStandardizedCvText();$("confirmStandardCvBtn").disabled=false;renderMasterSummary()});
-  $("saveMissingDataBtn").addEventListener("click",saveMissingData);
-  ["candidateEducationLevel","candidateMajor","candidateSkills","candidateCareerLevel","candidateLanguages"].forEach(id=>$(id).addEventListener("input",()=>{markMasterProfileRevised();renderMasterSummary()}));
+      const date =
+        new Date(value);
 
-  ["searchInput","recommendationFilter","matchFilter","companyFilter","locationFilter","safetyFilter"]
-    .forEach(id => $(id).addEventListener(id === "searchInput" ? "input" : "change", render));
+      if (
+        Number.isNaN(
+          date.getTime()
+        )
+      ) {
+        return null;
+      }
 
-  $("settingsModal").addEventListener("click", e => {
-    if(e.target === $("settingsModal")) $("settingsModal").classList.remove("open");
-  });
+      return new Intl.DateTimeFormat(
+        "id-ID",
+        {
+          day: "numeric",
+          month: "short",
+          year: "numeric"
+        }
+      ).format(date);
+    }
 
-  $("appTitle").textContent = config.title;
-  document.title = config.title;
-  updateFindButton();
-  rows=[];normalized=[];updateStats();populateFilters();render();
-  applyLanguage(currentLang);
-  $("resultInfo").textContent=currentLang==="id"
-    ? "Upload CV untuk memulai pencarian lowongan sesuai kandidat."
-    : "Upload a CV to start candidate-specific discovery.";
-  renderCvQuality();
-})();
-</script>
+
+    /* =====================================================
+       PROVINCE SELECT
+       ===================================================== */
+
+    function buildProvinceOptions() {
+      const select =
+        document.getElementById(
+          "provinceFilter"
+        );
+
+      PROVINCES.forEach(
+        province => {
+          const option =
+            document.createElement(
+              "option"
+            );
+
+          option.value =
+            province;
+
+          option.textContent =
+            province;
+
+          select.appendChild(
+            option
+          );
+        }
+      );
+    }
+
+
+    /* =====================================================
+       LOAD VERIFIED JOBS
+       ===================================================== */
+
+    async function loadJobs() {
+      const loadingState =
+        document.getElementById(
+          "loadingState"
+        );
+
+      const errorState =
+        document.getElementById(
+          "errorState"
+        );
+
+      const jobsList =
+        document.getElementById(
+          "jobsList"
+        );
+
+      loadingState.classList.remove(
+        "hidden"
+      );
+
+      errorState.classList.add(
+        "hidden"
+      );
+
+      jobsList.innerHTML = "";
+
+      const fields = [
+        "id",
+        "job_title",
+        "company_name",
+        "country_name",
+        "province_code",
+        "province_name",
+        "city",
+        "location_text",
+        "work_mode",
+        "remote_scope",
+        "indonesia_applicant_eligible",
+        "employment_type",
+        "experience_level",
+        "posted_at",
+        "application_deadline",
+        "official_url",
+        "trust_score"
+      ].join(",");
+
+      const endpoint =
+        SUPABASE_URL +
+        "/rest/v1/verified_job_dashboard" +
+        "?select=" +
+        encodeURIComponent(fields) +
+        "&order=posted_at.desc.nullslast";
+
+      try {
+        const response =
+          await fetch(
+            endpoint,
+            {
+              headers: {
+                apikey:
+                  SUPABASE_KEY,
+
+                Authorization:
+                  "Bearer " +
+                  SUPABASE_KEY
+              }
+            }
+          );
+
+        if (!response.ok) {
+          const errorText =
+            await response.text();
+
+          throw new Error(
+            "Supabase HTTP " +
+            response.status +
+            " — " +
+            errorText
+          );
+        }
+
+        const data =
+          await response.json();
+
+        allJobs =
+          Array.isArray(data)
+            ? data
+            : [];
+
+        updateStats();
+        applyFilters();
+
+      } catch (error) {
+        console.error(error);
+
+        loadingState.classList.add(
+          "hidden"
+        );
+
+        errorState.classList.remove(
+          "hidden"
+        );
+
+        document.getElementById(
+          "errorMessage"
+        ).textContent =
+          error?.message ||
+          "Unknown error";
+      }
+    }
+
+
+    /* =====================================================
+       STATS
+       ===================================================== */
+
+    function updateStats() {
+      const indonesiaJobs =
+        allJobs.filter(
+          job =>
+            String(
+              job.country_name || ""
+            ).toLowerCase() ===
+            "indonesia"
+        );
+
+      const remoteJobs =
+        allJobs.filter(
+          job =>
+            job.work_mode ===
+            "REMOTE"
+        );
+
+      const companies =
+        new Set(
+          allJobs
+            .map(
+              job =>
+                job.company_name
+            )
+            .filter(Boolean)
+        );
+
+      document.getElementById(
+        "verifiedCount"
+      ).textContent =
+        allJobs.length;
+
+      document.getElementById(
+        "indonesiaCount"
+      ).textContent =
+        indonesiaJobs.length;
+
+      document.getElementById(
+        "remoteCount"
+      ).textContent =
+        remoteJobs.length;
+
+      document.getElementById(
+        "companyCount"
+      ).textContent =
+        companies.size;
+    }
+
+
+    /* =====================================================
+       FILTER
+       ===================================================== */
+
+    function applyFilters() {
+      const q =
+        document
+          .getElementById(
+            "searchInput"
+          )
+          .value
+          .trim()
+          .toLowerCase();
+
+      const province =
+        document.getElementById(
+          "provinceFilter"
+        ).value;
+
+      const workMode =
+        document.getElementById(
+          "workModeFilter"
+        ).value;
+
+      const filtered =
+        allJobs.filter(
+          job => {
+            const haystack =
+              [
+                job.job_title,
+                job.company_name,
+                job.city,
+                job.province_name,
+                job.country_name,
+                job.location_text
+              ]
+                .filter(Boolean)
+                .join(" ")
+                .toLowerCase();
+
+            if (
+              q &&
+              !haystack.includes(q)
+            ) {
+              return false;
+            }
+
+            if (
+              province &&
+              job.province_name !==
+              province
+            ) {
+              return false;
+            }
+
+            if (
+              workMode &&
+              job.work_mode !==
+              workMode
+            ) {
+              return false;
+            }
+
+            return true;
+          }
+        );
+
+      renderJobs(
+        filtered
+      );
+    }
+
+
+    /* =====================================================
+       RENDER
+       ===================================================== */
+
+    function renderJobs(jobs) {
+      const loadingState =
+        document.getElementById(
+          "loadingState"
+        );
+
+      const emptyState =
+        document.getElementById(
+          "emptyState"
+        );
+
+      const jobsList =
+        document.getElementById(
+          "jobsList"
+        );
+
+      loadingState.classList.add(
+        "hidden"
+      );
+
+      document.getElementById(
+        "resultCount"
+      ).textContent =
+        jobs.length +
+        " verified result" +
+        (
+          jobs.length === 1
+            ? ""
+            : "s"
+        );
+
+      if (!jobs.length) {
+        jobsList.innerHTML = "";
+
+        emptyState.classList.remove(
+          "hidden"
+        );
+
+        return;
+      }
+
+      emptyState.classList.add(
+        "hidden"
+      );
+
+      jobsList.innerHTML =
+        jobs
+          .map(
+            job => {
+              const location =
+                [
+                  job.city,
+                  job.province_name
+                ]
+                  .filter(Boolean)
+                  .filter(
+                    (value, index, array) =>
+                      array.indexOf(value) ===
+                      index
+                  )
+                  .join(", ") ||
+                job.location_text ||
+                job.country_name ||
+                "Location not specified";
+
+              const deadline =
+                formatDate(
+                  job.application_deadline
+                );
+
+              const posted =
+                formatDate(
+                  job.posted_at
+                );
+
+              const trust =
+                job.trust_score !==
+                  null &&
+                job.trust_score !==
+                  undefined
+                  ? job.trust_score
+                  : null;
+
+              const url =
+                job.official_url
+                  ? escapeHtml(
+                      job.official_url
+                    )
+                  : "";
+
+              return `
+                <article class="job-card">
+
+                  <div class="job-top">
+
+                    <div>
+                      <h3 class="job-title">
+                        ${escapeHtml(
+                          job.job_title ||
+                          "Untitled Vacancy"
+                        )}
+                      </h3>
+
+                      <div class="company">
+                        ${escapeHtml(
+                          job.company_name ||
+                          "Unknown Company"
+                        )}
+                      </div>
+                    </div>
+
+                    <div class="verified-badge">
+                      ✓ VERIFIED SAFE
+                    </div>
+
+                  </div>
+
+                  <div class="meta">
+
+                    <span class="badge">
+                      📍 ${escapeHtml(location)}
+                    </span>
+
+                    ${
+                      job.work_mode
+                        ? `
+                          <span class="badge ${
+                            job.work_mode ===
+                            "REMOTE"
+                              ? "remote"
+                              : ""
+                          }">
+                            ${escapeHtml(
+                              pretty(
+                                job.work_mode
+                              )
+                            )}
+                          </span>
+                        `
+                        : ""
+                    }
+
+                    ${
+                      job.employment_type
+                        ? `
+                          <span class="badge">
+                            ${escapeHtml(
+                              pretty(
+                                job.employment_type
+                              )
+                            )}
+                          </span>
+                        `
+                        : ""
+                    }
+
+                    ${
+                      job.experience_level
+                        ? `
+                          <span class="badge">
+                            ${escapeHtml(
+                              pretty(
+                                job.experience_level
+                              )
+                            )}
+                          </span>
+                        `
+                        : ""
+                    }
+
+                    ${
+                      trust !== null
+                        ? `
+                          <span class="badge score">
+                            Trust ${escapeHtml(
+                              trust
+                            )}
+                          </span>
+                        `
+                        : ""
+                    }
+
+                  </div>
+
+                  <div class="job-footer">
+
+                    <div class="deadline">
+
+                      ${
+                        posted
+                          ? "Posted: " +
+                            escapeHtml(posted)
+                          : "Official vacancy verified"
+                      }
+
+                      ${
+                        deadline
+                          ? " • Deadline: " +
+                            escapeHtml(deadline)
+                          : ""
+                      }
+
+                    </div>
+
+                    ${
+                      url
+                        ? `
+                          <a
+                            class="apply-btn"
+                            href="${url}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            View Official Vacancy ↗
+                          </a>
+                        `
+                        : ""
+                    }
+
+                  </div>
+
+                </article>
+              `;
+            }
+          )
+          .join("");
+    }
+
+
+    /* =====================================================
+       TABS
+       ===================================================== */
+
+    function showTab(tab) {
+      const jobs =
+        document.getElementById(
+          "jobsSection"
+        );
+
+      const scholarships =
+        document.getElementById(
+          "scholarshipsSection"
+        );
+
+      const jobsTab =
+        document.getElementById(
+          "jobsTab"
+        );
+
+      const scholarshipsTab =
+        document.getElementById(
+          "scholarshipsTab"
+        );
+
+      if (
+        tab ===
+        "scholarships"
+      ) {
+        jobs.classList.add(
+          "hidden"
+        );
+
+        scholarships.classList.remove(
+          "hidden"
+        );
+
+        jobsTab.classList.remove(
+          "active"
+        );
+
+        scholarshipsTab.classList.add(
+          "active"
+        );
+
+      } else {
+        scholarships.classList.add(
+          "hidden"
+        );
+
+        jobs.classList.remove(
+          "hidden"
+        );
+
+        scholarshipsTab.classList.remove(
+          "active"
+        );
+
+        jobsTab.classList.add(
+          "active"
+        );
+      }
+    }
+
+
+    /* =====================================================
+       EVENTS
+       ===================================================== */
+
+    document
+      .getElementById(
+        "searchInput"
+      )
+      .addEventListener(
+        "input",
+        applyFilters
+      );
+
+    document
+      .getElementById(
+        "provinceFilter"
+      )
+      .addEventListener(
+        "change",
+        applyFilters
+      );
+
+    document
+      .getElementById(
+        "workModeFilter"
+      )
+      .addEventListener(
+        "change",
+        applyFilters
+      );
+
+
+    /* =====================================================
+       BOOT
+       ===================================================== */
+
+    buildProvinceOptions();
+    loadJobs();
+
+  </script>
+
 </body>
 </html>
