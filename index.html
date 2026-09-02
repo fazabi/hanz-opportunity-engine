@@ -1006,6 +1006,47 @@ h1{
   .lang-label{display:none}
 }
 
+
+/* HANZ V1.5 — live screening outcome UI */
+.pipeline-banner{
+  margin:14px 0 18px;
+  padding:13px 15px;
+  border:1px solid #dfe5ec;
+  border-radius:12px;
+  background:#f8fafc;
+  font-size:13px;
+  line-height:1.55;
+}
+.pipeline-banner strong{display:block;margin-bottom:3px}
+.pipeline-status{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 10px;
+  border-radius:999px;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.02em;
+  white-space:nowrap;
+}
+.pipeline-status.waiting{background:#fff5df;color:#8a5a00;border:1px solid #f0d28c}
+.pipeline-status.complete{background:#e9f8ef;color:#17653a;border:1px solid #b9e5c9}
+.pipeline-status.blocked{background:#fff0f0;color:#a52a2a;border:1px solid #efc0c0}
+.pipeline-status.unknown{background:#eef2f6;color:#4b5563;border:1px solid #d6dde5}
+.pipeline-source-note{
+  font-size:12px;
+  color:#667085;
+  line-height:1.45;
+}
+.pipeline-reason{
+  margin-top:12px;
+  padding:11px 12px;
+  background:#f8fafc;
+  border-radius:10px;
+  font-size:13px;
+  line-height:1.5;
+}
+
 </style>
 </head>
 
@@ -1916,7 +1957,8 @@ h1{
 
 <script>
 
-// HANZ FRONTEND V1.3 — CLEAN CV SESSION
+// HANZ FRONTEND V1.5 — LIVE SCREENING DASHBOARD
+// Uses the production discovery/screening backend and renders terminal outcomes safely.
 // Every newly selected CV clears all previous candidate state before analysis.
 
 const SUPABASE_URL =
@@ -1930,6 +1972,8 @@ let verifiedJobs = [];
 let globalJobs = [];
 let indonesiaJobs = [];
 let scholarships = [];
+let liveScreenedJobs = [];
+let liveDiscoveryMeta = null;
 
 let candidateProfile = null;
 
@@ -2729,30 +2773,291 @@ function inferJobFamilies(
 }
 
 
+
+/* =====================================================
+   LIVE PRODUCTION DISCOVERY + SCREENING — V1.5
+===================================================== */
+
+async function invokeEdgeFunction(functionName, payload){
+
+  const response = await fetch(
+    SUPABASE_URL + "/functions/v1/" + functionName,
+    {
+      method:"POST",
+      headers:{
+        apikey:SUPABASE_KEY,
+        Authorization:"Bearer " + SUPABASE_KEY,
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify(payload)
+    }
+  );
+
+  const raw = await response.text();
+  let data = {};
+
+  try{
+    data = raw ? JSON.parse(raw) : {};
+  }
+  catch{
+    throw new Error(
+      functionName + " returned non-JSON response (HTTP " +
+      response.status + ")."
+    );
+  }
+
+  if (!response.ok || data?.ok === false){
+    throw new Error(
+      data?.error ||
+      data?.message ||
+      (functionName + " failed (HTTP " + response.status + ").")
+    );
+  }
+
+  return data;
+}
+
+
+function pipelineOutcomeMeta(job){
+
+  const status =
+    String(
+      job?._pipeline_status ||
+      job?.screening_status ||
+      ""
+    ).toUpperCase();
+
+  if (status === "SCREENED_COMPLETE"){
+    return {
+      text:"SCREENED COMPLETE",
+      cls:"complete",
+      note:"HANZ completed the screening pipeline for this vacancy."
+    };
+  }
+
+  if (status === "WAITING_REVIEW"){
+    return {
+      text:"NEEDS VERIFICATION",
+      cls:"waiting",
+      note:"Candidate-relevant vacancy found, but the official employer source still needs verification."
+    };
+  }
+
+  if (status === "BLOCKED"){
+    return {
+      text:"BLOCKED",
+      cls:"blocked",
+      note:"HANZ stopped this vacancy because a screening gate blocked it."
+    };
+  }
+
+  return {
+    text:"UNDER REVIEW",
+    cls:"unknown",
+    note:"HANZ has not produced a final screening outcome yet."
+  };
+}
+
+
+function mapPipelineDetailToJob(detail){
+
+  return {
+    job_title:
+      detail?.job_title || "Untitled vacancy",
+
+    company_name:
+      detail?.company || "Company not identified",
+
+    city:null,
+    province_name:null,
+    country_code:"ID",
+    country_name:"Indonesia",
+    location_text:
+      detail?.location || "Indonesia",
+
+    job_url:
+      detail?.job_url || "",
+
+    official_url:null,
+
+    education_level:"UNKNOWN",
+    career_level:null,
+    fresh_graduate_eligible:null,
+    experience_required_years:null,
+    study_fields:[],
+    work_mode:null,
+    employment_type:null,
+
+    _live_pipeline:true,
+    _pipeline_status:
+      detail?.screening_status || "UNKNOWN",
+    _pipeline_complete:
+      detail?.pipeline_complete === true,
+    _screening_run_id:
+      detail?.screening_run_id || null,
+    _recommendation_group:
+      detail?.recommendation_group || "UNKNOWN",
+    _safety_status:
+      detail?.safety_status ?? null,
+    _official_status:
+      detail?.official_status ?? null,
+    _eligibility:
+      detail?.eligibility ?? null,
+    _recruiter_match:
+      detail?.recruiter_match ?? null
+  };
+}
+
+
+async function runLiveJobDiscovery(candidate){
+
+  const basePayload = {
+    candidate_profile_result:candidate,
+    max_per_platform:10,
+    router_max_items:5,
+    forward_to_router:true
+  };
+
+  const first =
+    await invokeEdgeFunction(
+      "vacancy-platform-discovery-adapter",
+      {
+        ...basePayload,
+        router_offset_items:0
+      }
+    );
+
+  const responses = [first];
+
+  const firstProgress =
+    first?.progressive_batching || {};
+
+  if (
+    firstProgress.has_more === true &&
+    Number.isFinite(
+      Number(firstProgress.next_offset)
+    )
+  ){
+    const second =
+      await invokeEdgeFunction(
+        "vacancy-platform-discovery-adapter",
+        {
+          ...basePayload,
+          router_offset_items:
+            Number(firstProgress.next_offset)
+        }
+      );
+
+    responses.push(second);
+  }
+
+  const details = [];
+
+  for (const response of responses){
+    const batch =
+      response?.router?.router_response?.result?.details;
+
+    if (Array.isArray(batch)){
+      details.push(...batch);
+    }
+  }
+
+  const seen = new Set();
+
+  liveScreenedJobs =
+    details
+      .filter(item => {
+        const key =
+          String(item?.job_url || item?.external_id || item?.fingerprint || "");
+
+        if (!key || seen.has(key)){
+          return false;
+        }
+
+        seen.add(key);
+        return true;
+      })
+      .map(mapPipelineDetailToJob);
+
+  liveDiscoveryMeta = {
+    engine:first?.engine || null,
+    total:liveScreenedJobs.length,
+    waiting_review:
+      liveScreenedJobs.filter(
+        x => x._pipeline_status === "WAITING_REVIEW"
+      ).length,
+    screened_complete:
+      liveScreenedJobs.filter(
+        x => x._pipeline_status === "SCREENED_COMPLETE"
+      ).length,
+    blocked:
+      liveScreenedJobs.filter(
+        x => x._pipeline_status === "BLOCKED"
+      ).length
+  };
+
+  return liveScreenedJobs;
+}
+
+
 /* =====================================================
    LOAD OPPORTUNITIES
 ===================================================== */
 
 async function loadOpportunityData(){
 
-  const jobs =
-    await supabaseFetch(
-      "verified_global_job_dashboard?select=*&order=posted_at.desc.nullslast"
-    );
+  /*
+    1) Run the production candidate-aware discovery/screening flow.
+       This is the primary Indonesia opportunity source in V1.5.
+  */
+  try{
+    await runLiveJobDiscovery(candidateProfile);
+  }
+  catch(error){
+    liveScreenedJobs = [];
+    liveDiscoveryMeta = {
+      error:
+        error?.message ||
+        "Live discovery failed."
+    };
+  }
 
 
-  verifiedJobs =
-    jobs;
+  /*
+    2) Keep the existing verified dashboard as a safe fallback
+       and as the current source for verified global vacancies.
+  */
+  let jobs = [];
+
+  try{
+    jobs =
+      await supabaseFetch(
+        "verified_global_job_dashboard?select=*&order=posted_at.desc.nullslast"
+      );
+  }
+  catch{
+    jobs = [];
+  }
+
+  verifiedJobs = jobs;
 
 
-  indonesiaJobs =
+  const verifiedIndonesia =
     jobs.filter(
       job =>
         job.country_code === "ID" ||
-        normalize(
-          job.country_name
-        ) === "indonesia"
+        normalize(job.country_name) === "indonesia"
     );
+
+
+  /*
+    Prefer the new candidate-aware screening output.
+    If it is unavailable, fall back to the verified dashboard.
+  */
+  indonesiaJobs =
+    liveScreenedJobs.length
+      ? liveScreenedJobs
+      : verifiedIndonesia;
 
 
   globalJobs =
@@ -2769,7 +3074,6 @@ async function loadOpportunityData(){
             job.country_name
           );
 
-
         if (
           code === "ID" ||
           country === "indonesia"
@@ -2777,29 +3081,18 @@ async function loadOpportunityData(){
           return false;
         }
 
-
         if (
-          [
-            "IN",
-            "VN",
-            "KH"
-          ].includes(code)
+          ["IN","VN","KH"].includes(code)
         ){
           return false;
         }
 
-
         if (
-          [
-            "india",
-            "vietnam",
-            "viet nam",
-            "cambodia"
-          ].includes(country)
+          ["india","vietnam","viet nam","cambodia"]
+            .includes(country)
         ){
           return false;
         }
-
 
         return true;
       }
@@ -2807,17 +3100,13 @@ async function loadOpportunityData(){
 
 
   try{
-
     scholarships =
       await supabaseFetch(
         "master_scholarship_dashboard?select=*"
       );
-
   }
   catch{
-
     scholarships = [];
-
   }
 
 
@@ -2854,7 +3143,7 @@ async function executeHANZ(){
     "execution-status";
 
   status.textContent =
-    "Membaca profil dan mengambil verified opportunities...";
+    "Membaca profil, mencari vacancy, dan menjalankan screening HANZ...";
 
 
   try{
@@ -3066,7 +3355,7 @@ async function executeHANZ(){
       "execution-status success";
 
     status.textContent =
-      "✓ Profil selesai dianalisa. HANZ sudah meranking peluang yang paling relevan.";
+      "✓ Profil selesai dianalisa. HANZ sudah mencari dan melakukan screening peluang yang relevan.";
 
   }
 
@@ -3971,7 +4260,15 @@ function applyJobFilters(){
         job => ({
           ...job,
           _match:
-            scoreJob(job)
+            job._live_pipeline
+              ? {
+                  score:0,
+                  reasons:[],
+                  eligible:true,
+                  hard_mismatch:false,
+                  mismatch_code:null
+                }
+              : scoreJob(job)
         })
       )
       .filter(
@@ -3983,6 +4280,7 @@ function applyJobFilters(){
             are intentionally hidden from recommendations.
           */
           if (
+            !job._live_pipeline &&
             job._match?.eligible !== true
           ){
             return false;
@@ -4092,9 +4390,30 @@ function applyJobFilters(){
         }
       )
       .sort(
-        (a,b) =>
-          b._match.score -
-          a._match.score
+        (a,b) => {
+
+          if (
+            a._live_pipeline ||
+            b._live_pipeline
+          ){
+            const priority = {
+              SCREENED_COMPLETE:4,
+              WAITING_REVIEW:3,
+              UNKNOWN:2,
+              BLOCKED:1
+            };
+
+            return (
+              (priority[b._pipeline_status] || 0) -
+              (priority[a._pipeline_status] || 0)
+            );
+          }
+
+          return (
+            b._match.score -
+            a._match.score
+          );
+        }
       );
 
 
@@ -4208,56 +4527,56 @@ function matchLabel(score){
 function renderJobs(jobs){
 
   const container =
-    document.getElementById(
-      "jobItems"
-    );
+    document.getElementById("jobItems");
 
   const empty =
-    document.getElementById(
-      "jobEmpty"
+    document.getElementById("jobEmpty");
+
+  const liveMode =
+    jobs.some(
+      job => job._live_pipeline
     );
 
-
   document
-    .getElementById(
-      "resultCount"
-    )
+    .getElementById("resultCount")
     .textContent =
-      jobs.length +
-      " verified vacancies";
+      liveMode
+        ? jobs.length + " candidate-relevant vacancies"
+        : jobs.length + " verified vacancies";
 
 
   if (!jobs.length){
 
-    container.innerHTML =
-      "";
+    container.innerHTML = "";
 
-    empty
-      .classList
-      .remove(
-        "hidden"
-      );
+    empty.classList.remove("hidden");
 
     return;
   }
 
 
-  empty
-    .classList
-    .add(
-      "hidden"
-    );
+  empty.classList.add("hidden");
+
+
+  const banner =
+    liveMode
+      ? `
+        <div class="pipeline-banner">
+          <strong>HANZ Live Screening</strong>
+          Vacancy di bawah ini ditemukan berdasarkan profil kandidat.
+          Status <b>Needs Verification</b> berarti lowongan relevan,
+          tetapi HANZ belum menemukan bukti official employer source
+          yang cukup kuat. Status ini bukan kegagalan sistem dan
+          bukan klaim bahwa vacancy sudah verified.
+        </div>
+      `
+      : "";
 
 
   container.innerHTML =
+    banner +
     jobs.map(
       job => {
-
-        const match =
-          matchLabel(
-            job._match.score
-          );
-
 
         const location =
           [
@@ -4275,6 +4594,159 @@ function renderJobs(jobs){
           job.location_text
           ||
           "Lokasi belum teridentifikasi";
+
+
+        if (job._live_pipeline){
+
+          const outcome =
+            pipelineOutcomeMeta(job);
+
+          const sourceUrl =
+            job.job_url || "";
+
+          return `
+
+            <article class="job-card">
+
+              <div class="job-head">
+
+                <div>
+
+                  <h3 class="job-title">
+                    ${esc(job.job_title)}
+                  </h3>
+
+                  <div class="company">
+                    ${esc(job.company_name)}
+                  </div>
+
+                </div>
+
+
+                <div class="right-badges">
+
+                  <div class="pipeline-status ${esc(outcome.cls)}">
+                    ${esc(outcome.text)}
+                  </div>
+
+                </div>
+
+              </div>
+
+
+              <div class="badges">
+
+                <span class="badge">
+                  📍 ${esc(location)}
+                </span>
+
+                <span class="badge blue">
+                  Candidate Relevant
+                </span>
+
+                <span class="badge purple">
+                  ${esc(
+                    job._recommendation_group &&
+                    job._recommendation_group !== "UNKNOWN"
+                      ? pretty(job._recommendation_group)
+                      : "Screening Pipeline"
+                  )}
+                </span>
+
+              </div>
+
+
+              <div class="pipeline-reason">
+
+                <strong>
+                  HANZ status:
+                </strong>
+
+                ${esc(outcome.note)}
+
+              </div>
+
+
+              <div class="candidate-box">
+
+                <div class="candidate-label">
+                  Screening Trace
+                </div>
+
+                <strong>Screening status:</strong>
+                ${esc(
+                  pretty(job._pipeline_status) ||
+                  "Unknown"
+                )}
+
+                <br>
+
+                <strong>Official verification:</strong>
+                ${esc(
+                  job._official_status ||
+                  (
+                    job._pipeline_status === "WAITING_REVIEW"
+                      ? "Needs verification"
+                      : "Not reported in compact result"
+                  )
+                )}
+
+                <br>
+
+                <strong>Eligibility:</strong>
+                ${esc(
+                  job._eligibility ||
+                  "Not yet available"
+                )}
+
+                <br>
+
+                <strong>Screening Run ID:</strong>
+                ${esc(
+                  job._screening_run_id ||
+                  "Not available"
+                )}
+
+              </div>
+
+
+              <div class="footer-row">
+
+                <div class="pipeline-source-note">
+                  ${
+                    job._pipeline_status === "WAITING_REVIEW"
+                      ? "Discovery source only — official employer source still pending verification."
+                      : "HANZ production screening pipeline result."
+                  }
+                </div>
+
+                ${
+                  sourceUrl
+                    ? `
+                      <a
+                        class="open-button"
+                        href="${esc(sourceUrl)}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Open Discovery Source ↗
+                      </a>
+                    `
+                    : ""
+                }
+
+              </div>
+
+            </article>
+
+          `;
+        }
+
+
+        const match =
+          matchLabel(
+            job._match.score
+          );
 
 
         const fields =
@@ -4353,11 +4825,7 @@ function renderJobs(jobs){
                 job.work_mode
                   ? `
                     <span class="badge blue">
-                      ${esc(
-                        pretty(
-                          job.work_mode
-                        )
-                      )}
+                      ${esc(pretty(job.work_mode))}
                     </span>
                   `
                   : ""
@@ -4367,11 +4835,7 @@ function renderJobs(jobs){
                 job.employment_type
                   ? `
                     <span class="badge">
-                      ${esc(
-                        pretty(
-                          job.employment_type
-                        )
-                      )}
+                      ${esc(pretty(job.employment_type))}
                     </span>
                   `
                   : ""
@@ -4389,11 +4853,7 @@ function renderJobs(jobs){
                 job.career_level
                   ? `
                     <span class="badge purple">
-                      ${esc(
-                        pretty(
-                          job.career_level
-                        )
-                      )}
+                      ${esc(pretty(job.career_level))}
                     </span>
                   `
                   : ""
@@ -4436,9 +4896,7 @@ function renderJobs(jobs){
               </strong>
 
               ${esc(
-                pretty(
-                  job.career_level
-                ) ||
+                pretty(job.career_level) ||
                 "Belum disebutkan"
               )}
 
@@ -4472,9 +4930,7 @@ function renderJobs(jobs){
                   ? `
                     <a
                       class="open-button"
-                      href="${esc(
-                        job.official_url
-                      )}"
+                      href="${esc(job.official_url)}"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
