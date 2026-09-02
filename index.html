@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<!-- HANZ FRONTEND V1.4 JOB RELEVANCE HARD GATE -->
 <title>HANZ Opportunity Engine</title>
 
 <style>
@@ -3271,19 +3272,49 @@ function renderAnalyzedProfile(){
 function scoreJob(job){
 
   if (!candidateProfile){
-
     return {
       score:0,
-      reasons:[]
+      reasons:[],
+      eligible:false,
+      hard_mismatch:true,
+      mismatch_code:"NO_CANDIDATE_PROFILE"
     };
-
   }
 
-
-  let score =
-    30;
-
+  let score = 0;
   const reasons = [];
+
+  let hardMismatch = false;
+  let mismatchCode = null;
+
+  const candidateCareer =
+    String(
+      candidateProfile.career_status || ""
+    ).toUpperCase();
+
+  const jobCareer =
+    String(
+      job.career_level || ""
+    ).toUpperCase();
+
+  /*
+    HARD GATE #1
+    Experienced candidates must not be recommended internships.
+  */
+  if (
+    candidateCareer === "EXPERIENCED" &&
+    jobCareer === "INTERNSHIP"
+  ){
+    return {
+      score:0,
+      reasons:[
+        "Lowongan internship tidak relevan untuk kandidat berpengalaman."
+      ],
+      eligible:false,
+      hard_mismatch:true,
+      mismatch_code:"EXPERIENCED_CANDIDATE_INTERNSHIP"
+    };
+  }
 
 
   /* EDUCATION */
@@ -3292,153 +3323,129 @@ function scoreJob(job){
     SMA_SMK:1,
     D3:2,
     D4_S1:3,
-    S2:4
+    S2:4,
+    S3:5
   };
 
-
   const candidateEducation =
-    candidateProfile
-      .education_level;
+    candidateProfile.education_level;
 
   const requirement =
     job.education_level;
 
-
   if (
-    requirement ===
-      "UNKNOWN"
+    requirement === "UNKNOWN" ||
+    !requirement
   ){
-
     reasons.push(
       "Persyaratan pendidikan belum disebutkan oleh perusahaan"
     );
-
   }
-
   else if (
-    requirement ===
-      "NOT_REQUIRED"
+    requirement === "NOT_REQUIRED"
   ){
-
-    score += 10;
-
+    score += 8;
     reasons.push(
       "Tidak mensyaratkan gelar tertentu"
     );
-
   }
-
   else if (
     rank[candidateEducation] &&
     rank[requirement]
   ){
-
     if (
       rank[candidateEducation] >=
       rank[requirement]
     ){
-
-      score += 18;
-
+      score += 15;
       reasons.push(
         "Pendidikan memenuhi requirement"
       );
-
     }
-
     else{
-
-      score -= 30;
+      hardMismatch = true;
+      mismatchCode =
+        "EDUCATION_BELOW_REQUIREMENT";
 
       reasons.push(
         "Pendidikan berada di bawah requirement yang terdeteksi"
       );
-
     }
-
   }
 
 
-  /* FRESH GRAD */
+  /* CAREER LEVEL */
 
   if (
-    candidateProfile
-      .career_status ===
-      "FRESH_GRADUATE"
+    candidateCareer === "FRESH_GRADUATE"
   ){
-
     if (
-      job.fresh_graduate_eligible ===
-      true
+      job.fresh_graduate_eligible === true
     ){
-
-      score += 18;
-
+      score += 15;
       reasons.push(
         "Confirmed fresh graduate eligible"
       );
-
     }
-
     else if (
-      job.fresh_graduate_eligible ===
-      false
+      job.fresh_graduate_eligible === false
     ){
-
-      score -= 35;
+      hardMismatch = true;
+      mismatchCode =
+        "FRESH_GRADUATE_NOT_ELIGIBLE";
 
       reasons.push(
         "Vacancy bukan untuk fresh graduate"
       );
-
     }
+  }
 
+  if (
+    candidateCareer === "EXPERIENCED" &&
+    ["MID","SENIOR","LEAD","MANAGER","SUPERVISOR","EXPERIENCED"]
+      .includes(jobCareer)
+  ){
+    score += 12;
+
+    reasons.push(
+      "Career level sesuai kandidat berpengalaman"
+    );
   }
 
 
   /* EXPERIENCE */
 
   if (
-    candidateProfile
-      .experience_years !==
-      null &&
-    candidateProfile
-      .experience_years !==
-      undefined &&
-    job.experience_required_years !==
-      null &&
-    job.experience_required_years !==
-      undefined
+    candidateProfile.experience_years !== null &&
+    candidateProfile.experience_years !== undefined &&
+    job.experience_required_years !== null &&
+    job.experience_required_years !== undefined
   ){
-
     if (
-      candidateProfile
-        .experience_years >=
+      candidateProfile.experience_years >=
       job.experience_required_years
     ){
-
-      score += 12;
+      score += 15;
 
       reasons.push(
         "Pengalaman memenuhi minimum"
       );
-
     }
-
     else{
-
-      score -= 20;
+      hardMismatch = true;
+      mismatchCode =
+        "EXPERIENCE_BELOW_REQUIREMENT";
 
       reasons.push(
         "Pengalaman belum memenuhi minimum"
       );
-
     }
-
   }
 
 
-  /* STUDY / JOB FAMILY */
+  /* =====================================================
+     DOMAIN / FIELD MATCH
+     ===================================================== */
 
   const jobText =
     normalize(
@@ -3448,85 +3455,125 @@ function scoreJob(job){
       ].join(" ")
     );
 
+  /*
+    IMPORTANT:
+    Generic words such as "engineer", "data", "excel",
+    or "reporting" are not enough to create a domain match.
+  */
 
   const familyTerms = {
 
+    "Process / Chemical Engineering":[
+      "chemical engineering",
+      "process engineering",
+      "process engineer",
+      "chemical engineer",
+      "petrochemical",
+      "process safety",
+      "process control"
+    ],
+
+    "Utilities / Plant Operations":[
+      "utilities",
+      "utility",
+      "plant operations",
+      "plant operation",
+      "dcs operator",
+      "panel operator",
+      "boiler",
+      "steam",
+      "water treatment"
+    ],
+
+    "Process Operations":[
+      "process operations",
+      "process operator",
+      "plant operator",
+      "dcs operator",
+      "production engineer",
+      "operations engineer"
+    ],
+
     "Network / Infrastructure":[
       "network",
+      "networking",
       "infrastructure",
-      "cloud",
-      "security",
       "telecommunication",
-      "system"
+      "systems engineer",
+      "system engineer"
     ],
 
     "Cloud Engineering":[
       "cloud",
       "aws",
       "azure",
-      "platform",
-      "infrastructure"
+      "gcp",
+      "cloud engineer",
+      "cloud engineering"
     ],
 
     "DevOps / Platform Engineering":[
       "devops",
-      "platform",
-      "ci cd",
-      "cloud",
-      "infrastructure"
+      "platform engineering",
+      "platform engineer",
+      "site reliability",
+      "sre",
+      "ci cd"
     ],
 
     "Cybersecurity":[
-      "cyber",
-      "security",
-      "soc",
+      "cybersecurity",
+      "cyber security",
+      "security engineer",
+      "soc analyst",
       "information security"
     ],
 
     "IoT / Embedded Systems":[
       "iot",
+      "internet of things",
       "embedded",
       "firmware"
     ],
 
     "Data / AI":[
-      "data",
+      "data scientist",
+      "data science",
       "machine learning",
       "artificial intelligence",
-      "ai"
+      "statistics",
+      "statistician"
     ],
 
     "Software Engineering":[
-      "software",
-      "developer",
-      "engineer",
+      "software engineer",
+      "software engineering",
+      "software developer",
       "frontend",
-      "backend"
+      "backend",
+      "full stack",
+      "full-stack"
     ],
 
     "Automation / Mechatronics":[
       "automation",
       "plc",
       "scada",
-      "mechatronic"
+      "mechatronic",
+      "instrumentation"
     ]
-
   };
 
+  const candidateFamilies =
+    candidateProfile.job_families || [];
 
-  let familyMatched =
-    false;
-
+  let familyMatched = false;
 
   for (
-    const family of
-    candidateProfile
-      .job_families || []
+    const family of candidateFamilies
   ){
-
     const terms =
       familyTerms[family] || [];
-
 
     if (
       terms.some(
@@ -3536,47 +3583,204 @@ function scoreJob(job){
           )
       )
     ){
-
-      familyMatched =
-        true;
-
+      familyMatched = true;
       break;
     }
-
   }
 
-
   if (familyMatched){
-
-    score += 22;
+    score += 30;
 
     reasons.push(
       "Job family sesuai dengan background"
     );
+  }
 
+
+  /*
+    HARD GATE #2 — SPECIFIC FIELD MISMATCH
+
+    If the vacancy explicitly names a study field,
+    and that field belongs to a different technical domain,
+    do not recommend it merely because education is UNKNOWN.
+  */
+
+  const studyFields =
+    Array.isArray(job.study_fields)
+      ? job.study_fields
+      : [];
+
+  const candidateStudyText =
+    normalize(
+      [
+        ...(candidateProfile.study_programs || []),
+        ...(candidateProfile.job_families || [])
+      ].join(" ")
+    );
+
+  const explicitFieldText =
+    normalize(
+      studyFields.join(" ")
+    );
+
+  const broadField =
+    !explicitFieldText ||
+    [
+      "any field",
+      "any eligible",
+      "all majors",
+      "all major",
+      "any major"
+    ].some(
+      term =>
+        explicitFieldText.includes(
+          normalize(term)
+        )
+    );
+
+  const domainGroups = [
+    {
+      name:"PROCESS_CHEMICAL",
+      terms:[
+        "chemical engineering",
+        "teknik kimia",
+        "process engineering",
+        "petrochemical"
+      ]
+    },
+    {
+      name:"DATA_AI",
+      terms:[
+        "data science",
+        "statistics",
+        "mathematics",
+        "machine learning",
+        "artificial intelligence"
+      ]
+    },
+    {
+      name:"SOFTWARE_COMPUTER",
+      terms:[
+        "computer science",
+        "informatics",
+        "software engineering",
+        "computer engineering"
+      ]
+    },
+    {
+      name:"NETWORK_INFRA",
+      terms:[
+        "network",
+        "network engineering",
+        "telecommunication",
+        "internet engineering",
+        "infrastructure"
+      ]
+    },
+    {
+      name:"ELECTRICAL_AUTOMATION",
+      terms:[
+        "electrical engineering",
+        "electronics",
+        "mechatronics",
+        "automation",
+        "instrumentation"
+      ]
+    }
+  ];
+
+  function detectedDomains(value){
+    const v =
+      normalize(value);
+
+    return domainGroups
+      .filter(
+        group =>
+          group.terms.some(
+            term =>
+              v.includes(
+                normalize(term)
+              )
+          )
+      )
+      .map(
+        group =>
+          group.name
+      );
+  }
+
+  if (
+    studyFields.length &&
+    !broadField
+  ){
+    const candidateDomains =
+      detectedDomains(
+        candidateStudyText
+      );
+
+    const vacancyDomains =
+      detectedDomains(
+        explicitFieldText
+      );
+
+    if (
+      candidateDomains.length &&
+      vacancyDomains.length &&
+      !candidateDomains.some(
+        x =>
+          vacancyDomains.includes(x)
+      )
+    ){
+      hardMismatch = true;
+      mismatchCode =
+        "STUDY_FIELD_DOMAIN_MISMATCH";
+
+      reasons.push(
+        "Bidang studi lowongan tidak sesuai dengan latar belakang kandidat"
+      );
+    }
   }
 
 
   /* SKILLS */
 
   const candidateSkills =
-    candidateProfile
-      .skills || [];
-
+    candidateProfile.skills || [];
 
   const matchedSkills =
     candidateSkills.filter(
-      skill =>
-        jobText.includes(
-          normalize(skill)
-        )
-    );
+      skill => {
+        const normalizedSkill =
+          normalize(skill);
 
+        /*
+          Generic skills do not create role relevance by themselves.
+        */
+        if (
+          [
+            "excel",
+            "microsoft excel",
+            "microsoft office",
+            "communication",
+            "teamwork",
+            "leadership",
+            "problem solving"
+          ].includes(
+            normalizedSkill
+          )
+        ){
+          return false;
+        }
+
+        return jobText.includes(
+          normalizedSkill
+        );
+      }
+    );
 
   if (
     matchedSkills.length
   ){
-
     score += Math.min(
       15,
       matchedSkills.length * 5
@@ -3588,37 +3792,31 @@ function scoreJob(job){
         .slice(0,3)
         .join(", ")
     );
-
   }
 
 
   /* WORK MODE */
 
   if (
-    candidateProfile
-      .preferred_work_mode &&
+    candidateProfile.preferred_work_mode &&
+    candidateProfile.preferred_work_mode !== "ALL" &&
     job.work_mode ===
-      candidateProfile
-        .preferred_work_mode
+      candidateProfile.preferred_work_mode
   ){
-
-    score += 7;
+    score += 5;
 
     reasons.push(
       "Work mode sesuai preferensi"
     );
-
   }
 
 
   /* COUNTRY */
 
   if (
-    candidateProfile
-      .target_countries?.length &&
+    candidateProfile.target_countries?.length &&
     job.country_name
   ){
-
     const countryMatch =
       candidateProfile
         .target_countries
@@ -3630,19 +3828,26 @@ function scoreJob(job){
             )
         );
 
-
     if (countryMatch){
-
-      score += 8;
+      score += 5;
 
       reasons.push(
         "Negara sesuai preferensi"
       );
-
     }
-
   }
 
+
+  /*
+    A verified vacancy is NOT automatically a candidate match.
+    Safety and relevance are separate concepts.
+  */
+
+  if (
+    hardMismatch
+  ){
+    score = 0;
+  }
 
   score =
     Math.max(
@@ -3653,10 +3858,27 @@ function scoreJob(job){
       )
     );
 
+  /*
+    Minimum relevance gate.
+    A role with no domain/family evidence should not be
+    shown as a candidate recommendation.
+  */
+
+  const eligible =
+    !hardMismatch &&
+    (
+      familyMatched ||
+      score >= 45
+    );
 
   return {
     score,
-    reasons
+    reasons,
+    eligible,
+    hard_mismatch:
+      hardMismatch,
+    mismatch_code:
+      mismatchCode
   };
 }
 
@@ -3754,6 +3976,17 @@ function applyJobFilters(){
       )
       .filter(
         job => {
+
+          /*
+            Candidate relevance gate:
+            verified-safe vacancies that are clearly irrelevant
+            are intentionally hidden from recommendations.
+          */
+          if (
+            job._match?.eligible !== true
+          ){
+            return false;
+          }
 
           const haystack =
             normalize(
@@ -3952,9 +4185,17 @@ function matchLabel(score){
   }
 
 
+  if (score >= 45){
+    return {
+      text:
+        "Possible Match",
+      cls:"possible"
+    };
+  }
+
   return {
     text:
-      "Possible Match",
+      "Not Recommended",
     cls:"possible"
   };
 }
