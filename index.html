@@ -1915,6 +1915,9 @@ h1{
 
 <script>
 
+// HANZ FRONTEND V1.3 — CLEAN CV SESSION
+// Every newly selected CV clears all previous candidate state before analysis.
+
 const SUPABASE_URL =
   "https://mjnlucjidysptonyocxi.supabase.co";
 
@@ -2029,6 +2032,211 @@ function splitComma(v){
    CV
 ===================================================== */
 
+function clearPreviousCandidateSessionForNewCv(){
+
+  /*
+    CLEAN SESSION POLICY
+    --------------------
+    A newly selected CV starts a completely fresh candidate session.
+
+    We intentionally clear:
+    - previous candidateProfile object
+    - browser-stored candidate profile
+    - previous analyzed-profile UI
+    - candidate-derived/manual form fields from the previous CV/session
+    - previous job/scholarship results and execution state
+
+    We intentionally keep:
+    - UI language preference
+    - default nationality = Indonesia
+  */
+
+  candidateProfile = null;
+  hasExecuted = false;
+
+  localStorage.removeItem(
+    "hanz_candidate_profile"
+  );
+
+  const clearValueIds = [
+    "profileEducation",
+    "profileStudy",
+    "profileCareer",
+    "profileExperience",
+    "profileSkills",
+    "profileWorkMode",
+    "profileCountries",
+    "profileGraduationYear"
+  ];
+
+  clearValueIds.forEach(
+    id => {
+      const el =
+        document.getElementById(id);
+
+      if (el){
+        el.value = "";
+      }
+    }
+  );
+
+  const nationality =
+    document.getElementById(
+      "profileNationality"
+    );
+
+  if (nationality){
+    nationality.value =
+      "Indonesia";
+  }
+
+  const analyzed =
+    document.getElementById(
+      "analyzedProfile"
+    );
+
+  if (analyzed){
+    analyzed.classList.add(
+      "hidden"
+    );
+  }
+
+  const analysisGrid =
+    document.getElementById(
+      "analysisGrid"
+    );
+
+  if (analysisGrid){
+    analysisGrid.innerHTML =
+      "";
+  }
+
+  const jobItems =
+    document.getElementById(
+      "jobItems"
+    );
+
+  if (jobItems){
+    jobItems.innerHTML =
+      "";
+  }
+
+  const scholarshipItems =
+    document.getElementById(
+      "scholarshipItems"
+    );
+
+  if (scholarshipItems){
+    scholarshipItems.innerHTML =
+      "";
+  }
+
+  const jobWaiting =
+    document.getElementById(
+      "jobWaiting"
+    );
+
+  if (jobWaiting){
+    jobWaiting.classList.remove(
+      "hidden"
+    );
+  }
+
+  const scholarshipWaiting =
+    document.getElementById(
+      "scholarshipWaiting"
+    );
+
+  if (scholarshipWaiting){
+    scholarshipWaiting.classList.remove(
+      "hidden"
+    );
+  }
+
+  const jobEmpty =
+    document.getElementById(
+      "jobEmpty"
+    );
+
+  if (jobEmpty){
+    jobEmpty.classList.add(
+      "hidden"
+    );
+  }
+
+  const scholarshipEmpty =
+    document.getElementById(
+      "scholarshipEmpty"
+    );
+
+  if (scholarshipEmpty){
+    scholarshipEmpty.classList.add(
+      "hidden"
+    );
+  }
+
+  const jobError =
+    document.getElementById(
+      "jobError"
+    );
+
+  if (jobError){
+    jobError.classList.add(
+      "hidden"
+    );
+  }
+
+  [
+    "jobCount",
+    "companyCount",
+    "freshCount",
+    "remoteCount"
+  ].forEach(
+    id => {
+      const el =
+        document.getElementById(id);
+
+      if (el){
+        el.textContent = "—";
+      }
+    }
+  );
+
+  const resultCount =
+    document.getElementById(
+      "resultCount"
+    );
+
+  if (resultCount){
+    resultCount.textContent =
+      "Isi profil lalu jalankan HANZ";
+  }
+
+  const scholarshipCount =
+    document.getElementById(
+      "scholarshipCount"
+    );
+
+  if (scholarshipCount){
+    scholarshipCount.textContent =
+      "Isi profil lalu jalankan HANZ";
+  }
+
+  const executionStatus =
+    document.getElementById(
+      "executionStatus"
+    );
+
+  if (executionStatus){
+    executionStatus.className =
+      "execution-status";
+
+    executionStatus.textContent =
+      "CV baru dipilih. Data kandidat sebelumnya sudah dibersihkan.";
+  }
+}
+
+
 document
   .getElementById("cvFile")
   .addEventListener(
@@ -2037,6 +2245,15 @@ document
 
       const file =
         this.files?.[0];
+
+      if (file){
+        /*
+          IMPORTANT:
+          Clear the PREVIOUS candidate session immediately,
+          before this new CV is ever analyzed.
+        */
+        clearPreviousCandidateSessionForNewCv();
+      }
 
       document
         .getElementById(
