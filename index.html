@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <!-- HANZ FRONTEND V1.4 JOB RELEVANCE HARD GATE -->
-<title>HANZ Opportunity Engine V1.9</title>
+<title>HANZ Opportunity Engine V2.0</title>
 
 <style>
 *{box-sizing:border-box}
@@ -1045,6 +1045,109 @@ h1{
   border-radius:10px;
   font-size:13px;
   line-height:1.5;
+}
+
+
+/* =====================================================
+   V2.0 — ACTION & GAP ANALYSIS
+===================================================== */
+.action-gap-box{
+  margin-top:14px;
+  padding:14px 16px;
+  border:1px solid rgba(148,163,184,.26);
+  border-radius:14px;
+  background:rgba(15,23,42,.035);
+}
+.action-gap-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:10px;
+}
+.action-gap-title{
+  font-weight:800;
+  font-size:14px;
+}
+.action-gap-sub{
+  margin-top:3px;
+  font-size:12px;
+  color:var(--muted);
+}
+.action-decision{
+  flex:0 0 auto;
+  border-radius:999px;
+  padding:6px 10px;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.02em;
+  border:1px solid rgba(148,163,184,.28);
+}
+.action-decision.go{
+  background:rgba(34,197,94,.11);
+  color:#15803d;
+}
+.action-decision.prepare{
+  background:rgba(245,158,11,.12);
+  color:#b45309;
+}
+.action-decision.monitor{
+  background:rgba(59,130,246,.10);
+  color:#1d4ed8;
+}
+.action-columns{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+.action-panel{
+  padding:11px 12px;
+  border-radius:12px;
+  background:rgba(255,255,255,.60);
+  border:1px solid rgba(148,163,184,.18);
+}
+.action-panel strong{
+  display:block;
+  margin-bottom:6px;
+  font-size:12px;
+}
+.action-line{
+  font-size:12px;
+  line-height:1.55;
+  margin:3px 0;
+}
+.next-action{
+  margin-top:10px;
+  padding:11px 12px;
+  border-radius:12px;
+  background:rgba(99,102,241,.08);
+  border:1px solid rgba(99,102,241,.18);
+  font-size:12px;
+  line-height:1.55;
+}
+.action-buttons{
+  margin-top:10px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.action-mini-button{
+  appearance:none;
+  border:1px solid rgba(148,163,184,.35);
+  border-radius:10px;
+  background:#fff;
+  padding:8px 10px;
+  font:inherit;
+  font-size:12px;
+  font-weight:700;
+  cursor:pointer;
+}
+.action-mini-button:hover{
+  transform:translateY(-1px);
+}
+@media (max-width:760px){
+  .action-columns{grid-template-columns:1fr}
+  .action-gap-head{flex-direction:column}
 }
 
 </style>
@@ -4714,6 +4817,8 @@ function renderJobs(jobs){
               </div>
 
 
+              ${jobActionHtml(job,false)}
+
               <div class="footer-row">
 
                 <div class="pipeline-source-note">
@@ -4922,6 +5027,8 @@ function renderJobs(jobs){
 
             </div>
 
+
+            ${jobActionHtml(job,true)}
 
             <div class="footer-row">
 
@@ -5653,6 +5760,197 @@ function applicationTimingLines(item){
   return lines;
 }
 
+
+function candidateProfileText(){
+  if(!candidateProfile) return "";
+  return [
+    candidateProfile.education_level,
+    ...(candidateProfile.study_programs||[]),
+    ...(candidateProfile.skills||[]),
+    ...(candidateProfile.career_interests||[]),
+    ...(candidateProfile.job_families||[])
+  ].filter(Boolean).join(" ").toLowerCase();
+}
+
+function scholarshipActionGap(item){
+  const claims = scholarshipClaimsByRadar[String(item.radar_key||"")] || [];
+  const has=(type,key)=>claims.some(c=>c.claim_type===type && c.claim_key===key);
+  const get=(type,key)=>claims.find(c=>c.claim_type===type && c.claim_key===key);
+
+  const strengths=[];
+  const gaps=[];
+  const profileText=candidateProfileText();
+  const domains=(item.matched_domains||[]).filter(Boolean);
+
+  if(domains.length){
+    const aligned=domains.filter(d=>{
+      const words=String(d).toLowerCase().split(/[^a-z0-9]+/).filter(x=>x.length>3);
+      return words.some(w=>profileText.includes(w));
+    }).slice(0,4);
+    if(aligned.length){
+      strengths.push(`Profile alignment: ${aligned.join(", ")}`);
+    }else{
+      strengths.push(`Academic/technical fit detected by HANZ: ${domains.slice(0,4).join(", ")}`);
+    }
+  }
+
+  const fit=Number(item.candidate_fit_score||0);
+  if(fit>=85) strengths.push(`Strong candidate fit (${fit}%)`);
+  else if(fit>=70) strengths.push(`Good candidate fit (${fit}%)`);
+
+  if(has("ELIGIBILITY","BACHELOR_OR_EQUIVALENT") || has("ELIGIBILITY","SIXTEEN_YEAR_EDUCATION_ROUTE")){
+    strengths.push("Official source states a bachelor/equivalent or education-route pathway");
+  }
+
+  if(has("FUNDING","TUITION_COVERAGE")) strengths.push("Official tuition coverage/exemption evidence found");
+  if(has("FUNDING","MONTHLY_STIPEND")) strengths.push("Official stipend/allowance evidence found");
+  if(has("FUNDING","TRAVEL_SUPPORT")) strengths.push("Official travel-support evidence found");
+
+  if(has("ELIGIBILITY","INDIVIDUAL_ELIGIBILITY_SCREENING")){
+    gaps.push("Confirm whether your D4/S1 credential needs individual eligibility screening");
+  }
+
+  if(has("LANGUAGE","ENGLISH_REQUIREMENT")){
+    const v=get("LANGUAGE","ENGLISH_REQUIREMENT")?.claim_value||{};
+    const detail=[v.cefr_mentioned?"CEFR":null,v.toefl_mentioned?"TOEFL":null,v.ielts_mentioned?"IELTS":null].filter(Boolean).join("/");
+    gaps.push(`Prepare valid English-language evidence${detail?` (${detail})`:""}`);
+  }
+
+  if(has("SUPERVISOR","SUPERVISOR_CONTACT_OR_CONSENT")){
+    gaps.push("Professor/supervisor contact or consent needs attention");
+  }
+
+  const docs=[];
+  if(has("DOCUMENTS","RESEARCH_OR_STUDY_PLAN")) docs.push("research/study plan");
+  if(has("DOCUMENTS","ACADEMIC_TRANSCRIPT")) docs.push("academic transcript");
+  if(has("DOCUMENTS","RECOMMENDATION_LETTER")) docs.push("recommendation letter");
+  if(docs.length) gaps.push(`Prepare official application documents: ${docs.join(", ")}`);
+
+  const gre=get("TEST_REQUIREMENT","GRE");
+  if(gre){
+    if(gre.claim_value?.mandatory_explicit===true) gaps.push("GRE is explicitly required in the current evidence");
+    else gaps.push("GRE is mentioned; verify whether it applies to your exact course");
+  }
+
+  if(!claims.length){
+    gaps.push("Detailed official evidence has not been structured yet; verify the current official guide");
+  }
+
+  const status=String(item.radar_status||"MONITOR").toUpperCase();
+  let decision="MONITOR";
+  let decisionClass="monitor";
+  let next="Keep this program on radar and prepare reusable documents before the next verified opening.";
+
+  if(status==="APPLY_NOW"){
+    decision="APPLY / ACT NOW";
+    decisionClass="go";
+    if(has("SUPERVISOR","SUPERVISOR_CONTACT_OR_CONSENT")){
+      next="Contact the target professor/supervisor first, then complete the current-cycle application checklist before the official deadline.";
+    }else{
+      next="Open the official application guide now, confirm every candidate-specific requirement, and complete the current-cycle application checklist.";
+    }
+  }else if(status==="PREPARE_NOW" || status==="OPENING_SOON"){
+    decision="PREPARE NOW";
+    decisionClass="prepare";
+    next="Close the gaps above now so the application can be submitted quickly when the official window opens.";
+  }
+
+  return {
+    strengths:[...new Set(strengths)].slice(0,6),
+    gaps:[...new Set(gaps)].slice(0,7),
+    decision,
+    decisionClass,
+    next
+  };
+}
+
+function scholarshipActionGapHtml(item){
+  const a=scholarshipActionGap(item);
+  return `
+    <div class="action-gap-box">
+      <div class="action-gap-head">
+        <div>
+          <div class="action-gap-title">HANZ Action & Gap Analysis</div>
+          <div class="action-gap-sub">Should I pursue this, why me, what is missing, and what should I do next?</div>
+        </div>
+        <div class="action-decision ${esc(a.decisionClass)}">${esc(a.decision)}</div>
+      </div>
+      <div class="action-columns">
+        <div class="action-panel">
+          <strong>✓ Why you match</strong>
+          ${(a.strengths.length?a.strengths:["No strong evidence-based strength identified yet."]).map(x=>`<div class="action-line">• ${esc(x)}</div>`).join("")}
+        </div>
+        <div class="action-panel">
+          <strong>△ Gaps / preparation</strong>
+          ${(a.gaps.length?a.gaps:["No material gap detected from the currently structured evidence."]).map(x=>`<div class="action-line">• ${esc(x)}</div>`).join("")}
+        </div>
+      </div>
+      <div class="next-action"><strong>Next action:</strong> ${esc(a.next)}</div>
+      <div class="action-buttons">
+        <button class="action-mini-button" type="button" onclick="copyScholarshipActionPlan('${esc(String(item.radar_key||""))}')">Copy Action Plan</button>
+        ${item.official_url?`<a class="action-mini-button" href="${esc(item.official_url)}" target="_blank" rel="noopener noreferrer">Open Official Guide ↗</a>`:""}
+      </div>
+    </div>`;
+}
+
+async function copyScholarshipActionPlan(radarKey){
+  const item=(scholarshipRadar||[]).find(x=>String(x.radar_key||"")===String(radarKey||""));
+  if(!item) return;
+  const a=scholarshipActionGap(item);
+  const text=[
+    `HANZ Action Plan — ${item.program_name||"Scholarship"}`,
+    `${item.university_name||""}`,
+    `Decision: ${a.decision}`,
+    "",
+    "WHY I MATCH",
+    ...(a.strengths.length?a.strengths:["No strong evidence-based strength identified yet."]).map(x=>`- ${x}`),
+    "",
+    "GAPS / PREPARATION",
+    ...(a.gaps.length?a.gaps:["No material gap detected from current structured evidence."]).map(x=>`- ${x}`),
+    "",
+    `NEXT ACTION: ${a.next}`,
+    item.official_url?`Official source: ${item.official_url}`:""
+  ].filter(x=>x!==undefined).join("\n");
+  try{
+    await navigator.clipboard.writeText(text);
+    alert("HANZ action plan copied.");
+  }catch{
+    prompt("Copy HANZ Action Plan:",text);
+  }
+}
+
+function jobActionHtml(job, verifiedMode){
+  const score=Number(job?._match?.score||0);
+  const reasons=(job?._match?.reasons||[]).slice(0,4);
+  let decision="REVIEW";
+  let cls="prepare";
+  let next="Review the vacancy requirements and tailor the CV only to requirements supported by the candidate's actual experience.";
+
+  if(verifiedMode && score>=60){
+    decision=score>=80?"APPLY":"CONSIDER APPLYING";
+    cls="go";
+    next="Tailor the CV to the verified role requirements, keep only truthful evidence from the candidate profile, then apply through the official vacancy source.";
+  }else if(job?._pipeline_status==="WAITING_REVIEW"){
+    decision="VERIFY FIRST";
+    cls="monitor";
+    next="Do not treat this vacancy as confirmed yet. Verify the official employer source before investing time in an application.";
+  }
+
+  return `
+    <div class="action-gap-box">
+      <div class="action-gap-head">
+        <div>
+          <div class="action-gap-title">HANZ Next Action</div>
+          <div class="action-gap-sub">Action recommendation based on current screening evidence.</div>
+        </div>
+        <div class="action-decision ${esc(cls)}">${esc(decision)}</div>
+      </div>
+      ${reasons.length?`<div class="action-panel"><strong>Why it matches</strong>${reasons.map(x=>`<div class="action-line">• ${esc(x)}</div>`).join("")}</div>`:""}
+      <div class="next-action"><strong>Next action:</strong> ${esc(next)}</div>
+    </div>`;
+}
+
+
 function radarScholarshipCard(item){
   const meta=radarStatusMeta(item.radar_status);
   const t=item.timing||{};
@@ -5714,6 +6012,7 @@ function radarScholarshipCard(item){
         </div>
       </div>
 
+      ${scholarshipActionGapHtml(item)}
       ${scholarshipOfficialEvidenceHtml(item)}
       <div class="match-reason">
         <strong>Why HANZ keeps this on your radar:</strong>
