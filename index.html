@@ -1957,7 +1957,7 @@ h1{
 
 <script>
 
-// HANZ FRONTEND V1.6 — HISTORICAL SCHOLARSHIP RADAR
+// HANZ FRONTEND V1.7 — WORLDWIDE SCHOLARSHIP RADAR
 // Uses the production discovery/screening backend and renders terminal outcomes safely.
 // Every newly selected CV clears all previous candidate state before analysis.
 
@@ -5516,6 +5516,7 @@ function radarScholarshipCard(item){
         <div class="right-badges">
           <div class="pipeline-status ${esc(meta.cls)}">${esc(meta.text)}</div>
           <div class="match-score">Fit ${esc(item.candidate_fit_score || 0)}%</div>
+          <div class="match-score">Priority ${esc(item.opportunity_priority_score ?? item.candidate_fit_score ?? 0)}%</div>
         </div>
       </div>
       <div class="badges">
@@ -5535,6 +5536,8 @@ function radarScholarshipCard(item){
       <div class="candidate-box">
         <div class="candidate-label">Preparation Radar</div>
         <strong>Status:</strong> ${esc(pretty(item.radar_status))}<br>
+        <strong>Candidate fit:</strong> ${esc(item.candidate_fit_score ?? 0)}%<br>
+        <strong>Opportunity priority:</strong> ${esc(item.opportunity_priority_score ?? item.candidate_fit_score ?? 0)}%<br>
         <strong>Verified historical cycles:</strong> ${esc(cycleCount)}<br>
         <strong>Timing confidence:</strong> ${esc(t.confidence || "UNKNOWN")}<br>
         <strong>Professor contact:</strong> ${item.professor_contact_required===true ? `Recommended/required — start about ${esc(item.professor_lead_days || 45)} days before application.` : "Not marked as required"}<br>
@@ -5579,7 +5582,7 @@ async function renderScholarships(){
     const prepare=scholarshipRadar.filter(x=>x.radar_status==="OPENING_SOON" || x.radar_status==="PREPARE_NOW");
     const monitor=scholarshipRadar.filter(x=>x.radar_status==="MONITOR");
     count.textContent = `${applyNow.length} apply now • ${prepare.length} prepare • ${monitor.length} monitor`;
-    let html=`<div class="pipeline-banner"><strong>HANZ Historical Scholarship Radar</strong>HANZ sekarang menampilkan program yang harus dipersiapkan sebelum pendaftaran dibuka. Prediksi bulan hanya dipakai bila ada cukup history terverifikasi; current official call selalu lebih kuat.</div>`;
+    let html=`<div class="pipeline-banner"><strong>HANZ Worldwide Scholarship Radar</strong>HANZ menampilkan fully-funded Master opportunities berdasarkan profile fit, official-source trust, current cycle, dan historical timing. Fit kandidat dipisahkan dari Priority agar program yang sedang open tidak otomatis dianggap paling cocok secara akademik.</div>`;
     if(applyNow.length) html += `<div class="scholarship-section-label">🔥 Apply Now — Current Official Cycle</div>` + applyNow.map(radarScholarshipCard).join("");
     if(prepare.length) html += `<div class="scholarship-section-label">🧭 Prepare Now / Opening Soon</div>` + prepare.map(radarScholarshipCard).join("");
     if(monitor.length) html += `<div class="scholarship-section-label">👀 Historical Radar — Monitor Upcoming Cycle</div>` + monitor.map(radarScholarshipCard).join("");
