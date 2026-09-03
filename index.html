@@ -1957,7 +1957,7 @@ h1{
 
 <script>
 
-// HANZ FRONTEND V1.5 — LIVE SCREENING DASHBOARD
+// HANZ FRONTEND V1.6 — HISTORICAL SCHOLARSHIP RADAR
 // Uses the production discovery/screening backend and renders terminal outcomes safely.
 // Every newly selected CV clears all previous candidate state before analysis.
 
@@ -1972,6 +1972,7 @@ let verifiedJobs = [];
 let globalJobs = [];
 let indonesiaJobs = [];
 let scholarships = [];
+let scholarshipRadar = [];
 let liveScreenedJobs = [];
 let liveDiscoveryMeta = null;
 
@@ -3109,6 +3110,7 @@ async function loadOpportunityData(){
     scholarships = [];
   }
 
+  await loadScholarshipHistoricalRadar();
 
   buildCountryFilter();
   buildProvinceFilter();
@@ -5474,6 +5476,81 @@ function scholarshipCard(
 }
 
 
+
+async function loadScholarshipHistoricalRadar(){
+  try{
+    const result = await invokeEdgeFunction(
+      "scholarship-historical-radar",
+      { candidate_profile_result:candidateProfile }
+    );
+    scholarshipRadar = Array.isArray(result?.results) ? result.results : [];
+  }
+  catch(error){
+    console.error("Scholarship historical radar failed",error);
+    scholarshipRadar = [];
+  }
+}
+
+function radarStatusMeta(status){
+  const s=String(status||"MONITOR").toUpperCase();
+  if(s==="APPLY_NOW") return {text:"🔥 APPLY NOW",cls:"complete"};
+  if(s==="OPENING_SOON") return {text:"⏰ OPENING SOON",cls:"waiting"};
+  if(s==="PREPARE_NOW") return {text:"🧭 PREPARE NOW",cls:"waiting"};
+  return {text:"👀 MONITOR",cls:"unknown"};
+}
+
+function radarScholarshipCard(item){
+  const meta=radarStatusMeta(item.radar_status);
+  const t=item.timing||{};
+  const month=t.typical_open_month_name||"Belum cukup history";
+  const official=t.source==="CURRENT_OFFICIAL";
+  const deadline=official && t.official_deadline ? new Date(t.official_deadline).toLocaleDateString("id-ID",{day:"2-digit",month:"short",year:"numeric"}) : null;
+  const cycleCount=Number(t.verified_cycle_count ?? item.verified_cycle_count ?? 0);
+  return `
+    <article class="job-card scholarship-card">
+      <div class="job-head">
+        <div>
+          <h3 class="job-title">${esc(item.program_name || "Master Program")}</h3>
+          <div class="company">${esc(item.university_name || "University")}</div>
+        </div>
+        <div class="right-badges">
+          <div class="pipeline-status ${esc(meta.cls)}">${esc(meta.text)}</div>
+          <div class="match-score">Fit ${esc(item.candidate_fit_score || 0)}%</div>
+        </div>
+      </div>
+      <div class="badges">
+        <span class="badge">🌍 ${esc(item.destination_country || "Global")}</span>
+        <span class="badge green">${esc(pretty(item.funding_class || "Funding"))}</span>
+        <span class="badge purple">Master / S2</span>
+        ${deadline?`<span class="badge orange">Official deadline: ${esc(deadline)}</span>`:""}
+      </div>
+      <div class="pipeline-reason">
+        <strong>HANZ Opportunity Calendar:</strong><br>
+        ${official
+          ? `Current official cycle is active. Use the official dates below.`
+          : cycleCount>=2
+            ? `Historical pattern suggests applications typically open around <b>${esc(month)}</b>. Start preparation before that month.`
+            : `HANZ is monitoring this recurring program, but there is not enough verified multi-year history yet to predict a reliable annual opening month.`}
+      </div>
+      <div class="candidate-box">
+        <div class="candidate-label">Preparation Radar</div>
+        <strong>Status:</strong> ${esc(pretty(item.radar_status))}<br>
+        <strong>Verified historical cycles:</strong> ${esc(cycleCount)}<br>
+        <strong>Timing confidence:</strong> ${esc(t.confidence || "UNKNOWN")}<br>
+        <strong>Professor contact:</strong> ${item.professor_contact_required===true ? `Recommended/required — start about ${esc(item.professor_lead_days || 45)} days before application.` : "Not marked as required"}<br>
+        <strong>Scholarship route:</strong> ${esc(item.scholarship_route || "Verify current official call")}
+      </div>
+      <div class="match-reason">
+        <strong>Why HANZ keeps this on your radar:</strong>
+        ${esc((item.reasons||[]).join(" • ") || "Program fits the candidate radar policy.")}
+      </div>
+      <div class="footer-row">
+        <div class="source-note">Historical radar ≠ current application confirmation. Official page always wins.</div>
+        ${item.official_url?`<a class="open-button" href="${esc(item.official_url)}" target="_blank" rel="noopener noreferrer">Open Official Program ↗</a>`:""}
+      </div>
+    </article>`;
+}
+
 async function renderScholarships(){
 
   if (!hasExecuted){
@@ -5496,6 +5573,19 @@ async function renderScholarships(){
       "scholarshipCount"
     );
 
+  if (scholarshipRadar.length){
+    empty.classList.add("hidden");
+    const applyNow=scholarshipRadar.filter(x=>x.radar_status==="APPLY_NOW");
+    const prepare=scholarshipRadar.filter(x=>x.radar_status==="OPENING_SOON" || x.radar_status==="PREPARE_NOW");
+    const monitor=scholarshipRadar.filter(x=>x.radar_status==="MONITOR");
+    count.textContent = `${applyNow.length} apply now • ${prepare.length} prepare • ${monitor.length} monitor`;
+    let html=`<div class="pipeline-banner"><strong>HANZ Historical Scholarship Radar</strong>HANZ sekarang menampilkan program yang harus dipersiapkan sebelum pendaftaran dibuka. Prediksi bulan hanya dipakai bila ada cukup history terverifikasi; current official call selalu lebih kuat.</div>`;
+    if(applyNow.length) html += `<div class="scholarship-section-label">🔥 Apply Now — Current Official Cycle</div>` + applyNow.map(radarScholarshipCard).join("");
+    if(prepare.length) html += `<div class="scholarship-section-label">🧭 Prepare Now / Opening Soon</div>` + prepare.map(radarScholarshipCard).join("");
+    if(monitor.length) html += `<div class="scholarship-section-label">👀 Historical Radar — Monitor Upcoming Cycle</div>` + monitor.map(radarScholarshipCard).join("");
+    container.innerHTML=html;
+    return;
+  }
 
   if (!scholarships.length){
 
