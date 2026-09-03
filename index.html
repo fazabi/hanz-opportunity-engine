@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <!-- HANZ FRONTEND V1.4 JOB RELEVANCE HARD GATE -->
-<title>HANZ Opportunity Engine V2.1</title>
+<title>HANZ Opportunity Engine V2.2</title>
 
 <style>
 *{box-sizing:border-box}
@@ -1049,7 +1049,7 @@ h1{
 
 
 /* =====================================================
-   V2.1 — ACTION & GAP ANALYSIS
+   V2.2 — ACTION & GAP ANALYSIS
 ===================================================== */
 .action-gap-box{
   margin-top:14px;
@@ -3017,7 +3017,7 @@ function mapPipelineDetailToJob(detail){
 async function runLiveJobDiscovery(candidate){
 
   /*
-    Vacancy Discovery V2.1 WIDE NET
+    Vacancy Discovery V2.2 WIDE NET
     --------------------------------
     1. Discover once across the expanded platform adapter.
     2. Receive the candidate-relevant raw pool.
@@ -3096,9 +3096,15 @@ async function runLiveJobDiscovery(candidate){
     routerRuns.push(routed);
 
     const batchDetails =
-      routed?.result?.details;
+      Array.isArray(routed?.details)
+        ? routed.details
+        : (
+            Array.isArray(routed?.result?.details)
+              ? routed.result.details
+              : []
+          );
 
-    if(Array.isArray(batchDetails)){
+    if(batchDetails.length){
       details.push(...batchDetails);
     }
 
@@ -3136,17 +3142,29 @@ async function runLiveJobDiscovery(candidate){
     registryRuns.push(registry);
 
     const registryDetails =
-      registry?.result?.details;
+      Array.isArray(registry?.details)
+        ? registry.details
+        : (
+            Array.isArray(registry?.result?.details)
+              ? registry.result.details
+              : []
+          );
 
-    if(Array.isArray(registryDetails)){
+    if(registryDetails.length){
       details.push(...registryDetails);
     }
 
     const hasMore =
-      registry?.result?.has_more === true;
+      (
+        registry?.has_more === true ||
+        registry?.result?.has_more === true
+      );
 
     const nextOffset =
-      Number(registry?.result?.next_offset);
+      Number(
+        registry?.next_offset ??
+        registry?.result?.next_offset
+      );
 
     if(!hasMore || !Number.isFinite(nextOffset)){
       break;
@@ -3195,6 +3213,10 @@ async function runLiveJobDiscovery(candidate){
       routerRuns.length,
     registry_batches:
       registryRuns.length,
+    router_details_collected:
+      details.length,
+    router_response_shape:
+      "TOP_LEVEL_DETAILS_WITH_NESTED_FALLBACK",
     discovery_lanes:[
       "INDONESIA_JOB_PLATFORMS",
       "DIRECT_COMPANY_ATS_REGISTRY"
