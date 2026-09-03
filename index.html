@@ -1957,7 +1957,7 @@ h1{
 
 <script>
 
-// HANZ FRONTEND V1.7 — WORLDWIDE SCHOLARSHIP RADAR
+// HANZ FRONTEND V1.8 — SCHOLARSHIP TIMING & PREPARATION
 // Uses the production discovery/screening backend and renders terminal outcomes safely.
 // Every newly selected CV clears all previous candidate state before analysis.
 
@@ -5499,6 +5499,80 @@ function radarStatusMeta(status){
   return {text:"👀 MONITOR",cls:"unknown"};
 }
 
+function preparationItems(item){
+  const fields = (item.matched_domains || []).map(x=>String(x).toLowerCase());
+  const route = String(item.scholarship_route || "").toLowerCase();
+  const notes = String(item.notes || "").toLowerCase();
+  const items = [];
+
+  // Always useful baseline.
+  items.push("Academic transcript + graduation certificate / degree evidence");
+  items.push("CV / resume");
+  items.push("Statement of purpose / motivation letter");
+  items.push("English proficiency evidence if required by the current program guide");
+
+  if(item.professor_contact_required === true){
+    items.push("Identify suitable professor/lab and prepare professor outreach email");
+    items.push("Research proposal / research interest draft aligned to target lab");
+  }
+
+  if(
+    fields.some(x=>x.includes("network") || x.includes("internet") || x.includes("cloud") ||
+                   x.includes("iot") || x.includes("security") || x.includes("distributed") ||
+                   x.includes("artificial intelligence") || x.includes("computer"))
+  ){
+    items.push("Technical portfolio: final project, GitHub/projects, network/cloud/IoT/AI evidence");
+  }
+
+  if(route.includes("mext")){
+    items.push("MEXT-specific forms and documents according to the current university recommendation guide");
+  }
+
+  if(notes.includes("gre")){
+    items.push("GRE General Test");
+  }
+
+  // De-duplicate.
+  return [...new Set(items)];
+}
+
+function applicationTimingLines(item){
+  const t=item.timing||{};
+  const lines=[];
+
+  if(t.source==="CURRENT_OFFICIAL"){
+    if(t.official_open_at){
+      lines.push(`Application opened: ${new Date(t.official_open_at).toLocaleDateString("id-ID",{day:"2-digit",month:"short",year:"numeric"})}`);
+    }
+    if(t.official_deadline){
+      lines.push(`Application deadline: ${new Date(t.official_deadline).toLocaleDateString("id-ID",{day:"2-digit",month:"short",year:"numeric"})}`);
+    }
+    const cycle = Array.isArray(item._cycles)
+      ? item._cycles.find(x=>x.cycle_status==="CURRENT_OFFICIAL")
+      : null;
+    if(cycle?.professor_contact_deadline){
+      lines.push(`Professor/contact milestone: ${new Date(cycle.professor_contact_deadline).toLocaleDateString("id-ID",{day:"2-digit",month:"short",year:"numeric"})}`);
+    }
+    if(cycle?.registration_deadline){
+      lines.push(`Registration milestone: ${new Date(cycle.registration_deadline).toLocaleDateString("id-ID",{day:"2-digit",month:"short",year:"numeric"})}`);
+    }
+  } else {
+    if(t.typical_open_month_name){
+      lines.push(`Typical opening month from verified history: ${t.typical_open_month_name}`);
+    }
+    if(item.historical_deadline_months?.length){
+      const m=item.historical_deadline_months[0];
+      const names=["","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+      lines.push(`Typical deadline month from history: ${names[m] || m}`);
+    }
+    if(item.professor_contact_required===true){
+      lines.push(`Recommended preparation lead time: about ${item.professor_lead_days || 45} days before application`);
+    }
+  }
+
+  return lines;
+}
+
 function radarScholarshipCard(item){
   const meta=radarStatusMeta(item.radar_status);
   const t=item.timing||{};
@@ -5542,6 +5616,22 @@ function radarScholarshipCard(item){
         <strong>Timing confidence:</strong> ${esc(t.confidence || "UNKNOWN")}<br>
         <strong>Professor contact:</strong> ${item.professor_contact_required===true ? `Recommended/required — start about ${esc(item.professor_lead_days || 45)} days before application.` : "Not marked as required"}<br>
         <strong>Scholarship route:</strong> ${esc(item.scholarship_route || "Verify current official call")}
+      </div>
+
+      <div class="match-reason">
+        <strong>When to Apply / Start Preparing:</strong>
+        <div class="eligibility-checks">
+          ${applicationTimingLines(item).length
+            ? applicationTimingLines(item).map(x=>`<div>• ${esc(x)}</div>`).join("")
+            : `<div>• Current opening date is not yet verified. Keep this program on monitor.</div>`}
+        </div>
+      </div>
+
+      <div class="match-reason">
+        <strong>What Candidate Should Prepare:</strong>
+        <div class="eligibility-checks">
+          ${preparationItems(item).map(x=>`<div>• ${esc(x)}</div>`).join("")}
+        </div>
       </div>
       <div class="match-reason">
         <strong>Why HANZ keeps this on your radar:</strong>
