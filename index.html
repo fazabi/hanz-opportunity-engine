@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <!-- HANZ FRONTEND V1.4 JOB RELEVANCE HARD GATE -->
-<title>HANZ Opportunity Engine</title>
+<title>HANZ Opportunity Engine V1.9</title>
 
 <style>
 *{box-sizing:border-box}
@@ -1973,6 +1973,7 @@ let globalJobs = [];
 let indonesiaJobs = [];
 let scholarships = [];
 let scholarshipRadar = [];
+let scholarshipClaimsByRadar = {};
 let liveScreenedJobs = [];
 let liveDiscoveryMeta = null;
 
@@ -3111,6 +3112,7 @@ async function loadOpportunityData(){
   }
 
   await loadScholarshipHistoricalRadar();
+  await loadScholarshipStructuredClaims();
 
   buildCountryFilter();
   buildProvinceFilter();
@@ -5491,6 +5493,84 @@ async function loadScholarshipHistoricalRadar(){
   }
 }
 
+async function loadScholarshipStructuredClaims(){
+  scholarshipClaimsByRadar = {};
+  try{
+    const rows = await supabaseFetch(
+      "scholarship_structured_claim_review_dashboard?select=radar_key,source_url,claim_type,claim_key,claim_value,confidence,review_status,evidence_text&review_status=eq.WAITING_REVIEW&order=confidence.desc"
+    );
+    for(const row of (Array.isArray(rows)?rows:[])){
+      const key=String(row.radar_key||"");
+      if(!key) continue;
+      if(!scholarshipClaimsByRadar[key]) scholarshipClaimsByRadar[key]=[];
+      scholarshipClaimsByRadar[key].push(row);
+    }
+  }
+  catch(error){
+    console.warn("Structured scholarship claims unavailable",error);
+    scholarshipClaimsByRadar = {};
+  }
+}
+
+function scholarshipOfficialEvidenceHtml(item){
+  const claims = scholarshipClaimsByRadar[String(item.radar_key||"")] || [];
+  if(!claims.length) return "";
+
+  const unique=(type,key)=>claims.find(c=>c.claim_type===type && c.claim_key===key);
+  const items=[];
+
+  const bachelor=unique("ELIGIBILITY","BACHELOR_OR_EQUIVALENT");
+  const sixteen=unique("ELIGIBILITY","SIXTEEN_YEAR_EDUCATION_ROUTE");
+  const screening=unique("ELIGIBILITY","INDIVIDUAL_ELIGIBILITY_SCREENING");
+  if(bachelor) items.push(`Degree eligibility: bachelor / equivalent route stated in official evidence (${bachelor.confidence})`);
+  else if(sixteen) items.push(`Degree eligibility: 16-year education route stated in official evidence (${sixteen.confidence})`);
+  if(screening) items.push(`Individual eligibility screening route is available/required for some applicants (${screening.confidence})`);
+
+  const tuition=unique("FUNDING","TUITION_COVERAGE");
+  const stipend=unique("FUNDING","MONTHLY_STIPEND");
+  const travel=unique("FUNDING","TRAVEL_SUPPORT");
+  if(tuition) items.push(`Funding evidence: tuition coverage/exemption stated (${tuition.confidence})`);
+  if(stipend) items.push(`Funding evidence: monthly stipend/allowance stated (${stipend.confidence})`);
+  if(travel) items.push(`Funding evidence: travel support stated (${travel.confidence})`);
+
+  const lang=unique("LANGUAGE","ENGLISH_REQUIREMENT");
+  if(lang){
+    const v=lang.claim_value||{};
+    const detail=[v.cefr_mentioned?"CEFR":null,v.toefl_mentioned?"TOEFL":null,v.ielts_mentioned?"IELTS":null].filter(Boolean).join(" / ");
+    items.push(`English requirement found in official evidence${detail?`: ${detail}`:""} (${lang.confidence})`);
+  }
+
+  const supervisor=unique("SUPERVISOR","SUPERVISOR_CONTACT_OR_CONSENT");
+  if(supervisor) items.push(`Professor/supervisor contact or consent appears in application evidence (${supervisor.confidence})`);
+
+  const docMap=[
+    ["RESEARCH_OR_STUDY_PLAN","Research / study plan"],
+    ["ACADEMIC_TRANSCRIPT","Academic transcript"],
+    ["RECOMMENDATION_LETTER","Recommendation letter"]
+  ];
+  const docs=docMap.filter(([k])=>unique("DOCUMENTS",k)).map(([,label])=>label);
+  if(docs.length) items.push(`Official preparation documents detected: ${docs.join(", ")}`);
+
+  const gre=unique("TEST_REQUIREMENT","GRE");
+  if(gre){
+    const mandatory=gre.claim_value?.mandatory_explicit===true;
+    items.push(mandatory ? `GRE explicitly required in official evidence (${gre.confidence})` : `GRE is mentioned in official evidence, but this resolver did not confirm it as mandatory (${gre.confidence})`);
+  }
+
+  const timing=claims.filter(c=>c.claim_type==="APPLICATION_TIMING");
+  if(timing.length) items.push(`Official timing evidence detected (${[...new Set(timing.map(c=>c.claim_key))].join(", ")}); exact dates still follow the radar/current-cycle record.`);
+
+  const sourceCount=new Set(claims.map(c=>c.source_url).filter(Boolean)).size;
+  return `
+    <div class="match-reason">
+      <strong>Official Evidence Layer:</strong>
+      <div class="eligibility-checks">
+        ${items.map(x=>`<div>• ${esc(x)}</div>`).join("")}
+      </div>
+      <div class="source-note" style="margin-top:8px">${esc(sourceCount)} official source(s) contributed structured evidence. Claims remain review-staging and do not override the current official cycle record.</div>
+    </div>`;
+}
+
 function radarStatusMeta(status){
   const s=String(status||"MONITOR").toUpperCase();
   if(s==="APPLY_NOW") return {text:"🔥 APPLY NOW",cls:"complete"};
@@ -5633,6 +5713,8 @@ function radarScholarshipCard(item){
           ${preparationItems(item).map(x=>`<div>• ${esc(x)}</div>`).join("")}
         </div>
       </div>
+
+      ${scholarshipOfficialEvidenceHtml(item)}
       <div class="match-reason">
         <strong>Why HANZ keeps this on your radar:</strong>
         ${esc((item.reasons||[]).join(" • ") || "Program fits the candidate radar policy.")}
