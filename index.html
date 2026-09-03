@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <!-- HANZ FRONTEND V1.4 JOB RELEVANCE HARD GATE -->
-<title>HANZ Opportunity Engine V2.0</title>
+<title>HANZ Opportunity Engine V2.1</title>
 
 <style>
 *{box-sizing:border-box}
@@ -1049,7 +1049,7 @@ h1{
 
 
 /* =====================================================
-   V2.0 — ACTION & GAP ANALYSIS
+   V2.1 — ACTION & GAP ANALYSIS
 ===================================================== */
 .action-gap-box{
   margin-top:14px;
@@ -3016,55 +3016,144 @@ function mapPipelineDetailToJob(detail){
 
 async function runLiveJobDiscovery(candidate){
 
-  const basePayload = {
-    candidate_profile_result:candidate,
-    max_per_platform:10,
-    router_max_items:5,
-    forward_to_router:true
-  };
+  /*
+    Vacancy Discovery V2.1 WIDE NET
+    --------------------------------
+    1. Discover once across the expanded platform adapter.
+    2. Receive the candidate-relevant raw pool.
+    3. Send that pool to the existing screening router in small safe batches.
+    4. Collect up to 30 screened opportunities instead of stopping after only
+       one or two five-item batches.
 
-  const first =
+    This avoids re-fetching all job platforms for every router page.
+  */
+
+  const discovery =
     await invokeEdgeFunction(
       "vacancy-platform-discovery-adapter",
       {
-        ...basePayload,
-        router_offset_items:0
+        candidate_profile_result:candidate,
+        max_per_platform:25,
+        forward_to_router:false,
+        return_discovered_items:true
       }
     );
 
-  const responses = [first];
+  const rawPool =
+    Array.isArray(discovery?.discovered_pool?.items)
+      ? discovery.discovered_pool.items
+      : [];
 
-  const firstProgress =
-    first?.progressive_batching || {};
+  const ROUTER_BATCH_SIZE = 5;
+  const MAX_SCREENED_CANDIDATES = 30;
+  const MAX_BATCHES =
+    Math.min(
+      Math.ceil(
+        Math.min(rawPool.length, MAX_SCREENED_CANDIDATES) /
+        ROUTER_BATCH_SIZE
+      ),
+      6
+    );
 
-  if (
-    firstProgress.has_more === true &&
-    Number.isFinite(
-      Number(firstProgress.next_offset)
-    )
-  ){
-    const second =
+  const details = [];
+  const routerRuns = [];
+
+  for(let batchIndex=0; batchIndex<MAX_BATCHES; batchIndex++){
+
+    const from = batchIndex * ROUTER_BATCH_SIZE;
+    const items =
+      rawPool.slice(
+        from,
+        from + ROUTER_BATCH_SIZE
+      );
+
+    if(!items.length) break;
+
+    /*
+      The existing router/orchestrator remains unchanged.
+      Discovery V2 only feeds it a wider candidate pool.
+    */
+    const routed =
       await invokeEdgeFunction(
-        "vacancy-platform-discovery-adapter",
+        "vacancy-discovery-router",
         {
-          ...basePayload,
-          router_offset_items:
-            Number(firstProgress.next_offset)
+          sources:[
+            {
+              type:"DIRECT_ITEMS",
+              name:"HANZ Wide Net Discovery V2",
+              enabled:true,
+              items
+            }
+          ],
+          candidate_profile_result:candidate,
+          max_items:ROUTER_BATCH_SIZE,
+          offset_items:0,
+          screen:true,
+          use_registry:false
         }
       );
 
-    responses.push(second);
+    routerRuns.push(routed);
+
+    const batchDetails =
+      routed?.result?.details;
+
+    if(Array.isArray(batchDetails)){
+      details.push(...batchDetails);
+    }
+
+    /*
+      Small spacing between batches protects the existing downstream
+      screening chain from burst traffic without artificially reducing
+      discovery to only 5–10 vacancies.
+    */
+    if(batchIndex < MAX_BATCHES - 1){
+      await new Promise(resolve => setTimeout(resolve, 900));
+    }
   }
 
-  const details = [];
+  /*
+    Second lane: existing direct-company / ATS registry.
+    The router already knows GREENHOUSE / LEVER / JSON_FEED sources registered
+    in Supabase, so Wide Net also asks that registry for candidates.
+  */
+  const registryRuns = [];
+  let registryOffset = 0;
 
-  for (const response of responses){
-    const batch =
-      response?.router?.router_response?.result?.details;
+  for(let registryBatch=0; registryBatch<3; registryBatch++){
+    const registry =
+      await invokeEdgeFunction(
+        "vacancy-discovery-router",
+        {
+          candidate_profile_result:candidate,
+          max_items:ROUTER_BATCH_SIZE,
+          offset_items:registryOffset,
+          screen:true,
+          use_registry:true
+        }
+      );
 
-    if (Array.isArray(batch)){
-      details.push(...batch);
+    registryRuns.push(registry);
+
+    const registryDetails =
+      registry?.result?.details;
+
+    if(Array.isArray(registryDetails)){
+      details.push(...registryDetails);
     }
+
+    const hasMore =
+      registry?.result?.has_more === true;
+
+    const nextOffset =
+      Number(registry?.result?.next_offset);
+
+    if(!hasMore || !Number.isFinite(nextOffset)){
+      break;
+    }
+
+    registryOffset = nextOffset;
+    await new Promise(resolve => setTimeout(resolve, 900));
   }
 
   const seen = new Set();
@@ -3084,8 +3173,32 @@ async function runLiveJobDiscovery(candidate){
       })
       .map(mapPipelineDetailToJob);
 
+  const platformResults =
+    Array.isArray(discovery?.platform_results)
+      ? discovery.platform_results
+      : [];
+
   liveDiscoveryMeta = {
-    engine:first?.engine || null,
+    engine:discovery?.engine || null,
+    mode:"WIDE_NET_DISCOVERY_V2_1",
+    sources_attempted:
+      Number(discovery?.summary?.platforms_requested || platformResults.length || 0),
+    sources_with_results:
+      platformResults.filter(
+        x => Number(x?.candidate_relevant_total || x?.item_count || 0) > 0
+      ).length,
+    raw_candidate_pool:
+      Number(discovery?.discovered_pool?.total || rawPool.length || 0),
+    routed_candidates:
+      Math.min(rawPool.length, MAX_SCREENED_CANDIDATES),
+    router_batches:
+      routerRuns.length,
+    registry_batches:
+      registryRuns.length,
+    discovery_lanes:[
+      "INDONESIA_JOB_PLATFORMS",
+      "DIRECT_COMPANY_ATS_REGISTRY"
+    ],
     total:liveScreenedJobs.length,
     waiting_review:
       liveScreenedJobs.filter(
@@ -3098,7 +3211,17 @@ async function runLiveJobDiscovery(candidate){
     blocked:
       liveScreenedJobs.filter(
         x => x._pipeline_status === "BLOCKED"
-      ).length
+      ).length,
+    platform_results:
+      platformResults.map(x => ({
+        platform:x?.platform || null,
+        platform_key:x?.platform_key || null,
+        status:x?.status || null,
+        candidate_relevant_total:
+          Number(x?.candidate_relevant_total || 0),
+        item_count:
+          Number(x?.item_count || 0)
+      }))
   };
 
   return liveScreenedJobs;
