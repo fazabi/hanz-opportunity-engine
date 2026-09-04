@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <!-- HANZ FRONTEND V1.4 JOB RELEVANCE HARD GATE -->
-<title>HANZ Opportunity Engine V2.2</title>
+<title>HANZ Opportunity Engine V2.5</title>
 
 <style>
 *{box-sizing:border-box}
@@ -1049,7 +1049,7 @@ h1{
 
 
 /* =====================================================
-   V2.2 — ACTION & GAP ANALYSIS
+   V2.5 — ACTION & GAP ANALYSIS
 ===================================================== */
 .action-gap-box{
   margin-top:14px;
@@ -1556,7 +1556,7 @@ h1{
 <section class="main-tabs">
 
   <button
-    class="main-tab active"
+    class="main-tab"
     id="globalTab"
     onclick="changeService('global')"
   >
@@ -1577,7 +1577,7 @@ h1{
 
 
   <button
-    class="main-tab"
+    class="main-tab active"
     id="indonesiaTab"
     onclick="changeService('indonesia')"
   >
@@ -1711,7 +1711,7 @@ h1{
 
 
     <div
-      class="field"
+      class="field hidden"
       id="countryField"
     >
 
@@ -1731,7 +1731,7 @@ h1{
 
 
     <div
-      class="field hidden"
+      class="field"
       id="provinceField"
     >
 
@@ -1905,7 +1905,7 @@ h1{
       </label>
 
       <div class="safe-box">
-        ✓ Verified Safe Only
+        ✓ Employer-grade sources • verification may be pending
       </div>
 
     </div>
@@ -1919,7 +1919,7 @@ h1{
       class="list-title"
       id="jobListTitle"
     >
-      🌍 Global Job Matches
+      🇮🇩 Indonesia Job Matches
     </div>
 
     <div
@@ -1959,6 +1959,12 @@ h1{
     <div id="jobErrorText"></div>
 
   </div>
+
+  <div
+    id="discoveryDiagnostic"
+    class="state hidden"
+    style="text-align:left"
+  ></div>
 
 
   <div
@@ -2083,7 +2089,7 @@ let liveDiscoveryMeta = null;
 let candidateProfile = null;
 
 let currentService =
-  "global";
+  "indonesia";
 
 let hasExecuted =
   false;
@@ -2204,9 +2210,33 @@ function clearPreviousCandidateSessionForNewCv(){
   candidateProfile = null;
   hasExecuted = false;
 
+  /*
+    FULL VACANCY SESSION RESET
+    A filter or stale result from the previous CV must never hide
+    a newly discovered vacancy pool.
+  */
+  verifiedJobs = [];
+  globalJobs = [];
+  indonesiaJobs = [];
+  liveScreenedJobs = [];
+  liveDiscoveryMeta = null;
+
   localStorage.removeItem(
     "hanz_candidate_profile"
   );
+
+  [
+    "searchInput",
+    "countryFilter",
+    "provinceFilter",
+    "workModeFilter",
+    "educationFilter",
+    "careerFilter",
+    "freshFilter"
+  ].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.value = "";
+  });
 
   const clearValueIds = [
     "profileEducation",
@@ -2334,6 +2364,18 @@ function clearPreviousCandidateSessionForNewCv(){
     jobError.classList.add(
       "hidden"
     );
+  }
+
+  const discoveryDiagnostic =
+    document.getElementById(
+      "discoveryDiagnostic"
+    );
+
+  if(discoveryDiagnostic){
+    discoveryDiagnostic.classList.add(
+      "hidden"
+    );
+    discoveryDiagnostic.innerHTML = "";
   }
 
   [
@@ -2948,6 +2990,14 @@ function pipelineOutcomeMeta(job){
     };
   }
 
+  if (status === "DISCOVERED"){
+    return {
+      text:"DISCOVERED",
+      cls:"waiting",
+      note:"Found from an employer-grade hiring source. HANZ screening is running in the background."
+    };
+  }
+
   if (status === "BLOCKED"){
     return {
       text:"BLOCKED",
@@ -3014,18 +3064,162 @@ function mapPipelineDetailToJob(detail){
 }
 
 
+
+function mapDiscoveredRawToJob(item){
+  return {
+    job_title:
+      item?.job_title || "Untitled vacancy",
+
+    company_name:
+      item?.company || "Company not identified",
+
+    city:null,
+    province_name:null,
+    country_code:"ID",
+    country_name:"Indonesia",
+    location_text:
+      item?.location || "Indonesia",
+
+    job_url:
+      item?.job_url || "",
+
+    official_url:null,
+
+    education_level:"UNKNOWN",
+    career_level:null,
+    fresh_graduate_eligible:null,
+    experience_required_years:null,
+    study_fields:[],
+    work_mode:
+      item?.work_mode || null,
+    employment_type:
+      item?.employment_type || null,
+
+    _live_pipeline:true,
+    _pipeline_status:"DISCOVERED",
+    _pipeline_complete:false,
+    _screening_run_id:null,
+    _recommendation_group:"DISCOVERED",
+    _safety_status:null,
+    _official_status:
+      item?.official_verification_status || "PENDING",
+    _eligibility:null,
+    _recruiter_match:null,
+    _discovery_platform:
+      item?.discovery_platform || null,
+    _source_name:
+      item?.source_name || null
+  };
+}
+
+async function enrichLiveJobsInBackground(candidate, rawPool){
+
+  const ROUTER_BATCH_SIZE = 5;
+  const MAX_SCREENED_CANDIDATES = Math.min(rawPool.length, 15);
+  const totalBatches =
+    Math.ceil(
+      MAX_SCREENED_CANDIDATES /
+      ROUTER_BATCH_SIZE
+    );
+
+  const mergedByUrl = new Map(
+    liveScreenedJobs.map(
+      x => [String(x.job_url || ""), x]
+    )
+  );
+
+  let completedBatches = 0;
+  let failedBatches = 0;
+
+  for(let batchIndex=0; batchIndex<totalBatches; batchIndex++){
+
+    const items =
+      rawPool.slice(
+        batchIndex * ROUTER_BATCH_SIZE,
+        (batchIndex + 1) * ROUTER_BATCH_SIZE
+      );
+
+    if(!items.length) break;
+
+    try{
+      const routed =
+        await invokeEdgeFunction(
+          "vacancy-discovery-router",
+          {
+            sources:[
+              {
+                type:"DIRECT_ITEMS",
+                name:"HANZ Employer Grade Discovery V3",
+                enabled:true,
+                items
+              }
+            ],
+            candidate_profile_result:candidate,
+            max_items:ROUTER_BATCH_SIZE,
+            offset_items:0,
+            screen:true,
+            use_registry:false
+          }
+        );
+
+      const batchDetails =
+        Array.isArray(routed?.result?.details)
+          ? routed.result.details
+          : (
+              Array.isArray(routed?.details)
+                ? routed.details
+                : []
+            );
+
+      for(const detail of batchDetails){
+        const mapped = mapPipelineDetailToJob(detail);
+        const key = String(mapped.job_url || "");
+        if(key){
+          mergedByUrl.set(key, mapped);
+        }
+      }
+
+      completedBatches++;
+    }
+    catch(error){
+      /*
+        IMPORTANT:
+        One screening timeout/failure must never erase the vacancies that
+        discovery already found. Keep them visible as DISCOVERED / VERIFY FIRST.
+      */
+      failedBatches++;
+      console.warn("HANZ background screening batch failed:", error);
+    }
+
+    liveScreenedJobs = Array.from(mergedByUrl.values());
+    indonesiaJobs = liveScreenedJobs;
+
+    liveDiscoveryMeta = {
+      ...(liveDiscoveryMeta || {}),
+      screening_completed_batches:completedBatches,
+      screening_failed_batches:failedBatches,
+      total:liveScreenedJobs.length
+    };
+
+    if(hasExecuted && currentService === "indonesia"){
+      try{
+        applyJobFilters();
+      }catch{}
+    }
+
+    await new Promise(resolve => setTimeout(resolve, 500));
+  }
+}
+
 async function runLiveJobDiscovery(candidate){
 
   /*
-    Vacancy Discovery V2.2 WIDE NET
-    --------------------------------
-    1. Discover once across the expanded platform adapter.
-    2. Receive the candidate-relevant raw pool.
-    3. Send that pool to the existing screening router in small safe batches.
-    4. Collect up to 30 screened opportunities instead of stopping after only
-       one or two five-item batches.
+    V2.5 FAST-FIRST / NO-NIL
+    ------------------------
+    Discovery results are shown immediately.
+    Screening then enriches the first 15 opportunities in the background.
 
-    This avoids re-fetching all job platforms for every router page.
+    A router timeout can no longer wipe out an already-valid discovery pool.
   */
 
   const discovery =
@@ -3039,157 +3233,42 @@ async function runLiveJobDiscovery(candidate){
       }
     );
 
+  if(
+    !discovery ||
+    discovery?.ok === false
+  ){
+    throw new Error(
+      discovery?.error ||
+      discovery?.message ||
+      "Vacancy discovery returned an invalid response."
+    );
+  }
+
   const rawPool =
     Array.isArray(discovery?.discovered_pool?.items)
       ? discovery.discovered_pool.items
       : [];
 
-  const ROUTER_BATCH_SIZE = 5;
-  const MAX_SCREENED_CANDIDATES = 30;
-  const MAX_BATCHES =
-    Math.min(
-      Math.ceil(
-        Math.min(rawPool.length, MAX_SCREENED_CANDIDATES) /
-        ROUTER_BATCH_SIZE
-      ),
-      6
-    );
-
-  const details = [];
-  const routerRuns = [];
-
-  for(let batchIndex=0; batchIndex<MAX_BATCHES; batchIndex++){
-
-    const from = batchIndex * ROUTER_BATCH_SIZE;
-    const items =
-      rawPool.slice(
-        from,
-        from + ROUTER_BATCH_SIZE
-      );
-
-    if(!items.length) break;
-
-    /*
-      The existing router/orchestrator remains unchanged.
-      Discovery V2 only feeds it a wider candidate pool.
-    */
-    const routed =
-      await invokeEdgeFunction(
-        "vacancy-discovery-router",
-        {
-          sources:[
-            {
-              type:"DIRECT_ITEMS",
-              name:"HANZ Wide Net Discovery V2",
-              enabled:true,
-              items
-            }
-          ],
-          candidate_profile_result:candidate,
-          max_items:ROUTER_BATCH_SIZE,
-          offset_items:0,
-          screen:true,
-          use_registry:false
-        }
-      );
-
-    routerRuns.push(routed);
-
-    const batchDetails =
-      Array.isArray(routed?.details)
-        ? routed.details
-        : (
-            Array.isArray(routed?.result?.details)
-              ? routed.result.details
-              : []
-          );
-
-    if(batchDetails.length){
-      details.push(...batchDetails);
-    }
-
-    /*
-      Small spacing between batches protects the existing downstream
-      screening chain from burst traffic without artificially reducing
-      discovery to only 5–10 vacancies.
-    */
-    if(batchIndex < MAX_BATCHES - 1){
-      await new Promise(resolve => setTimeout(resolve, 900));
-    }
-  }
-
-  /*
-    Second lane: existing direct-company / ATS registry.
-    The router already knows GREENHOUSE / LEVER / JSON_FEED sources registered
-    in Supabase, so Wide Net also asks that registry for candidates.
-  */
-  const registryRuns = [];
-  let registryOffset = 0;
-
-  for(let registryBatch=0; registryBatch<3; registryBatch++){
-    const registry =
-      await invokeEdgeFunction(
-        "vacancy-discovery-router",
-        {
-          candidate_profile_result:candidate,
-          max_items:ROUTER_BATCH_SIZE,
-          offset_items:registryOffset,
-          screen:true,
-          use_registry:true
-        }
-      );
-
-    registryRuns.push(registry);
-
-    const registryDetails =
-      Array.isArray(registry?.details)
-        ? registry.details
-        : (
-            Array.isArray(registry?.result?.details)
-              ? registry.result.details
-              : []
-          );
-
-    if(registryDetails.length){
-      details.push(...registryDetails);
-    }
-
-    const hasMore =
-      (
-        registry?.has_more === true ||
-        registry?.result?.has_more === true
-      );
-
-    const nextOffset =
-      Number(
-        registry?.next_offset ??
-        registry?.result?.next_offset
-      );
-
-    if(!hasMore || !Number.isFinite(nextOffset)){
-      break;
-    }
-
-    registryOffset = nextOffset;
-    await new Promise(resolve => setTimeout(resolve, 900));
-  }
-
   const seen = new Set();
 
   liveScreenedJobs =
-    details
+    rawPool
       .filter(item => {
         const key =
-          String(item?.job_url || item?.external_id || item?.fingerprint || "");
+          String(
+            item?.job_url ||
+            item?.external_id ||
+            ""
+          );
 
-        if (!key || seen.has(key)){
+        if(!key || seen.has(key)){
           return false;
         }
 
         seen.add(key);
         return true;
       })
-      .map(mapPipelineDetailToJob);
+      .map(mapDiscoveredRawToJob);
 
   const platformResults =
     Array.isArray(discovery?.platform_results)
@@ -3198,42 +3277,36 @@ async function runLiveJobDiscovery(candidate){
 
   liveDiscoveryMeta = {
     engine:discovery?.engine || null,
-    mode:"WIDE_NET_DISCOVERY_V2_1",
+    mode:"EMPLOYER_GRADE_FAST_FIRST_V2_3",
     sources_attempted:
-      Number(discovery?.summary?.platforms_requested || platformResults.length || 0),
+      Number(
+        discovery?.summary?.platforms_requested ||
+        platformResults.length ||
+        0
+      ),
     sources_with_results:
       platformResults.filter(
-        x => Number(x?.candidate_relevant_total || x?.item_count || 0) > 0
+        x =>
+          Number(
+            x?.candidate_relevant_total ||
+            x?.item_count ||
+            0
+          ) > 0
       ).length,
     raw_candidate_pool:
-      Number(discovery?.discovered_pool?.total || rawPool.length || 0),
-    routed_candidates:
-      Math.min(rawPool.length, MAX_SCREENED_CANDIDATES),
-    router_batches:
-      routerRuns.length,
-    registry_batches:
-      registryRuns.length,
-    router_details_collected:
-      details.length,
-    router_response_shape:
-      "TOP_LEVEL_DETAILS_WITH_NESTED_FALLBACK",
-    discovery_lanes:[
-      "INDONESIA_JOB_PLATFORMS",
-      "DIRECT_COMPANY_ATS_REGISTRY"
-    ],
-    total:liveScreenedJobs.length,
-    waiting_review:
-      liveScreenedJobs.filter(
-        x => x._pipeline_status === "WAITING_REVIEW"
-      ).length,
-    screened_complete:
-      liveScreenedJobs.filter(
-        x => x._pipeline_status === "SCREENED_COMPLETE"
-      ).length,
-    blocked:
-      liveScreenedJobs.filter(
-        x => x._pipeline_status === "BLOCKED"
-      ).length,
+      Number(
+        discovery?.discovered_pool?.total ||
+        rawPool.length ||
+        0
+      ),
+    displayed_immediately:
+      liveScreenedJobs.length,
+    screening_target:
+      Math.min(rawPool.length, 15),
+    screening_completed_batches:0,
+    screening_failed_batches:0,
+    total:
+      liveScreenedJobs.length,
     platform_results:
       platformResults.map(x => ({
         platform:x?.platform || null,
@@ -3246,6 +3319,17 @@ async function runLiveJobDiscovery(candidate){
       }))
   };
 
+  /*
+    Do NOT await this.
+    Candidate profile + discovered vacancies must render first.
+  */
+  if(rawPool.length){
+    void enrichLiveJobsInBackground(
+      candidate,
+      rawPool
+    );
+  }
+
   return liveScreenedJobs;
 }
 
@@ -3254,28 +3338,34 @@ async function runLiveJobDiscovery(candidate){
    LOAD OPPORTUNITIES
 ===================================================== */
 
-async function loadOpportunityData(){
+async function loadVacancyData(){
 
-  /*
-    1) Run the production candidate-aware discovery/screening flow.
-       This is the primary Indonesia opportunity source in V1.5.
-  */
+  let discoveryError = null;
+
   try{
-    await runLiveJobDiscovery(candidateProfile);
+    await runLiveJobDiscovery(
+      candidateProfile
+    );
   }
   catch(error){
+    discoveryError =
+      error?.message ||
+      "Live discovery failed.";
+
     liveScreenedJobs = [];
+
     liveDiscoveryMeta = {
-      error:
-        error?.message ||
-        "Live discovery failed."
+      error:discoveryError,
+      sources_attempted:0,
+      sources_with_results:0,
+      raw_candidate_pool:0
     };
   }
 
-
   /*
-    2) Keep the existing verified dashboard as a safe fallback
-       and as the current source for verified global vacancies.
+    Verified dashboard is ONLY a fallback.
+    It must never silently replace a failed employer-grade discovery
+    without exposing the actual discovery failure.
   */
   let jobs = [];
 
@@ -3291,7 +3381,6 @@ async function loadOpportunityData(){
 
   verifiedJobs = jobs;
 
-
   const verifiedIndonesia =
     jobs.filter(
       job =>
@@ -3299,16 +3388,10 @@ async function loadOpportunityData(){
         normalize(job.country_name) === "indonesia"
     );
 
-
-  /*
-    Prefer the new candidate-aware screening output.
-    If it is unavailable, fall back to the verified dashboard.
-  */
   indonesiaJobs =
     liveScreenedJobs.length
-      ? liveScreenedJobs
-      : verifiedIndonesia;
-
+      ? [...liveScreenedJobs]
+      : [...verifiedIndonesia];
 
   globalJobs =
     jobs.filter(
@@ -3324,20 +3407,20 @@ async function loadOpportunityData(){
             job.country_name
           );
 
-        if (
+        if(
           code === "ID" ||
           country === "indonesia"
         ){
           return false;
         }
 
-        if (
+        if(
           ["IN","VN","KH"].includes(code)
         ){
           return false;
         }
 
-        if (
+        if(
           ["india","vietnam","viet nam","cambodia"]
             .includes(country)
         ){
@@ -3348,6 +3431,18 @@ async function loadOpportunityData(){
       }
     );
 
+  buildCountryFilter();
+  buildProvinceFilter();
+
+  return {
+    discoveryError,
+    liveCount:liveScreenedJobs.length,
+    indonesiaCount:indonesiaJobs.length
+  };
+}
+
+
+async function loadScholarshipDataInBackground(){
 
   try{
     scholarships =
@@ -3362,8 +3457,30 @@ async function loadOpportunityData(){
   await loadScholarshipHistoricalRadar();
   await loadScholarshipStructuredClaims();
 
-  buildCountryFilter();
-  buildProvinceFilter();
+  const scholarshipWaiting =
+    document.getElementById(
+      "scholarshipWaiting"
+    );
+
+  if(scholarshipWaiting){
+    scholarshipWaiting.classList.add(
+      "hidden"
+    );
+  }
+
+  if(
+    hasExecuted &&
+    currentService === "scholarship"
+  ){
+    try{
+      await renderScholarships();
+    }catch(error){
+      console.warn(
+        "Scholarship background render failed",
+        error
+      );
+    }
+  }
 }
 
 
@@ -3395,7 +3512,7 @@ async function executeHANZ(){
     "execution-status";
 
   status.textContent =
-    "Membaca profil, mencari vacancy, dan menjalankan screening HANZ...";
+    "Membaca CV dan mencari vacancy dari employer-grade sources...";
 
 
   try{
@@ -3568,11 +3685,18 @@ async function executeHANZ(){
     );
 
 
-    await loadOpportunityData();
+    const vacancyLoad =
+      await loadVacancyData();
 
 
     hasExecuted =
       true;
+
+    /*
+      Force the currently implemented live vacancy lane to Indonesia
+      and render it BEFORE any scholarship/network ancillary work.
+    */
+    changeService("indonesia");
 
 
     document
@@ -3585,29 +3709,31 @@ async function executeHANZ(){
       );
 
 
-    document
-      .getElementById(
-        "scholarshipWaiting"
-      )
-      .classList
-      .add(
-        "hidden"
-      );
-
-
     renderAnalyzedProfile();
 
 
     applyJobFilters();
 
-    await renderScholarships();
+
+    /*
+      Scholarship work is independent. Do not make vacancy visibility
+      wait for scholarship REST/radar/evidence calls.
+    */
+    void loadScholarshipDataInBackground();
 
 
     status.className =
-      "execution-status success";
+      vacancyLoad.discoveryError
+        ? "execution-status error"
+        : "execution-status success";
 
     status.textContent =
-      "✓ Profil selesai dianalisa. HANZ sudah mencari dan melakukan screening peluang yang relevan.";
+      vacancyLoad.discoveryError
+        ? "⚠ Profil selesai dianalisa, tetapi live vacancy discovery gagal: " +
+          vacancyLoad.discoveryError
+        : "✓ Profil selesai dianalisa. " +
+          vacancyLoad.indonesiaCount +
+          " vacancy tersedia; screening HANZ berlanjut di background.";
 
   }
 
@@ -4428,6 +4554,68 @@ function scoreJob(job){
    JOB FILTER
 ===================================================== */
 
+
+function renderDiscoveryDiagnostic(){
+
+  const box =
+    document.getElementById(
+      "discoveryDiagnostic"
+    );
+
+  if(!box) return;
+
+  const meta =
+    liveDiscoveryMeta || {};
+
+  const raw =
+    Number(
+      meta.raw_candidate_pool || 0
+    );
+
+  const sources =
+    Number(
+      meta.sources_with_results || 0
+    );
+
+  const attempted =
+    Number(
+      meta.sources_attempted || 0
+    );
+
+  if(meta.error){
+    box.classList.remove("hidden");
+    box.innerHTML =
+      `<strong>Vacancy discovery error:</strong> ${esc(meta.error)}`;
+    return;
+  }
+
+  if(!attempted && !raw){
+    box.classList.add("hidden");
+    box.innerHTML = "";
+    return;
+  }
+
+  box.classList.remove("hidden");
+
+  box.innerHTML = `
+    <strong>HANZ Vacancy Discovery</strong><br>
+    Employer-grade sources with results:
+    ${esc(sources)} / ${esc(attempted)}
+    &nbsp;•&nbsp;
+    Raw candidate-relevant vacancies:
+    ${esc(raw)}
+    &nbsp;•&nbsp;
+    Displayed:
+    ${esc(indonesiaJobs.length)}
+    ${
+      Number(meta.screening_failed_batches || 0) > 0
+        ? `&nbsp;•&nbsp; Background screening failures: ${esc(meta.screening_failed_batches)}`
+        : ""
+    }
+  `;
+}
+
+
 function applyJobFilters(){
 
   if (
@@ -4649,8 +4837,9 @@ function applyJobFilters(){
             b._live_pipeline
           ){
             const priority = {
-              SCREENED_COMPLETE:4,
-              WAITING_REVIEW:3,
+              SCREENED_COMPLETE:5,
+              WAITING_REVIEW:4,
+              DISCOVERED:3,
               UNKNOWN:2,
               BLOCKED:1
             };
@@ -4676,6 +4865,8 @@ function applyJobFilters(){
   renderJobs(
     jobs
   );
+
+  renderDiscoveryDiagnostic();
 
 }
 
