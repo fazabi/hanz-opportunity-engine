@@ -7070,7 +7070,7 @@ function resetProfile(){
 
 
 /* =====================================================
-   DUAL LANGUAGE V1.1 — BAHASA INDONESIA / ENGLISH
+   DUAL LANGUAGE V1.2 — FULL UI / CARDS BAHASA INDONESIA / ENGLISH
    UI-only. Backend machine codes remain unchanged.
 ===================================================== */
 
@@ -7240,7 +7240,56 @@ const I18N = [
   ["Perlu Verifikasi","Verification Required"],
   ["Deadline:","Deadline:"],
   ["Kecocokan","Match"],
-  ["tahun","years"]
+  ["tahun","years"],
+  ["Lowongan","Vacancies"],
+  ["Perusahaan","Companies"],
+  ["Fresh Graduate","Fresh Graduate"],
+  ["Cari lowongan...","Search vacancies..."],
+  ["Status","Status"],
+  ["Sumber","Source"],
+  ["Lokasi","Location"],
+  ["Perusahaan","Company"],
+  ["Lowongan Terverifikasi","Verified Vacancies"],
+  ["Belum Diverifikasi","Not Yet Verified"],
+  ["Menunggu Verifikasi","Pending Verification"],
+  ["Terverifikasi","Verified"],
+  ["Sumber Resmi","Official Source"],
+  ["Buka Lowongan","Open Vacancy"],
+  ["Lihat Detail","View Details"],
+  ["Alasan Kecocokan","Match Reasons"],
+  ["Alasan HANZ memilih lowongan ini","Why HANZ selected this vacancy"],
+  ["Persyaratan Lowongan","Vacancy Requirements"],
+  ["Kualifikasi","Qualifications"],
+  ["Pengalaman Minimum","Minimum Experience"],
+  ["Bidang Studi","Field of Study"],
+  ["Mode Kerja","Work Mode"],
+  ["Level Karier","Career Level"],
+  ["Kelayakan Fresh Graduate","Fresh Graduate Eligibility"],
+  ["Cocok","Suitable"],
+  ["Mungkin Cocok","Possible Match"],
+  ["Perlu Dicek","Needs Verification"],
+  ["Tidak Direkomendasikan","Not Recommended"],
+  ["Sedang mencari lowongan...","Searching for vacancies..."],
+  ["Sedang memuat lowongan...","Loading vacancies..."],
+  ["Menganalisa profil...","Analyzing profile..."],
+  ["Memuat hasil...","Loading results..."],
+  ["Lowongan ditemukan","Vacancies found"],
+  ["Tidak ada lowongan ditemukan","No vacancies found"],
+  ["Sumber employer-grade • verifikasi mungkin masih pending","Employer-grade sources • verification may still be pending"],
+  ["✓ Sumber employer-grade • verifikasi mungkin masih pending","✓ Employer-grade sources • verification may still be pending"],
+  ["HANZ Vacancy Discovery","HANZ Vacancy Discovery"],
+  ["Sumber dengan hasil","Sources with results"],
+  ["Sumber dicoba","Sources attempted"],
+  ["Raw candidate-relevant vacancies","Raw candidate-relevant vacancies"],
+  ["Ditampilkan","Displayed"],
+  ["Kegagalan screening background","Background screening failures"],
+  ["Tidak ada","None"],
+  ["Belum tersedia","Not available"],
+  ["Belum diketahui","Unknown"],
+  ["Ya","Yes"],
+  ["Tidak","No"],
+  ["Global","Global"],
+  ["Indonesia","Indonesia"]
 ];
 
 function i18nPairFor(source){
@@ -7283,6 +7332,23 @@ function translateDynamicString(source,lang){
     return lang === "en" ? `The profile appears suitable and there are no hard failures. Still requires verification: ${m[1]}` : s;
   if ((m=s.match(/^Dipilih:\s*(.+)$/i)))
     return lang === "en" ? `Selected: ${m[1]}` : `Dipilih: ${m[1]}`;
+  if ((m=s.match(/^(\d+)\s+vacancies$/i)))
+    return lang === "en" ? `${m[1]} vacancies` : `${m[1]} lowongan`;
+  if ((m=s.match(/^(\d+)\s+companies$/i)))
+    return lang === "en" ? `${m[1]} companies` : `${m[1]} perusahaan`;
+  if ((m=s.match(/^Raw candidate-relevant vacancies:\s*(\d+)$/i)))
+    return lang === "en" ? `Raw candidate-relevant vacancies: ${m[1]}` : `Lowongan mentah relevan kandidat: ${m[1]}`;
+  if ((m=s.match(/^Displayed:\s*(\d+)$/i)))
+    return lang === "en" ? `Displayed: ${m[1]}` : `Ditampilkan: ${m[1]}`;
+  if ((m=s.match(/^Sources with results:\s*(\d+)\/(\d+)$/i)))
+    return lang === "en" ? `Sources with results: ${m[1]}/${m[2]}` : `Sumber dengan hasil: ${m[1]}/${m[2]}`;
+  if ((m=s.match(/^Background screening failures:\s*(\d+)$/i)))
+    return lang === "en" ? `Background screening failures: ${m[1]}` : `Kegagalan screening background: ${m[1]}`;
+  if (/^DISCOVERED$/i.test(s)) return lang === "en" ? "Discovered" : "Ditemukan";
+  if (/^PENDING$/i.test(s)) return lang === "en" ? "Pending" : "Menunggu";
+  if (/^VERIFIED$/i.test(s)) return lang === "en" ? "Verified" : "Terverifikasi";
+  if (/^UNKNOWN$/i.test(s)) return lang === "en" ? "Unknown" : "Belum diketahui";
+  if (/^OPEN$/i.test(s)) return lang === "en" ? "Open" : "Dibuka";
 
   return s;
 }
