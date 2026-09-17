@@ -11,7 +11,7 @@
 <script>
 (async()=>{
   try{
-    const response=await fetch('./legacy-v2.5.html?v=20260917b',{cache:'no-store'});
+    const response=await fetch('./legacy-v2.5.html?v=20260917c',{cache:'no-store'});
     if(!response.ok) throw new Error('Legacy frontend HTTP '+response.status);
 
     let html=await response.text();
@@ -20,7 +20,8 @@
     // Remove older candidate-profile loaders first so it can never initialize twice.
     html=html.replace(/<script\b[^>]*src=["'][^"']*candidate-profile-v3\.js[^"']*["'][^>]*><\/script>/gi,'');
 
-    const injection='<script src="./candidate-profile-v3.js?v=3.0.2"><\\/script>';
+    // Split the closing tag so this loader's own <script> is never terminated early.
+    const injection='<script src="./candidate-profile-v3.js?v=3.0.3"><'+'/script>';
     if(/<\/body>/i.test(html)){
       html=html.replace(/<\/body>/i,injection+'</body>');
     }else{
