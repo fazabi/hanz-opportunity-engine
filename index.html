@@ -14,7 +14,8 @@
     if(!response.ok) throw new Error('Legacy frontend HTTP '+response.status);
     let html=await response.text();
     const injection='<script src="./candidate-profile-v3.js?v=3.0.0"><\\/script>';
-    if(html.includes('</body>')) html=html.replace('</body>',injection+'</body>');
+    if(html.includes('<script src="candidate-profile-v3.js?v=3.0.1"></script>
+</body>')) html=html.replace('</body>',injection+'</body>');
     else html+=injection;
     document.open();
     document.write(html);
