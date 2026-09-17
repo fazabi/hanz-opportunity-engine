@@ -1,0 +1,25 @@
+name: HANZ V3 Check
+on:
+  push:
+    branches: [hanz-v3-universal-parser]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: JavaScript syntax check
+        run: node --check candidate-profile-v3.js
+      - name: Loader integrity check
+        run: |
+          test -s index.html
+          test -s legacy-v2.5.html
+          grep -q "candidate-profile-v3.js" index.html
+          grep -q "HANZ Opportunity Engine V2.5" legacy-v2.5.html
+      - name: Generic regression policy check
+        run: |
+          grep -q "Marketing / Growth" candidate-profile-v3.js
+          grep -q "Network / Infrastructure" candidate-profile-v3.js
+          grep -q "unknown_is_non_blocking" candidate-profile-v3.js
